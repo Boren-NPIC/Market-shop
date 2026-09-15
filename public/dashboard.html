@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ផ្ទាំងគ្រប់គ្រងម្ចាស់ហាង</title>
+    <title>Seller Dashboard - ផ្ទាំងគ្រប់គ្រងហាង</title>
     <script src="https://cdn.tailwindcss.com"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,737 +20,273 @@
         input,
         select,
         textarea,
-        button,
-        table,
-        th,
-        td {
+        button {
             font-family: 'Khmer OS Siemreap', 'Siemreap', sans-serif !important;
         }
     </style>
 </head>
 
-<body class="p-3 sm:p-6 max-w-7xl mx-auto bg-gray-50 text-gray-800 antialiased min-h-screen">
+<body class="p-3 sm:p-6 max-w-6xl mx-auto bg-gray-50 text-gray-800 antialiased min-h-screen">
 
-    <!-- Header -->
-    <header class="flex justify-between items-center mb-5 bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-        <div>
-            <h1 class="text-lg sm:text-2xl font-black text-indigo-600 tracking-tight" id="shop-name">
-                ផ្ទាំងគ្រប់គ្រងអ្នកលក់</h1>
-            <p class="text-[11px] sm:text-xs text-gray-500">Vendor Management Dashboard</p>
+    <!-- Header & Link ហាងផ្ទាល់ខ្លួន -->
+    <header class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-100 mb-5">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <div>
+                <h1 class="text-lg sm:text-2xl font-black text-indigo-600 tracking-tight" id="dash-store-name">
+                    ផ្ទាំងគ្រប់គ្រងហាង</h1>
+                <p class="text-xs text-gray-500">គ្រប់គ្រងផលិតផល និងការបញ្ជាទិញរបស់ហាងអ្នក</p>
+            </div>
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+                <button onclick="copyMyStoreLink()"
+                    class="flex-1 sm:flex-none bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold px-3.5 py-2 rounded-xl text-xs border border-emerald-200 transition flex items-center justify-center gap-1.5 shadow-sm">
+                    <span>🔗</span>
+                    <span>Copy Link ហាងផ្ញើឱ្យភ្ញៀវ</span>
+                </button>
+                <a href="/"
+                    class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-3 py-2 rounded-xl text-xs transition">
+                    &larr; ទៅទំព័រដើម
+                </a>
+            </div>
         </div>
-        <a href="/"
-            class="text-xs sm:text-sm font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-xl transition">
-            &larr; ទំព័រមុខ
-        </a>
+
+        <!-- បង្ហាញ Link ផ្ទាល់ខ្លួន -->
+        <div
+            class="mt-3 pt-3 border-t flex items-center justify-between bg-indigo-50/50 p-2.5 rounded-xl border border-indigo-100">
+            <span class="text-xs text-indigo-900">
+                Link ហាងរបស់អ្នក៖ <b id="my-store-url" class="font-mono text-indigo-600 underline"></b>
+            </span>
+            <span class="text-[10px] bg-indigo-200 text-indigo-800 px-2 py-0.5 rounded font-bold">Active</span>
+        </div>
     </header>
 
-    <!-- ១. ផ្នែក Upload KHQR របស់ម្ចាស់ហាង -->
+    <!-- ១. ផ្នែក Upload KHQR របស់ហាង -->
     <section class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-100 mb-5">
         <h2 class="font-bold text-sm sm:text-base text-gray-900 mb-0.5">💳 កុងធនាគារ KHQR របស់ហាង</h2>
-        <p class="text-[11px] sm:text-xs text-gray-500 mb-3">Upload រូបភាព KHQR ធនាគារផ្ទាល់ខ្លួន
-            ដើម្បីឱ្យភ្ញៀវស្កេនបាញ់លុយចូលកុងរបស់អ្នក</p>
+        <p class="text-xs text-gray-500 mb-3">Upload KHQR ផ្ទាល់ខ្លួន ដើម្បីឱ្យភ្ញៀវស្កេនបាញ់លុយចូលកុងអ្នក</p>
 
-        <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-            <form id="qr-upload-form"
-                class="w-full sm:w-auto flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center">
-                <input type="file" id="qrImageFile" name="qrImageFile" accept="image/*" required
-                    class="text-xs text-gray-500 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer border rounded-xl p-1 bg-white">
-                <button type="submit" id="btn-upload-qr"
-                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition shadow-sm">
-                    រក្សាទុក KHQR នេះ
-                </button>
-            </form>
-
-            <div id="qr-preview-box"
-                class="hidden flex items-center gap-3 p-2 bg-gray-50 rounded-xl border w-full sm:w-auto">
-                <img id="current-qr-preview" src="" class="w-14 h-14 object-contain border rounded-lg bg-white p-1">
-                <div>
-                    <span class="text-xs text-green-700 font-bold block">✓ KHQR បច្ចុប្បន្នរបស់ហាង</span>
-                    <span class="text-[10px] text-gray-500">ភ្ញៀវនឹងស្កេន QR មួយនេះពេលទូទាត់ប្រាក់</span>
-                </div>
-            </div>
-        </div>
+        <form id="qr-form" class="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+            <input type="file" id="qrImageFile" accept="image/*" required
+                class="text-xs text-gray-500 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer border rounded-xl p-1 bg-white">
+            <button type="submit"
+                class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition shadow-sm">
+                រក្សាទុក KHQR
+            </button>
+        </form>
     </section>
 
-    <!-- ២. ផ្នែកគ្រប់គ្រងការបញ្ជាទិញ (Orders Management) -->
+    <!-- ២. ផ្នែកដាក់លក់ផលិតផលថ្មី -->
     <section class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-100 mb-5">
-        <div class="flex justify-between items-center mb-3">
-            <div>
-                <h2 class="font-bold text-sm sm:text-base text-gray-900 flex items-center gap-2">
-                    <span>🔔 ការបញ្ជាទិញថ្មីៗ</span>
-                    <span id="order-badge"
-                        class="bg-indigo-600 text-white text-[11px] px-2 py-0.5 rounded-full font-bold">0</span>
-                </h2>
-                <p class="text-[11px] text-gray-500">ពិនិត្យវិក្កយបត្រ (Slip) មុននឹងយល់ព្រម ឬបដិសេធ</p>
+        <h2 class="font-bold text-sm sm:text-base text-gray-900 mb-1">📦 បញ្ចូលផលិតផលដាក់លក់</h2>
+        <form id="prod-form" class="space-y-3 mt-3">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="sm:col-span-2">
+                    <label class="block text-xs font-bold text-gray-700 mb-1">ឈ្មោះផលិតផល</label>
+                    <input id="p-title" required placeholder="ឧ. អាវខូវប៊យដៃវែង"
+                        class="w-full border p-2 rounded-xl text-xs bg-white outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">តម្លៃ ($)</label>
+                    <input id="p-price" type="number" step="0.01" required placeholder="18.00"
+                        class="w-full border p-2 rounded-xl text-xs bg-white outline-none">
+                </div>
             </div>
-            <div class="flex gap-1.5">
-                <button onclick="clearAllOrders()"
-                    class="text-[11px] bg-red-50 hover:bg-red-100 text-red-600 border border-red-100 px-2.5 py-1 rounded-lg font-bold transition">
-                    🧹 សម្អាត
-                </button>
-                <button onclick="loadOrders()"
-                    class="text-[11px] bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1 rounded-lg font-bold transition">
-                    🔄 Refresh
-                </button>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">ទំហំក្នុងស្តុក (Sizes)</label>
+                    <input id="p-sizes" required placeholder="S, M, L, XL" value="S, M, L, XL"
+                        class="w-full border p-2 rounded-xl text-xs bg-white outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">រូបភាពផលិតផល</label>
+                    <input id="p-img" type="file" accept="image/*" required onchange="previewProdImg(event)"
+                        class="w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-xs file:bg-indigo-50 file:text-indigo-700 border rounded-xl p-1 bg-white">
+                </div>
             </div>
-        </div>
 
-        <div id="order-cards-mobile" class="block sm:hidden space-y-3"></div>
-
-        <div class="hidden sm:block overflow-x-auto border rounded-xl">
-            <table class="w-full text-left border-collapse text-xs">
-                <thead class="bg-gray-100 text-gray-700 uppercase border-b font-bold">
-                    <tr>
-                        <th class="py-3 px-3">លេខកូដ</th>
-                        <th class="py-3 px-3">អ្នកទិញ</th>
-                        <th class="py-3 px-3">លេខទូរស័ព្ទ</th>
-                        <th class="py-3 px-3">ទំនិញ</th>
-                        <th class="py-3 px-3 text-center">វិក្កយបត្រ (Slip)</th>
-                        <th class="py-3 px-3">ទីតាំង</th>
-                        <th class="py-3 px-3">សរុប</th>
-                        <th class="py-3 px-3">ស្ថានភាព</th>
-                        <th class="py-3 px-3 text-center min-w-[140px]">សកម្មភាព</th>
-                    </tr>
-                </thead>
-                <tbody id="order-rows" class="divide-y divide-gray-100"></tbody>
-            </table>
-        </div>
+            <button type="submit"
+                class="bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-2.5 rounded-xl text-xs transition shadow-sm">
+                + ដាក់លក់ទំនិញ
+            </button>
+        </form>
     </section>
 
-    <!-- ៣. ផ្នែកបញ្ចូលផលិតផលថ្មី (Add Product) -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-5">
-        <section class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-100 md:col-span-3">
-            <h2 class="font-bold mb-1 text-sm sm:text-base text-gray-900">📦 បញ្ចូលផលិតផលថ្មី</h2>
-            <p class="text-[11px] text-gray-500 mb-3">បញ្ចូលព័ត៌មានលម្អិត និងទំហំដែលមានក្នុងស្តុក</p>
-
-            <form id="prod-form" class="space-y-3">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">ប្រភេទផលិតផល</label>
-                        <select id="p-category" onchange="updateSizePlaceholder()"
-                            class="w-full border p-2.5 rounded-xl text-xs sm:text-sm bg-white focus:ring-2 focus:ring-indigo-500 outline-none">
-                            <option value="clothes">ខោអាវ (Clothes)</option>
-                            <option value="shoes">ស្បែកជើង (Shoes)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">ឈ្មោះទំនិញ</label>
-                        <input id="p-title" required placeholder="ឧ. អាវខូវប៊យដៃវែង Jeans"
-                            class="w-full border p-2.5 rounded-xl text-xs sm:text-sm bg-white focus:ring-2 focus:ring-indigo-500 outline-none">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">តម្លៃ ($)</label>
-                        <input id="p-price" type="number" step="0.01" required placeholder="18.00"
-                            class="w-full border p-2.5 rounded-xl text-xs sm:text-sm bg-white focus:ring-2 focus:ring-indigo-500 outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">ចំនួនស្តុកសរុប</label>
-                        <input id="p-stock" type="number" required placeholder="25"
-                            class="w-full border p-2.5 rounded-xl text-xs sm:text-sm bg-white focus:ring-2 focus:ring-indigo-500 outline-none">
-                    </div>
-                    <div class="col-span-2 sm:col-span-1">
-                        <label class="block text-xs font-bold text-indigo-700 mb-1">ទំហំក្នុងស្តុក (Sizes) <span
-                                class="text-red-500">*</span></label>
-                        <input id="p-sizes" required placeholder="S, M, L, XL" value="S, M, L, XL"
-                            class="w-full border border-indigo-200 bg-indigo-50/40 p-2.5 rounded-xl text-xs sm:text-sm font-semibold focus:ring-2 focus:ring-indigo-500 outline-none">
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold text-gray-700 mb-1">ជ្រើសរើសរូបភាពទំនិញ</label>
-                    <input id="p-img-file" type="file" accept="image/*" required onchange="previewUploadImage(event)"
-                        class="w-full text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 cursor-pointer border rounded-xl p-1 bg-white">
-                </div>
-
-                <div id="new-img-preview-box"
-                    class="hidden flex items-center gap-3 p-2 bg-indigo-50/50 rounded-xl border border-indigo-100">
-                    <img id="new-img-preview" src=""
-                        class="w-12 h-12 object-cover rounded-lg border shadow-sm bg-white">
-                    <span class="text-xs text-indigo-700 font-bold">✓ រូបភាពត្រូវបានជ្រើសរើសរួចរាល់!</span>
-                </div>
-
-                <button type="submit" id="btn-add-prod"
-                    class="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition shadow-sm">
-                    + ដាក់លក់ទំនិញ
-                </button>
-            </form>
-        </section>
-    </div>
-
-    <!-- ៤. ផ្នែកគ្រប់គ្រងស្តុកទំនិញ -->
-    <section class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-100 mb-6">
-        <h2 class="font-bold text-sm sm:text-base text-gray-900 mb-1">📊 គ្រប់គ្រងស្តុកទំនិញ</h2>
-        <div id="product-cards-mobile" class="block sm:hidden space-y-3"></div>
-        <div class="hidden sm:block overflow-x-auto border rounded-xl">
-            <table class="w-full text-left border-collapse text-xs">
-                <thead>
-                    <tr class="border-b text-gray-500 uppercase bg-gray-50 font-bold">
-                        <th class="py-2.5 px-3">រូបភាព</th>
-                        <th class="py-2.5 px-3">ឈ្មោះទំនិញ</th>
-                        <th class="py-2.5 px-3">ប្រភេទ</th>
-                        <th class="py-2.5 px-3">ទំហំក្នុងស្តុក (Sizes)</th>
-                        <th class="py-2.5 px-3">តម្លៃ</th>
-                        <th class="py-2.5 px-3">ស្តុក</th>
-                        <th class="py-2.5 px-3 text-center">សកម្មភាព</th>
-                    </tr>
-                </thead>
-                <tbody id="product-rows" class="divide-y divide-gray-100"></tbody>
-            </table>
-        </div>
+    <!-- ៣. បញ្ជីផលិតផលក្នុងហាង -->
+    <section class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-100 mb-5">
+        <h2 class="font-bold text-sm sm:text-base text-gray-900 mb-3">📊 ផលិតផលក្នុងហាងរបស់អ្នក</h2>
+        <div id="product-list" class="space-y-2.5"></div>
     </section>
 
-    <!-- Modal សរសេរសារបដិសេធ Order -->
-    <div id="reject-modal"
-        class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border text-center">
-            <div
-                class="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-2 text-xl font-bold">
-                ✕</div>
-            <h3 class="font-bold text-base text-gray-900 mb-1">បដិសេធការបញ្ជាទិញ</h3>
-            <p class="text-xs text-gray-500 mb-4">សូមសរសេរសារប្រាប់អតិថិជនពីមូលហេតុ</p>
-            <input type="hidden" id="reject-tran-id">
-            <textarea id="reject-reason" rows="3" required placeholder="ឧ. មិនទាន់ឃើញលុយចូលកុងទេ..."
-                class="w-full border border-gray-300 rounded-xl p-3 text-xs bg-gray-50 focus:bg-white focus:ring-2 focus:ring-red-500 outline-none resize-none mb-4"></textarea>
-            <div class="flex gap-2">
-                <button type="button" onclick="closeRejectModal()"
-                    class="w-1/2 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl text-xs transition">បោះបង់</button>
-                <button type="button" onclick="submitRejectOrder()" id="btn-submit-reject"
-                    class="w-1/2 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-xs transition shadow">ផ្ញើសារបដិសេធ</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal សម្រាប់ Edit ទំនិញ -->
-    <div id="edit-modal"
-        class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl border">
-            <div class="flex justify-between items-center pb-3 mb-3 border-b">
-                <h3 class="font-bold text-sm text-gray-800">✏️ កែប្រែព័ត៌មានទំនិញ</h3>
-                <button onclick="closeEditModal()"
-                    class="text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
-            </div>
-            <form id="edit-prod-form" class="space-y-3">
-                <input type="hidden" id="edit-p-id">
-                <div>
-                    <label class="block text-xs font-semibold text-gray-700 mb-1">ឈ្មោះទំនិញ</label>
-                    <input id="edit-p-title" required
-                        class="w-full border rounded-xl p-2 text-xs sm:text-sm bg-white focus:ring-2 focus:ring-indigo-500 outline-none">
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">ប្រភេទ</label>
-                        <select id="edit-p-category"
-                            class="w-full border rounded-xl p-2 text-xs sm:text-sm bg-white focus:ring-2 focus:ring-indigo-500 outline-none">
-                            <option value="clothes">ខោអាវ (Clothes)</option>
-                            <option value="shoes">ស្បែកជើង (Shoes)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">តម្លៃ ($)</label>
-                        <input id="edit-p-price" type="number" step="0.01" required
-                            class="w-full border rounded-xl p-2 text-xs sm:text-sm bg-white focus:ring-2 focus:ring-indigo-500 outline-none">
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">ចំនួនស្តុក</label>
-                        <input id="edit-p-stock" type="number" required
-                            class="w-full border rounded-xl p-2 text-xs sm:text-sm bg-white focus:ring-2 focus:ring-indigo-500 outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-indigo-700 mb-1">ទំហំ (Sizes)</label>
-                        <input id="edit-p-sizes" required placeholder="S, M, L, XL"
-                            class="w-full border border-indigo-200 bg-indigo-50/40 rounded-xl p-2 text-xs sm:text-sm font-semibold focus:ring-2 focus:ring-indigo-500 outline-none">
-                    </div>
-                </div>
-                <div class="flex items-center gap-3 bg-gray-50 p-2 rounded-xl border">
-                    <img id="edit-preview-img" src=""
-                        class="w-12 h-12 object-cover rounded-lg border bg-white shadow-sm">
-                    <div class="flex-1">
-                        <label class="block text-[11px] font-semibold text-gray-700 mb-1">ជ្រើសរើសរូបភាពថ្មី</label>
-                        <input id="edit-p-img-file" type="file" accept="image/*" onchange="previewEditImage(event)"
-                            class="w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-[11px] file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer border rounded-lg p-0.5 bg-white">
-                    </div>
-                </div>
-                <div class="flex gap-2 pt-3 border-t mt-3">
-                    <button type="button" onclick="closeEditModal()"
-                        class="w-1/2 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl text-xs transition">បោះបង់</button>
-                    <button type="submit" id="btn-save-edit"
-                        class="w-1/2 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs transition shadow">រក្សាទុកការកែប្រែ</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal មើលវិក្កយបត្រ Slip Zoom -->
-    <div id="slip-modal"
-        class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-sm w-full p-4 shadow-2xl border text-center">
-            <div class="flex justify-between items-center pb-2 mb-2 border-b">
-                <h3 class="font-bold text-sm text-gray-800">📸 វិក្កយបត្របាញ់ប្រាក់របស់ភ្ញៀវ</h3>
-                <button onclick="closeSlipModal()"
-                    class="text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
-            </div>
-            <img id="slip-full-img" src=""
-                class="w-full max-h-[450px] object-contain rounded-xl border bg-gray-50 mb-3">
-            <button onclick="closeSlipModal()"
-                class="w-full py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl text-xs transition">បិទ</button>
-        </div>
-    </div>
+    <!-- ៤. ផ្នែក Order ការបញ្ជាទិញពីភ្ញៀវ -->
+    <section class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-100">
+        <h2 class="font-bold text-sm sm:text-base text-gray-900 mb-3">🔔 ការបញ្ជាទិញពីអតិថិជន (Orders)</h2>
+        <div id="order-list" class="space-y-3"></div>
+    </section>
 
     <script>
-        // ចាប់យក Secret Key ពី URL (?key=mysecret8888)
         const urlParams = new URLSearchParams(window.location.search);
-        let secretKey = urlParams.get('key') || localStorage.getItem('km_admin_secret_key') || '';
+        let storeSlug = urlParams.get('store') || localStorage.getItem('km_my_store_slug') || 'default';
+        let base64ProdImg = '';
 
-        if (secretKey) {
-            localStorage.setItem('km_admin_secret_key', secretKey);
-        }
+        async function initDashboard() {
+            const storeUrl = `${window.location.origin}/shop/${storeSlug}`;
+            document.getElementById('my-store-url').innerText = storeUrl;
 
-        // Header សម្ងាត់សម្រាប់ហៅ API
-        function getAuthHeaders() {
-            return {
-                'Content-Type': 'application/json',
-                'x-admin-key': secretKey
-            };
-        }
-
-        let allProducts = [];
-        let base64SelectedImg = '';
-        let base64EditImg = '';
-
-        function updateSizePlaceholder() {
-            const cat = document.getElementById('p-category').value;
-            const sizeInput = document.getElementById('p-sizes');
-            if (cat === 'shoes') {
-                sizeInput.placeholder = '39, 40, 41, 42, 43';
-                sizeInput.value = '39, 40, 41, 42';
-            } else {
-                sizeInput.placeholder = 'S, M, L, XL, XXL';
-                sizeInput.value = 'S, M, L, XL';
-            }
-        }
-
-        function previewUploadImage(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    base64SelectedImg = e.target.result;
-                    document.getElementById('new-img-preview').src = base64SelectedImg;
-                    document.getElementById('new-img-preview-box').classList.remove('hidden');
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function previewEditImage(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    base64EditImg = e.target.result;
-                    document.getElementById('edit-preview-img').src = base64EditImg;
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        async function loadDashboardData() {
             try {
-                const resUser = await fetch('/api/user/profile');
-                const user = await resUser.json();
-                document.getElementById('shop-name').innerText = user.name;
-
-                if (user.khqr_image && user.khqr_image.length > 5) {
-                    document.getElementById('current-qr-preview').src = user.khqr_image;
-                    document.getElementById('qr-preview-box').classList.remove('hidden');
+                const res = await fetch(`/api/store/get/${storeSlug}`);
+                if (res.ok) {
+                    const store = await res.json();
+                    document.getElementById('dash-store-name').innerText = store.name;
                 }
-
-                const resProd = await fetch('/api/products');
-                allProducts = await resProd.json();
-
-                document.getElementById('product-rows').innerHTML = allProducts.map(p => {
-                    const imgSrc = p.image || '';
-                    const sizeText = p.attributes?.size || 'M, L';
-                    return `
-                        <tr class="text-xs hover:bg-gray-50 transition">
-                            <td class="py-2.5 px-3"><img src="${imgSrc}" class="w-12 h-12 object-cover rounded-lg shadow-sm border bg-white"></td>
-                            <td class="py-2.5 px-3 font-semibold text-gray-800">${p.title || 'គ្មានឈ្មោះ'}</td>
-                            <td class="py-2.5 px-3"><span class="bg-gray-100 px-2 py-0.5 rounded text-gray-600 font-medium">${p.category}</span></td>
-                            <td class="py-2.5 px-3"><span class="bg-indigo-50 text-indigo-700 px-2 py-1 rounded-md font-bold text-[11px] border border-indigo-100">🏷️ ${sizeText}</span></td>
-                            <td class="py-2.5 px-3 font-bold text-indigo-600">$${Number(p.price || 0).toFixed(2)}</td>
-                            <td class="py-2.5 px-3">${p.stock > 0 ? `<span class="text-green-600 font-bold">${p.stock}</span>` : '<span class="text-red-500 font-bold">អស់ស្តុក</span>'}</td>
-                            <td class="py-2.5 px-3 text-center whitespace-nowrap">
-                                <div class="flex items-center justify-center gap-1.5">
-                                    <button onclick="openEditModal('${p.id}')" class="bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 px-2.5 py-1 rounded-md font-bold transition">✏️ កែ</button>
-                                    <button onclick="deleteProduct('${p.id}')" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-2.5 py-1 rounded-md font-bold transition">🗑️ លុប</button>
-                                </div>
-                            </td>
-                        </tr>
-                    `;
-                }).join('');
-
-                document.getElementById('product-cards-mobile').innerHTML = allProducts.map(p => {
-                    const imgSrc = p.image || '';
-                    const sizeText = p.attributes?.size || 'M, L';
-                    return `
-                        <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex gap-3 items-center">
-                            <img src="${imgSrc}" class="w-16 h-16 object-cover rounded-lg border bg-gray-50 flex-shrink-0">
-                            <div class="flex-1 min-w-0">
-                                <div class="flex justify-between items-start">
-                                    <h3 class="font-bold text-xs text-gray-900 truncate">${p.title || 'គ្មានឈ្មោះ'}</h3>
-                                    <span class="font-black text-xs text-indigo-600 ml-2">$${Number(p.price || 0).toFixed(2)}</span>
-                                </div>
-                                <div class="text-[10px] text-gray-500 mt-0.5">
-                                    ប្រភេទ៖ <span class="uppercase">${p.category}</span> | ស្តុក៖ <b class="${p.stock > 0 ? 'text-green-600' : 'text-red-500'}">${p.stock}</b>
-                                </div>
-                                <div class="mt-1">
-                                    <span class="bg-indigo-50 text-indigo-700 text-[10px] font-bold px-1.5 py-0.5 rounded border border-indigo-100">🏷️ Size: ${sizeText}</span>
-                                </div>
-                                <div class="flex gap-2 mt-2">
-                                    <button onclick="openEditModal('${p.id}')" class="w-1/2 py-1 bg-blue-50 text-blue-600 border border-blue-200 rounded text-[11px] font-bold">✏️ កែប្រែ</button>
-                                    <button onclick="deleteProduct('${p.id}')" class="w-1/2 py-1 bg-red-50 text-red-600 border border-red-200 rounded text-[11px] font-bold">🗑️ លុប</button>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-
-                loadOrders();
             } catch (e) { }
+
+            loadProducts();
+            loadOrders();
+        }
+
+        function copyMyStoreLink() {
+            const link = `${window.location.origin}/shop/${storeSlug}`;
+            navigator.clipboard.writeText(link);
+            alert(`✓ បានចម្លង Link ហាងរបស់អ្នកជោគជ័យ!\n${link}\nអ្នកអាចផ្ញើទៅកាន់ភ្ញៀវបានភ្លាម!`);
+        }
+
+        function previewProdImg(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (ev) => { base64ProdImg = ev.target.result; };
+                reader.readAsDataURL(file);
+            }
         }
 
         document.getElementById('prod-form').onsubmit = async (e) => {
             e.preventDefault();
-            if (!base64SelectedImg) return alert('សូមជ្រើសរើសរូបភាពទំនិញជាមុនសិន!');
+            if (!base64ProdImg) return alert('សូមជ្រើសរើសរូបភាពផលិតផល!');
 
             const payload = {
+                store_slug: storeSlug,
                 title: document.getElementById('p-title').value.trim(),
-                category: document.getElementById('p-category').value,
                 price: document.getElementById('p-price').value,
-                stock: document.getElementById('p-stock').value,
                 sizes: document.getElementById('p-sizes').value.trim(),
-                imageBase64: base64SelectedImg
+                imageBase64: base64ProdImg
             };
 
-            const btn = document.getElementById('btn-add-prod');
-            btn.disabled = true;
-            btn.innerText = 'កំពុងរក្សាទុក...';
+            const res = await fetch('/api/products', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
 
-            try {
-                const res = await fetch('/api/products', {
-                    method: 'POST',
-                    headers: getAuthHeaders(),
-                    body: JSON.stringify(payload)
-                });
-                if (res.ok) {
-                    alert('✓ ដាក់លក់ទំនិញជោគជ័យ!');
-                    document.getElementById('prod-form').reset();
-                    updateSizePlaceholder();
-                    base64SelectedImg = '';
-                    document.getElementById('new-img-preview-box').classList.add('hidden');
-                    loadDashboardData();
-                } else {
-                    alert('មិនអាចដាក់លក់បានទេ');
-                }
-            } catch (err) {
-                alert('បរាជ័យក្នុងការតភ្ជាប់');
-            } finally {
-                btn.disabled = false;
-                btn.innerText = '+ ដាក់លក់ទំនិញ';
+            if (res.ok) {
+                alert('✓ ដាក់លក់ផលិតផលជោគជ័យ!');
+                document.getElementById('prod-form').reset();
+                base64ProdImg = '';
+                loadProducts();
             }
         };
 
-        function openEditModal(prodId) {
-            const p = allProducts.find(item => String(item.id) === String(prodId));
-            if (!p) return;
+        async function loadProducts() {
+            const res = await fetch(`/api/products?slug=${storeSlug}`);
+            const prods = await res.json();
+            const container = document.getElementById('product-list');
 
-            base64EditImg = '';
-            document.getElementById('edit-p-id').value = p.id;
-            document.getElementById('edit-p-title').value = p.title || '';
-            document.getElementById('edit-p-category').value = p.category || 'clothes';
-            document.getElementById('edit-p-price').value = p.price || 0;
-            document.getElementById('edit-p-stock').value = p.stock || 0;
-            document.getElementById('edit-p-sizes').value = p.attributes?.size || 'S, M, L';
-            document.getElementById('edit-preview-img').src = p.image || '';
-            document.getElementById('edit-p-img-file').value = '';
+            if (!prods.length) {
+                container.innerHTML = '<div class="text-xs text-gray-400 text-center py-4">មិនទាន់មានផលិតផលនៅឡើយទេ</div>';
+                return;
+            }
 
-            document.getElementById('edit-modal').classList.remove('hidden');
+            container.innerHTML = prods.map(p => `
+                <div class="flex items-center justify-between p-2.5 bg-gray-50 rounded-xl border">
+                    <div class="flex items-center gap-3">
+                        <img src="${p.image}" class="w-12 h-12 object-cover rounded-lg border bg-white">
+                        <div>
+                            <h4 class="font-bold text-xs text-gray-900">${p.title}</h4>
+                            <span class="text-[11px] text-indigo-600 font-bold">$${Number(p.price).toFixed(2)}</span>
+                            <span class="text-[10px] text-gray-400 ml-2">Size: ${p.attributes?.size}</span>
+                        </div>
+                    </div>
+                    <button onclick="deleteProd('${p.id}')" class="text-xs text-red-500 hover:text-red-700 bg-red-50 px-2.5 py-1 rounded-lg font-bold">លុប</button>
+                </div>
+            `).join('');
         }
 
-        function closeEditModal() {
-            document.getElementById('edit-modal').classList.add('hidden');
+        async function deleteProd(id) {
+            if (!confirm('តើអ្នកចង់លុបទំនិញនេះមែនទេ?')) return;
+            await fetch(`/api/products/${id}`, { method: 'DELETE' });
+            loadProducts();
         }
 
-        document.getElementById('edit-prod-form').onsubmit = async (e) => {
+        document.getElementById('qr-form').onsubmit = async (e) => {
             e.preventDefault();
-            const id = document.getElementById('edit-p-id').value;
+            const file = document.getElementById('qrImageFile').files[0];
+            const fd = new FormData();
+            fd.append('qrImageFile', file);
+            fd.append('slug', storeSlug);
 
-            const payload = {
-                title: document.getElementById('edit-p-title').value.trim(),
-                category: document.getElementById('edit-p-category').value,
-                price: document.getElementById('edit-p-price').value,
-                stock: document.getElementById('edit-p-stock').value,
-                sizes: document.getElementById('edit-p-sizes').value.trim()
-            };
-
-            if (base64EditImg) payload.imageBase64 = base64EditImg;
-
-            const btn = document.getElementById('btn-save-edit');
-            btn.disabled = true;
-            btn.innerText = 'កំពុងរក្សាទុក...';
-
-            try {
-                const res = await fetch(`/api/products/${id}`, {
-                    method: 'PUT',
-                    headers: getAuthHeaders(),
-                    body: JSON.stringify(payload)
-                });
-                if (res.ok) {
-                    alert('✓ បានកែប្រែទំនិញជោគជ័យ!');
-                    closeEditModal();
-                    loadDashboardData();
-                } else {
-                    alert('កំហុសក្នុងការកែប្រែ');
-                }
-            } catch (err) {
-                alert('បរាជ័យក្នុងការតភ្ជាប់');
-            } finally {
-                btn.disabled = false;
-                btn.innerText = 'រក្សាទុកការកែប្រែ';
-            }
+            const res = await fetch('/api/vendor/khqr', { method: 'POST', body: fd });
+            if (res.ok) alert('✓ បាន Upload KHQR របស់ហាងជោគជ័យ!');
         };
-
-        async function deleteProduct(prodId) {
-            if (!confirm('តើអ្នកពិតជាចង់លុបទំនិញនេះចេញពីស្តុកមែនទេ?')) return;
-            try {
-                const res = await fetch(`/api/products/${prodId}`, {
-                    method: 'DELETE',
-                    headers: getAuthHeaders()
-                });
-                if (res.ok) {
-                    alert('✓ បានលុបទំនិញរួចរាល់!');
-                    loadDashboardData();
-                }
-            } catch (err) {
-                alert('បរាជ័យក្នុងការតភ្ជាប់');
-            }
-        }
 
         async function loadOrders() {
-            try {
-                const res = await fetch('/api/admin/orders', {
-                    headers: getAuthHeaders()
-                });
-                if (!res.ok) return;
+            const res = await fetch(`/api/admin/orders?slug=${storeSlug}`);
+            const orders = await res.json();
+            const container = document.getElementById('order-list');
 
-                const orders = await res.json();
-                const tbody = document.getElementById('order-rows');
-                const mobileCards = document.getElementById('order-cards-mobile');
-                const badge = document.getElementById('order-badge');
-
-                if (badge) badge.innerText = orders.length;
-
-                if (!orders.length) {
-                    tbody.innerHTML = '<tr><td colspan="9" class="text-center py-8 text-gray-400 text-xs">មិនទាន់មានការបញ្ជាទិញនៅឡើយទេ</td></tr>';
-                    mobileCards.innerHTML = '<div class="text-center py-6 text-gray-400 text-xs bg-white rounded-xl border">មិនទាន់មានការបញ្ជាទិញនៅឡើយទេ</div>';
-                    return;
-                }
-
-                tbody.innerHTML = orders.map(o => {
-                    const status = (o.status || 'PENDING').toUpperCase();
-                    const isPaid = status === 'PAID';
-                    const isRejected = status === 'REJECTED';
-
-                    const itemsHtml = (o.items && o.items.length > 0)
-                        ? o.items.map(it => `<div class="text-[11px] font-medium">${it.title} (Size: ${it.attributes?.size || 'M'}, x${it.qty || 1})</div>`).join('')
-                        : '<span class="text-gray-400">គ្មានទំនិញ</span>';
-
-                    const slipHtml = o.slipImage
-                        ? `<button onclick="viewSlip('${o.slipImage}')" class="inline-block"><img src="${o.slipImage}" class="w-10 h-12 object-cover rounded border"></button>`
-                        : '<span class="text-red-400 text-[10px]">គ្មាន Slip</span>';
-
-                    let statusBadge = '<span class="text-amber-600 font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">⏳ រង់ចាំ</span>';
-                    if (isPaid) statusBadge = '<span class="text-green-600 font-bold bg-green-50 px-2 py-0.5 rounded border border-green-200">✓ បង់រួច</span>';
-                    if (isRejected) statusBadge = `<span class="text-red-600 font-bold bg-red-50 px-2 py-0.5 rounded border border-red-200">✕ បដិសេធ</span>`;
-
-                    return `
-                        <tr class="hover:bg-gray-50 transition">
-                            <td class="py-2.5 px-3 font-mono text-[11px]">${o.tranId}</td>
-                            <td class="py-2.5 px-3 font-bold">${o.customerName}<br><span class="text-[10px] text-gray-400 font-normal uppercase">${o.bankAccountName || ''}</span></td>
-                            <td class="py-2.5 px-3">${o.phone || '-'}</td>
-                            <td class="py-2.5 px-3">${itemsHtml}</td>
-                            <td class="py-2.5 px-3 text-center">${slipHtml}</td>
-                            <td class="py-2.5 px-3 text-[11px]">${o.deliveryMethod}<br><span class="text-gray-500">${o.address}</span></td>
-                            <td class="py-2.5 px-3 font-bold text-indigo-600">$${o.amount}</td>
-                            <td class="py-2.5 px-3">${statusBadge}</td>
-                            <td class="py-2.5 px-3 text-center whitespace-nowrap">
-                                ${!isPaid && !isRejected ? `
-                                    <div class="flex items-center justify-center gap-1.5">
-                                        <button onclick="confirmOrder('${o.tranId}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded-md text-[11px] font-bold transition shadow-sm">✓ យល់ព្រម</button>
-                                        <button onclick="openRejectModal('${o.tranId}')" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-2.5 py-1 rounded-md text-[11px] font-bold transition">✕ បដិសេធ</button>
-                                    </div>
-                                ` : `<span class="text-gray-400 text-[11px]">${isPaid ? 'រួចរាល់' : 'បានបដិសេធ'}</span>`}
-                            </td>
-                        </tr>
-                    `;
-                }).join('');
-
-                mobileCards.innerHTML = orders.map(o => {
-                    const status = (o.status || 'PENDING').toUpperCase();
-                    const isPaid = status === 'PAID';
-                    const isRejected = status === 'REJECTED';
-
-                    return `
-                        <div class="bg-white p-3.5 rounded-xl border border-gray-200 shadow-sm text-xs">
-                            <div class="flex justify-between items-center pb-2 mb-2 border-b">
-                                <span class="font-mono text-[11px] text-gray-500">${o.tranId}</span>
-                                <span class="${isPaid ? 'bg-green-100 text-green-700' : (isRejected ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700')} font-bold px-2 py-0.5 rounded text-[10px]">
-                                    ${isPaid ? '✓ បង់រួច' : (isRejected ? '✕ បានបដិសេធ' : '⏳ រង់ចាំពិនិត្យ')}
-                                </span>
-                            </div>
-
-                            <div class="flex justify-between items-start mb-2">
-                                <div>
-                                    <div class="font-bold text-gray-900">${o.customerName} (${o.phone || '-'})</div>
-                                    <div class="text-[10px] text-indigo-600 font-bold uppercase mt-0.5">🏦 ${o.bankAccountName || 'មិនបានបញ្ជាក់'}</div>
-                                    <div class="text-[11px] text-gray-500 mt-1">📍 ${o.address} (${o.deliveryMethod})</div>
-                                    ${isRejected && o.rejectReason ? `<div class="mt-1.5 text-[10px] text-red-600 bg-red-50 p-1.5 rounded border border-red-100"><b>មូលហេតុ៖</b> ${o.rejectReason}</div>` : ''}
-                                </div>
-                                <div class="text-right">
-                                    <div class="font-black text-indigo-600 text-sm">$${o.amount}</div>
-                                    ${o.slipImage ? `
-                                        <button onclick="viewSlip('${o.slipImage}')" class="mt-1 inline-block border rounded p-0.5 bg-gray-50">
-                                            <img src="${o.slipImage}" class="w-10 h-12 object-cover rounded">
-                                            <span class="text-[9px] text-indigo-600 block font-bold">មើល Slip</span>
-                                        </button>
-                                    ` : '<span class="text-red-400 text-[9px] block">គ្មាន Slip</span>'}
-                                </div>
-                            </div>
-
-                            ${!isPaid && !isRejected ? `
-                                <div class="flex gap-2 mt-3 pt-2 border-t">
-                                    <button onclick="openRejectModal('${o.tranId}')" class="w-1/2 py-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg text-xs font-bold transition">
-                                        ✕ បដិសេធ
-                                    </button>
-                                    <button onclick="confirmOrder('${o.tranId}')" class="w-1/2 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition shadow-sm">
-                                        ✓ យល់ព្រម
-                                    </button>
-                                </div>
-                            ` : ''}
-                        </div>
-                    `;
-                }).join('');
-
-            } catch (e) { }
-        }
-
-        function viewSlip(slipSrc) {
-            document.getElementById('slip-full-img').src = slipSrc;
-            document.getElementById('slip-modal').classList.remove('hidden');
-        }
-
-        function closeSlipModal() {
-            document.getElementById('slip-modal').classList.add('hidden');
-        }
-
-        function openRejectModal(tranId) {
-            document.getElementById('reject-tran-id').value = tranId;
-            document.getElementById('reject-reason').value = 'មិនទាន់ឃើញលុយចូលកុងទេ សូមពិនិត្យ ឬបាញ់ម្តងទៀត';
-            document.getElementById('reject-modal').classList.remove('hidden');
-        }
-
-        function closeRejectModal() {
-            document.getElementById('reject-modal').classList.add('hidden');
-        }
-
-        async function submitRejectOrder() {
-            const tranId = document.getElementById('reject-tran-id').value;
-            const reason = document.getElementById('reject-reason').value.trim();
-            if (!reason) return alert('សូមសរសេរមូលហេតុនៃការបដិសេធ!');
-
-            const btn = document.getElementById('btn-submit-reject');
-            btn.disabled = true;
-            btn.innerText = 'កំពុងផ្ញើសារ...';
-
-            try {
-                const res = await fetch('/api/admin/orders/reject', {
-                    method: 'POST',
-                    headers: getAuthHeaders(),
-                    body: JSON.stringify({ tranId, reason })
-                });
-
-                if (res.ok) {
-                    alert('✓ បានផ្ញើសារបដិសេធទៅកាន់អតិថិជនរួចរាល់!');
-                    closeRejectModal();
-                    loadOrders();
-                }
-            } catch (e) {
-                alert('បរាជ័យក្នុងការតភ្ជាប់ Server');
-            } finally {
-                btn.disabled = false;
-                btn.innerText = 'ផ្ញើសារបដិសេធ';
+            if (!orders.length) {
+                container.innerHTML = '<div class="text-xs text-gray-400 text-center py-6 bg-gray-50 rounded-xl border">មិនទាន់មានការបញ្ជាទិញនៅឡើយទេ</div>';
+                return;
             }
+
+            container.innerHTML = orders.map(o => `
+                <div class="p-3.5 bg-gray-50 rounded-xl border text-xs">
+                    <div class="flex justify-between items-center pb-2 mb-2 border-b">
+                        <span class="font-mono text-gray-500">${o.tranId}</span>
+                        <span class="font-bold ${o.status === 'PAID' ? 'text-green-600' : (o.status === 'REJECTED' ? 'text-red-600' : 'text-amber-600')}">
+                            ${o.status === 'PAID' ? '✓ បង់រួច' : (o.status === 'REJECTED' ? '✕ បដិសេធ' : '⏳ រង់ចាំពិនិត្យ')}
+                        </span>
+                    </div>
+                    <div class="flex justify-between">
+                        <div>
+                            <div class="font-bold text-gray-900">${o.customerName} (${o.phone})</div>
+                            <div class="text-[11px] text-gray-500">📍 ${o.address}</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-black text-indigo-600 text-sm">$${o.amount}</div>
+                            ${o.slipImage ? `<a href="${o.slipImage}" target="_blank" class="text-[10px] text-indigo-600 underline font-bold">មើល Slip</a>` : ''}
+                        </div>
+                    </div>
+                    ${o.status === 'PENDING' ? `
+                        <div class="flex gap-2 mt-2 pt-2 border-t">
+                            <button onclick="confirmOrder('${o.tranId}')" class="w-1/2 py-1.5 bg-emerald-600 text-white rounded-lg font-bold text-xs">✓ យល់ព្រម</button>
+                            <button onclick="rejectOrder('${o.tranId}')" class="w-1/2 py-1.5 bg-red-50 text-red-600 border border-red-200 rounded-lg font-bold text-xs">✕ បដិសេធ</button>
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
         }
 
         async function confirmOrder(tranId) {
-            const res = await fetch('/api/admin/orders/confirm', {
+            await fetch('/api/admin/orders/confirm', {
                 method: 'POST',
-                headers: getAuthHeaders(),
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ tranId })
             });
-            if (res.ok) {
-                alert('✓ បានយល់ព្រមការទទួលប្រាក់រួចរាល់!');
-                loadOrders();
-            }
+            loadOrders();
         }
 
-        async function clearAllOrders() {
-            if (!confirm('តើអ្នកពិតជាចង់សម្អាត Order ចាស់ៗទាំងអស់ចោលមែនទេ?')) return;
-            const res = await fetch('/api/admin/orders/clear', {
+        async function rejectOrder(tranId) {
+            const reason = prompt('សរសេរមូលហេតុបដិសេធ:', 'មិនទាន់ឃើញលុយចូលកុងទេ');
+            if (!reason) return;
+            await fetch('/api/admin/orders/reject', {
                 method: 'POST',
-                headers: getAuthHeaders()
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tranId, reason })
             });
-            if (res.ok) {
-                alert('បានសម្អាតរួចរាល់!');
-                loadOrders();
-            }
+            loadOrders();
         }
 
-        document.getElementById('qr-upload-form').onsubmit = async (e) => {
-            e.preventDefault();
-            const fileInput = document.getElementById('qrImageFile');
-            if (!fileInput.files[0]) return alert('សូមជ្រើសរើសរូបភាព!');
-
-            const formData = new FormData();
-            formData.append('qrImageFile', fileInput.files[0]);
-
-            const btn = document.getElementById('btn-upload-qr');
-            btn.disabled = true;
-            btn.innerText = 'កំពុង Upload...';
-
-            try {
-                const res = await fetch('/api/vendor/khqr', { method: 'POST', body: formData });
-                const data = await res.json();
-                if (res.ok) {
-                    alert('✓ បាន Upload KHQR ហាងជោគជ័យ!');
-                    document.getElementById('current-qr-preview').src = data.qrImage;
-                    document.getElementById('qr-preview-box').classList.remove('hidden');
-                }
-            } catch (err) {
-                alert('បរាជ័យក្នុងការតភ្ជាប់');
-            } finally {
-                btn.disabled = false;
-                btn.innerText = 'រក្សាទុក KHQR នេះ';
-            }
-        };
-
-        loadDashboardData();
-        setInterval(loadOrders, 3000);
+        initDashboard();
+        setInterval(loadOrders, 4000);
     </script>
 </body>
 

@@ -43,7 +43,7 @@ function readData() {
 
     if (!memoryDB) {
         memoryDB = {
-            users: [{ id: 1, name: "KM-Market", logo: "", owner_email: "", isRegistered: false, khqr_image: "" }],
+            stores: [],
             products: [],
             orders: []
         };
@@ -75,71 +75,142 @@ app.get('/dashboard', (req, res) => res.sendFile(path.join(publicDir, 'dashboard
 app.get('/cart', (req, res) => res.sendFile(path.join(publicDir, 'cart.html')));
 app.get('/checkout', (req, res) => res.sendFile(path.join(publicDir, 'checkout.html')));
 
-// -------------------------------------------------------------
-// SELLER AUTH & SETUP API
-// -------------------------------------------------------------
-app.get('/api/store/profile', (req, res) => {
-    const data = readData();
-    res.json(data.users[0]);
+// Link ហាងផ្ទាល់ខ្លួន សម្រាប់ភ្ញៀវចូលទិញ (ឧ. /shop/boren-store)
+app.get('/shop/:slug', (req, res) => {
+    res.sendFile(path.join(publicDir, 'index.html'));
 });
 
-// Setup ឈ្មោះហាង & Logo ក្រោយពេល Login
-app.post('/api/store/register', (req, res) => {
-    const { email, name, logoBase64 } = req.body || {};
-    if (!email || !name) {
+// -------------------------------------------------------------
+// STORE ONBOARDING & AUTH API
+// -------------------------------------------------------------
+
+// ឆែកមើលហាងតាមរយៈ Slug URL ឬ Email
+app.get('/api/store/get/:slug', (req, res) => {
+    const data = readData();
+    const store = (data.stores || []).find(s => s.slug === req.params.slug);
+    if (!store) return res.status(404).json({ error: 'រកមិនឃើញហាងនេះទេ' });
+    res.json(store);
+});
+
+// បង្កើតហាងថ្មី (Register Store with custom slug & logo)
+app.post('/api/store/create', (req, res) => {
+    const { email, name, slug, logoBase64 } = req.body || {};
+    if (!name || !slug || !email) {
         return res.status(400).json({ error: 'សូមបំពេញព័ត៌មានឱ្យបានគ្រប់គ្រាន់!' });
     }
 
+    const cleanSlug = slug.toLowerCase().replace(/[^a-z0-9-_]/g, '');
     const data = readData();
-    data.users[0] = {
-        ...data.users[0],
-        owner_email: email.trim(),
-        name: name.trim(),
-        logo: logoBase64 || data.users[0].logo || '',
-        isRegistered: true
-    };
-    writeData(data);
+    if (!data.stores) data.stores = [];
 
-    res.json({ status: 'success', store: data.users[0] });
+    let existing = data.stores.find(s => s.slug === cleanSlug && s.email !== email);
+    if (existing) {
+        return res.status(400).json({ error: 'Link ហាងនេះមានគេប្រើរួចហើយ សូមប្តូរថ្មី!' });
+    }
+
+    let store = data.stores.find(s => s.email === email);
+    if (store) {
+        store.name = name.trim();
+        store.slug = cleanSlug;
+        if (logoBase64) store.logo = logoBase64;
+    } else {
+        store = {
+            id: 'STR_' + Date.now(),
+            email: email.trim(),
+            name: name.trim(),
+            slug: cleanSlug,
+            logo: logoBase64 || '',
+            khqr_image: '',
+            createdAt: new Date().toISOString()
+        };
+        data.stores.push(store);
+    }
+
+    writeData(data);
+    res.json({ status: 'success', store });
 });
 
-// KHQR
+// KHQR Upload សម្រាប់ហាង
 app.post('/api/vendor/khqr', upload.single('qrImageFile'), (req, res) => {
+    const storeSlug = req.body.slug;
     if (!req.file) return res.status(400).json({ error: 'សូមជ្រើសរើសរូបភាព!' });
     const qrUrl = '/uploads/' + req.file.filename;
+
     const data = readData();
-    data.users[0].khqr_image = qrUrl;
-    writeData(data);
+    const store = (data.stores || []).find(s => s.slug === storeSlug) || data.stores[0];
+    if (store) {
+        store.khqr_image = qrUrl;
+        writeData(data);
+    }
     res.json({ status: 'success', qrImage: qrUrl });
 });
 
-app.get('/api/user/profile', (req, res) => res.json(readData().users[0]));
-
+// Checkout KHQR Info
 app.get('/api/checkout/vendor-qr', (req, res) => {
+    const storeSlug = req.query.slug;
     const data = readData();
-    const vendor = data.users[0];
-    const qrUrl = (vendor.khqr_image && vendor.khqr_image.length > 5)
-        ? vendor.khqr_image
+    const store = (data.stores || []).find(s => s.slug === storeSlug) || data.stores[0] || {};
+    const qrUrl = (store.khqr_image && store.khqr_image.length > 5)
+        ? store.khqr_image
         : 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=ABA-KHQR-DEMO';
-    res.json({ qrImage: qrUrl, vendorName: vendor.name });
+    res.json({ qrImage: qrUrl, vendorName: store.name || 'ហាងអនឡាញ' });
+});
+
+// Products Filter តាមហាង (Store Slug)
+app.get('/api/products', (req, res) => {
+    const storeSlug = req.query.slug;
+    const data = readData();
+    let prods = data.products || [];
+    if (storeSlug) {
+        prods = prods.filter(p => p.store_slug === storeSlug);
+    }
+    res.json(prods);
+});
+
+app.post('/api/products', (req, res) => {
+    const data = readData();
+    const b = req.body || {};
+    const newProd = {
+        id: Date.now(),
+        store_slug: b.store_slug || 'default',
+        title: (b.title || 'ទំនិញថ្មី').trim(),
+        category: b.category || 'clothes',
+        price: parseFloat(b.price || 0),
+        stock: parseInt(b.stock || 0),
+        attributes: { size: (b.sizes || 'S, M, L').trim() },
+        image: b.imageBase64 || ''
+    };
+
+    if (!data.products) data.products = [];
+    data.products.unshift(newProd);
+    writeData(data);
+    res.json({ status: 'success', product: newProd });
+});
+
+app.delete('/api/products/:id', (req, res) => {
+    const reqId = String(req.params.id);
+    const data = readData();
+    data.products = (data.products || []).filter(p => String(p.id) !== reqId);
+    writeData(data);
+    res.json({ status: 'success' });
 });
 
 // Orders Management
 app.post('/api/checkout/confirm-payment', (req, res) => {
     try {
         const b = req.body || {};
-        if (!b.slipImage) return res.status(400).json({ error: 'សូម Upload រូបភាពវិក្កយបត្របាញ់លុយ!' });
+        if (!b.slipImage) return res.status(400).json({ error: 'សូម Upload រូបភាពវិក្កយបត្រ!' });
 
         const data = readData();
         const tranId = 'TX' + Date.now();
-
         const newOrder = {
             tranId,
+            store_slug: b.store_slug || 'default',
             customerName: (b.customerName || 'អតិថិជន').trim(),
             bankAccountName: (b.bankAccountName || 'មិនបានបញ្ជាក់').trim(),
             phone: (b.phone || '-').trim(),
-            deliveryMethod: (b.deliveryMethod || 'វីរៈប៊ុនថាំ (VET Express)').trim(),
-            address: (b.address && String(b.address).trim() !== '') ? String(b.address).trim() : 'មិនមានអាសយដ្ឋាន',
+            deliveryMethod: (b.deliveryMethod || 'វីរៈប៊ុនថាំ').trim(),
+            address: b.address || 'មិនមានអាសយដ្ឋាន',
             amount: parseFloat(b.amount || 0).toFixed(2),
             items: b.items || [],
             slipImage: b.slipImage,
@@ -153,25 +224,9 @@ app.post('/api/checkout/confirm-payment', (req, res) => {
         writeData(data);
 
         res.json({ status: 'success', tranId });
-    } catch (err) {
-        res.status(500).json({ error: 'កំហុស Server' });
+    } catch (e) {
+        res.status(500).json({ error: 'Server Error' });
     }
-});
-
-app.post('/api/checkout/reupload-slip', (req, res) => {
-    const { tranId, slipImage } = req.body || {};
-    if (!tranId || !slipImage) return res.status(400).json({ error: 'ទិន្នន័យមិនគ្រប់គ្រាន់' });
-
-    const data = readData();
-    const order = (data.orders || []).find(o => o.tranId === tranId);
-    if (!order) return res.status(404).json({ error: 'រកមិនឃើញ Order' });
-
-    order.slipImage = slipImage;
-    order.status = 'PENDING';
-    order.rejectReason = '';
-    writeData(data);
-
-    res.json({ status: 'success' });
 });
 
 app.get('/api/orders/check-status/:tranId', (req, res) => {
@@ -181,7 +236,15 @@ app.get('/api/orders/check-status/:tranId', (req, res) => {
     res.json({ status: order.status, rejectReason: order.rejectReason || '' });
 });
 
-app.get('/api/admin/orders', (req, res) => res.json(readData().orders || []));
+app.get('/api/admin/orders', (req, res) => {
+    const storeSlug = req.query.slug;
+    const data = readData();
+    let orders = data.orders || [];
+    if (storeSlug) {
+        orders = orders.filter(o => o.store_slug === storeSlug);
+    }
+    res.json(orders);
+});
 
 app.post('/api/admin/orders/confirm', (req, res) => {
     const { tranId } = req.body;
@@ -204,72 +267,6 @@ app.post('/api/admin/orders/reject', (req, res) => {
         writeData(data);
     }
     res.json({ message: 'បានបដិសេធ' });
-});
-
-app.post('/api/admin/orders/clear', (req, res) => {
-    const data = readData();
-    data.orders = [];
-    writeData(data);
-    res.json({ status: 'success' });
-});
-
-// Products CRUD
-app.get('/api/products', (req, res) => res.json(readData().products || []));
-
-app.post('/api/products', (req, res) => {
-    const data = readData();
-    const user = data.users[0];
-    const b = req.body || {};
-    const sizes = (b.sizes || b.size || 'S, M, L, XL').trim();
-
-    const newProd = {
-        id: Date.now(),
-        seller_id: user.id,
-        title: (b.title || 'ទំនិញថ្មី').trim(),
-        category: b.category || 'clothes',
-        price: parseFloat(b.price || 0),
-        stock: parseInt(b.stock || 0),
-        attributes: { size: sizes },
-        image: b.imageBase64 || b.image || ''
-    };
-
-    if (!data.products) data.products = [];
-    data.products.unshift(newProd);
-    writeData(data);
-    res.json({ status: 'success', product: newProd });
-});
-
-app.put('/api/products/:id', (req, res) => {
-    const reqId = String(req.params.id);
-    const data = readData();
-    const index = (data.products || []).findIndex(p => String(p.id) === reqId);
-
-    if (index === -1) return res.status(404).json({ error: 'រកមិនឃើញទំនិញ' });
-
-    const currentProd = data.products[index];
-    const b = req.body || {};
-    const sizes = b.sizes !== undefined ? String(b.sizes).trim() : (currentProd.attributes?.size || 'S, M, L');
-
-    data.products[index] = {
-        ...currentProd,
-        title: b.title ? b.title.trim() : currentProd.title,
-        category: b.category || currentProd.category,
-        price: b.price !== undefined ? parseFloat(b.price) : currentProd.price,
-        stock: b.stock !== undefined ? parseInt(b.stock) : currentProd.stock,
-        attributes: { size: sizes },
-        image: b.imageBase64 || currentProd.image
-    };
-
-    writeData(data);
-    res.json({ status: 'success', product: data.products[index] });
-});
-
-app.delete('/api/products/:id', (req, res) => {
-    const reqId = String(req.params.id);
-    const data = readData();
-    data.products = (data.products || []).filter(p => String(p.id) !== reqId);
-    writeData(data);
-    res.json({ status: 'success' });
 });
 
 const PORT = process.env.PORT || 3000;

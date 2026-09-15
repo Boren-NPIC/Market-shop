@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ហាងទំនិញអនឡាញ</title>
+    <title>វេទិកាហាងអនឡាញ</title>
     <script src="https://cdn.tailwindcss.com"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -28,42 +28,37 @@
 
 <body class="bg-gray-50 text-gray-800 antialiased min-h-screen flex flex-col justify-between">
 
-    <!-- Header -->
+    <!-- Header ហាង -->
     <header class="bg-white shadow-sm border-b sticky top-0 z-30">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex justify-between items-center">
 
-            <!-- Logo & ឈ្មោះហាង (Update តាមដែលម្ចាស់ហាងបានដាក់) -->
-            <a href="/" class="flex items-center gap-2.5 select-none">
-                <div id="header-logo-box"
+            <!-- Logo & ឈ្មោះហាង -->
+            <div class="flex items-center gap-2.5">
+                <div id="store-logo-box"
                     class="w-9 h-9 rounded-xl overflow-hidden bg-indigo-50 border border-indigo-100 flex items-center justify-center text-xl font-bold shadow-sm">
-                    <span id="header-logo-emoji">🛍️</span>
-                    <img id="header-logo-img" src="" class="w-full h-full object-cover hidden">
+                    <span id="store-logo-emoji">🛍️</span>
+                    <img id="store-logo-img" src="" class="w-full h-full object-cover hidden">
                 </div>
-                <span id="header-store-name"
-                    class="text-lg sm:text-xl font-black text-indigo-600 tracking-tight">ហាងអនឡាញ</span>
-            </a>
+                <div>
+                    <span id="store-name-display"
+                        class="text-base sm:text-xl font-black text-indigo-600 tracking-tight block">ហាងអនឡាញ</span>
+                    <span id="store-link-preview" class="text-[10px] text-gray-400 font-mono hidden"></span>
+                </div>
+            </div>
 
             <!-- ប៊ូតុងខាងស្តាំ -->
             <div class="flex items-center gap-2 sm:gap-3">
-
-                <!-- ១. ប៊ូតុងសម្រាប់ម្ចាស់ហាងចុច Login / Setup លើកដំបូង -->
-                <button id="btn-seller-login" onclick="openAuthModal()"
-                    class="bg-gray-900 hover:bg-black text-white text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5 shadow-sm">
-                    <span>👤</span>
-                    <span>ម្ចាស់ហាង (Login)</span>
+                <!-- ប៊ូតុងចូលគ្រប់គ្រង / បង្កើតហាង -->
+                <button id="btn-seller-action" onclick="handleSellerButtonClick()"
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 shadow-sm">
+                    <span>🏪</span>
+                    <span id="seller-btn-label">បើកហាងលក់ទំនិញ</span>
                 </button>
 
-                <!-- ២. ប៊ូតុង Dashboard (បង្ហាញតែពេលម្ចាស់ហាងបាន Login & ដាក់ឈ្មោះ Logo រួចរាល់) -->
-                <a id="btn-seller-dashboard" href="/dashboard"
-                    class="hidden bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition items-center gap-1.5 shadow-sm">
-                    <span>⚙️</span>
-                    <span>Dashboard</span>
-                </a>
-
-                <!-- ៣. ប៊ូតុងកន្ត្រកទំនិញរបស់អ្នកទិញ -->
+                <!-- ប៊ូតុងកន្ត្រករបស់អ្នកទិញ -->
                 <a href="/cart.html"
-                    class="relative bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs px-3 sm:px-4 py-2 rounded-xl flex items-center gap-2 transition">
-                    <span>🛒 កន្ត្រក</span>
+                    class="relative bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold text-xs px-3 sm:px-4 py-2 rounded-xl flex items-center gap-2 transition">
+                    <span>🛒</span>
                     <span id="cart-count"
                         class="bg-red-500 text-white text-[11px] px-2 py-0.5 rounded-full font-bold">0</span>
                 </a>
@@ -71,130 +66,44 @@
         </div>
     </header>
 
-    <!-- Main Grid -->
+    <!-- Main Grid ទំនិញក្នុងហាង -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 flex-1 w-full">
-        <div class="mb-5 sm:mb-6">
-            <h1 class="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">ទំនិញទើបដាក់លក់ថ្មីៗ</h1>
-            <p class="text-xs text-gray-500 mt-1">រើសទំនិញដែលអ្នកពេញចិត្ត រួចកុម្ម៉ង់ទិញយ៉ាងងាយស្រួល</p>
+        <div class="mb-5 sm:mb-6 flex justify-between items-end">
+            <div>
+                <h1 class="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">ទំនិញដាក់លក់ក្នុងហាង</h1>
+                <p class="text-xs text-gray-500 mt-0.5">ជ្រើសរើសទំនិញដើម្បីកុម្ម៉ង់ទិញភ្លាមៗ</p>
+            </div>
+            <!-- ប៊ូតុង Copy Link ហាងឱ្យភ្ញៀវ -->
+            <button onclick="copyStoreLink()" id="btn-copy-link"
+                class="hidden text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold px-3 py-1.5 rounded-lg border border-indigo-200 transition">
+                🔗 ចម្លង Link ហាង
+            </button>
         </div>
 
         <div id="product-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5 sm:gap-6">
         </div>
     </main>
 
-    <!-- Modal ជ្រើសរើស Size និងចំនួន ( Buy Options Modal ) -->
-    <div id="option-modal"
-        class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border">
-            <div class="flex gap-3 items-center pb-3 border-b mb-3">
-                <img id="opt-img" src="" class="w-16 h-16 object-cover rounded-xl border bg-gray-50 flex-shrink-0">
-                <div class="flex-1 min-w-0">
-                    <h3 id="opt-title" class="font-bold text-gray-900 text-sm truncate"></h3>
-                    <div id="opt-price" class="text-indigo-600 font-black text-base mt-0.5"></div>
-                    <div id="opt-stock" class="text-[11px] text-gray-500"></div>
-                </div>
-            </div>
-
-            <form id="option-form" class="space-y-4">
-                <input type="hidden" id="opt-prod-id">
-                <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1.5">ជ្រើសរើសទំហំ (Size) <span
-                            class="text-red-500">*</span></label>
-                    <div id="opt-size-container" class="flex flex-wrap gap-2"></div>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1.5">ចំនួន (Quantity)</label>
-                    <div class="flex items-center gap-3">
-                        <div class="flex items-center border rounded-xl overflow-hidden bg-gray-50">
-                            <button type="button" onclick="changeQty(-1)"
-                                class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold transition">-</button>
-                            <input type="number" id="opt-qty" value="1" min="1" readonly
-                                class="w-12 text-center bg-transparent font-bold text-sm outline-none">
-                            <button type="button" onclick="changeQty(1)"
-                                class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold transition">+</button>
-                        </div>
-                        <span class="text-xs text-gray-400">សរុប៖ <b id="opt-total-price"
-                                class="text-indigo-600">$0.00</b></span>
-                    </div>
-                </div>
-
-                <div class="flex gap-2 pt-2 border-t">
-                    <button type="button" onclick="closeOptionModal()"
-                        class="w-1/2 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold transition">
-                        បោះបង់
-                    </button>
-                    <button type="submit"
-                        class="w-1/2 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow">
-                        ដាក់ចូលកន្ត្រក
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal បង្ហាញព័ត៌មានលម្អិត -->
-    <div id="detail-modal"
-        class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border text-center">
-            <div class="w-full h-56 rounded-xl overflow-hidden bg-gray-50 mb-3 border">
-                <img id="modal-img" src="" class="w-full h-full object-cover">
-            </div>
-            <span id="modal-category"
-                class="bg-gray-100 text-gray-600 text-[10px] font-bold px-2 py-0.5 rounded uppercase"></span>
-            <h3 id="modal-title" class="font-bold text-gray-900 text-base mt-2"></h3>
-            <div id="modal-price" class="text-xl font-black text-indigo-600 my-1"></div>
-            <div id="modal-stock" class="text-xs text-gray-500 mb-4"></div>
-            <div class="flex gap-2">
-                <button onclick="closeDetailModal()"
-                    class="w-1/2 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold transition">បិទ</button>
-                <button id="modal-buy-btn"
-                    class="w-1/2 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition">ជ្រើសរើសទិញ</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Popup បញ្ជាក់ពេលដាក់ចូលកន្ត្រក -->
-    <div id="confirm-cart-modal"
-        class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border text-center">
-            <div
-                class="w-14 h-14 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl font-bold">
-                ✓</div>
-            <h3 class="font-bold text-base text-gray-800 mb-1">បានបញ្ចូលទៅក្នុងកន្ត្រក!</h3>
-            <p id="confirm-item-title" class="text-xs text-gray-500 mb-5 line-clamp-2 px-2"></p>
-            <div class="flex gap-3">
-                <button onclick="closeConfirmModal()"
-                    class="w-1/2 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl text-xs transition">ទិញបន្ត</button>
-                <a href="/cart.html"
-                    class="w-1/2 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs transition shadow flex items-center justify-center gap-1">ទៅកន្ត្រក
-                    &rarr;</a>
-            </div>
-        </div>
-    </div>
-
     <!-- ============================================================= -->
-    <!-- MODAL ម្ចាស់ហាង: SIGN IN WITH GOOGLE -> ដាក់ឈ្មោះហាង & LOGO -->
+    <!-- MODAL ចូលគណនី -> បង្កើតឈ្មោះហាង, LOGO, និង LINK ផ្ទាល់ខ្លួន -->
     <!-- ============================================================= -->
-    <div id="seller-auth-modal"
+    <div id="store-modal"
         class="fixed inset-0 bg-black/70 backdrop-blur-md hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border text-left">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border text-left">
             <div class="flex justify-between items-center pb-3 border-b mb-4">
                 <h3 class="font-black text-base text-gray-900 flex items-center gap-2">
                     <span>🏪</span>
-                    <span id="modal-step-title">ចូលគណនីម្ចាស់ហាង</span>
+                    <span id="modal-title">ចូលគណនីដើម្បីបើកហាង</span>
                 </h3>
-                <button onclick="closeAuthModal()"
-                    class="text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
+                <button onclick="closeStoreModal()"
+                    class="text-gray-400 hover:text-gray-600 text-2xl font-bold">&times;</button>
             </div>
 
-            <!-- ដំណាក់កាលទី ១៖ Sign In with Google / Email -->
-            <div id="step-signin">
-                <p class="text-xs text-gray-500 mb-4">សូមចូលគណនីដើម្បីបង្កើត និងគ្រប់គ្រងហាងអនឡាញរបស់អ្នក</p>
-
-                <!-- ប៊ូតុង Google Sign In -->
+            <!-- ដំណាក់កាលទី ១: Login / Google Sign In -->
+            <div id="step-auth">
+                <p class="text-xs text-gray-500 mb-4">សូមចូលគណនីរបស់អ្នកដើម្បីបង្កើត និងគ្រប់គ្រងហាង</p>
                 <button onclick="handleGoogleSignIn()" type="button"
-                    class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 hover:bg-gray-50 py-3 px-4 rounded-xl shadow-sm text-xs font-bold text-gray-700 transition">
+                    class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 hover:bg-gray-50 py-2.5 px-4 rounded-xl shadow-sm text-xs font-bold text-gray-700 transition mb-3">
                     <svg class="w-4 h-4" viewBox="0 0 24 24">
                         <path fill="#4285F4"
                             d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -208,56 +117,60 @@
                     <span>Sign in with Google</span>
                 </button>
 
-                <div class="flex items-center my-4">
+                <div class="flex items-center my-3">
                     <div class="flex-1 border-t"></div>
-                    <span class="px-2 text-[10px] text-gray-400 font-bold uppercase">ឬ ចូលតាម Email</span>
+                    <span class="px-2 text-[10px] text-gray-400 font-bold uppercase">ឬ តាម Email</span>
                     <div class="flex-1 border-t"></div>
                 </div>
 
-                <form id="email-login-form" class="space-y-3">
-                    <input type="email" id="login-email-input" required placeholder="name@gmail.com"
+                <form id="email-auth-form" class="space-y-3">
+                    <input type="email" id="auth-email-input" required placeholder="name@gmail.com"
                         class="w-full border rounded-xl p-2.5 text-xs bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none">
                     <button type="submit"
                         class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs transition">
-                        បន្តទៅជំហានបន្ទាប់ &rarr;
+                        បន្តទៅបង្កើតហាង &rarr;
                     </button>
                 </form>
             </div>
 
-            <!-- ដំណាក់កាលទី ២៖ បញ្ចូលឈ្មោះហាង & Upload Logo ហាង -->
-            <div id="step-setup-store" class="hidden">
-                <div class="bg-indigo-50/60 p-2.5 rounded-xl border border-indigo-100 text-[11px] text-indigo-700 mb-3">
-                    គណនីម្ចាស់ហាង៖ <b id="display-auth-email" class="font-mono"></b>
-                </div>
-
-                <form id="store-profile-form" class="space-y-3.5">
+            <!-- ដំណាក់កាលទី ២: បញ្ចូលឈ្មោះហាង, Logo, និងបង្កើត Link ផ្ទាល់ខ្លួន -->
+            <div id="step-create-store" class="hidden">
+                <form id="create-store-form" class="space-y-3.5">
                     <div>
                         <label class="block text-xs font-bold text-gray-700 mb-1">ឈ្មោះហាងរបស់អ្នក <span
                                 class="text-red-500">*</span></label>
-                        <input type="text" id="setup-store-name" required
-                            placeholder="ឧ. បូរិន ម៉ូដទាន់សម័យ (Boren Store)"
+                        <input type="text" id="str-name" onkeyup="autoGenerateSlug()" required
+                            placeholder="ឧ. បូរិន ម៉ូដទាន់សម័យ"
                             class="w-full border rounded-xl p-2.5 text-xs bg-white focus:ring-2 focus:ring-indigo-500 outline-none">
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">រូបភាព Logo ហាង <span
-                                class="text-red-500">*</span></label>
-                        <input type="file" id="setup-store-logo" accept="image/*" required
-                            onchange="previewSetupLogo(event)"
-                            class="w-full text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer border rounded-xl p-1 bg-white">
+                        <label class="block text-xs font-bold text-gray-700 mb-1">បង្កើត Link ហាងផ្ទាល់ខ្លួន (Store URL)
+                            <span class="text-red-500">*</span></label>
+                        <div
+                            class="flex items-center border rounded-xl overflow-hidden bg-gray-50 px-2.5 border-gray-300">
+                            <span class="text-[11px] text-gray-400 font-mono">.../shop/</span>
+                            <input type="text" id="str-slug" required placeholder="boren-store"
+                                class="w-full bg-transparent py-2.5 text-xs font-mono font-bold text-indigo-700 outline-none">
+                        </div>
+                        <span class="text-[10px] text-gray-400 block mt-1">ភ្ញៀវនឹងចូលទិញតាម Link នេះ (ប្រើតែអក្សរតូច
+                            និងលេខ)</span>
+                    </div>
 
-                        <div id="setup-logo-preview-box"
-                            class="hidden mt-2.5 flex items-center gap-3 p-2 bg-gray-50 rounded-xl border">
-                            <img id="setup-logo-preview" src=""
-                                class="w-12 h-12 object-cover rounded-lg border bg-white">
-                            <span class="text-xs text-green-600 font-bold">✓ បានជ្រើសរើស Logo រួចរាល់</span>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">រូបភាព Logo ហាង</label>
+                        <input type="file" id="str-logo" accept="image/*" onchange="previewLogo(event)"
+                            class="w-full text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer border rounded-xl p-1 bg-white">
+                        <div id="logo-preview-box"
+                            class="hidden mt-2 flex items-center gap-2 p-1.5 bg-gray-50 rounded-lg border">
+                            <img id="logo-preview-img" src="" class="w-10 h-10 object-cover rounded-lg border">
+                            <span class="text-[11px] text-green-600 font-bold">✓ បានជ្រើសរើស Logo</span>
                         </div>
                     </div>
 
-                    <button type="submit" id="btn-finish-setup"
-                        class="w-full mt-2 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1.5">
-                        <span>🚀</span>
-                        <span>បញ្ចប់ការរៀបចំ & បើក Dashboard</span>
+                    <button type="submit" id="btn-submit-store"
+                        class="w-full mt-2 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-xl text-xs transition shadow-md">
+                        🚀 បង្កើតហាង & ចូល Dashboard &rarr;
                     </button>
                 </form>
             </div>
@@ -265,295 +178,296 @@
         </div>
     </div>
 
+    <!-- Modal ជ្រើសរើសទិញ -->
+    <div id="buy-modal"
+        class="fixed inset-0 bg-black/50 backdrop-blur-xs hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border">
+            <div class="flex gap-3 items-center pb-3 border-b mb-3">
+                <img id="buy-img" src="" class="w-16 h-16 object-cover rounded-xl border bg-gray-50 flex-shrink-0">
+                <div class="flex-1 min-w-0">
+                    <h3 id="buy-title" class="font-bold text-gray-900 text-sm truncate"></h3>
+                    <div id="buy-price" class="text-indigo-600 font-black text-base mt-0.5"></div>
+                </div>
+            </div>
+
+            <form id="buy-form" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">ទំហំ (Size)</label>
+                    <div id="buy-sizes" class="flex flex-wrap gap-1.5"></div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">ចំនួន</label>
+                    <div class="flex items-center gap-2">
+                        <button type="button" onclick="changeQty(-1)"
+                            class="w-8 h-8 bg-gray-100 rounded-lg border font-bold">-</button>
+                        <input id="buy-qty" type="number" value="1" readonly
+                            class="w-12 text-center text-xs font-bold border rounded-lg h-8">
+                        <button type="button" onclick="changeQty(1)"
+                            class="w-8 h-8 bg-gray-100 rounded-lg border font-bold">+</button>
+                    </div>
+                </div>
+                <div class="flex gap-2 pt-2 border-t">
+                    <button type="button" onclick="closeBuyModal()"
+                        class="w-1/2 py-2.5 bg-gray-100 text-gray-700 rounded-xl text-xs font-bold">បោះបង់</button>
+                    <button type="submit"
+                        class="w-1/2 py-2.5 bg-indigo-600 text-white rounded-xl text-xs font-bold shadow">ដាក់ចូលកន្ត្រក</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         const CART_KEY = 'km_market_cart';
-        const SELLER_AUTH_KEY = 'km_seller_authenticated_email';
-
+        const SELLER_STORE_KEY = 'km_my_store_slug';
         let currentAuthEmail = '';
-        let base64StoreLogo = '';
-        let productList = [];
+        let base64Logo = '';
+        let storeSlugFromUrl = '';
+        let allProducts = [];
+        let selectedProduct = null;
         let selectedSize = '';
-        let currentProduct = null;
 
-        // ពិនិត្យស្ថានភាពហាងពី Server
-        async function loadStoreProfile() {
-            try {
-                const res = await fetch('/api/store/profile');
-                const store = await res.json();
-
-                if (store.name) {
-                    document.getElementById('header-store-name').innerText = store.name;
-                    document.title = store.name;
-                }
-
-                if (store.logo && store.logo.length > 10) {
-                    document.getElementById('header-logo-img').src = store.logo;
-                    document.getElementById('header-logo-img').classList.remove('hidden');
-                    document.getElementById('header-logo-emoji').classList.add('hidden');
-                }
-
-                // បើម្ចាស់ហាងធ្លាប់ Login ក្នុង Browser នេះរួចហើយ
-                const savedEmail = localStorage.getItem(SELLER_AUTH_KEY);
-                if (savedEmail && store.isRegistered) {
-                    document.getElementById('btn-seller-login').classList.add('hidden');
-                    document.getElementById('btn-seller-dashboard').classList.remove('hidden');
-                    document.getElementById('btn-seller-dashboard').classList.add('flex');
-                } else {
-                    document.getElementById('btn-seller-login').classList.remove('hidden');
-                    document.getElementById('btn-seller-dashboard').classList.add('hidden');
-                    document.getElementById('btn-seller-dashboard').classList.remove('flex');
-                }
-            } catch (e) { }
+        // ចាប់យក Store Slug ពី URL (/shop/boren-store)
+        const pathParts = window.location.pathname.split('/');
+        if (pathParts[1] === 'shop' && pathParts[2]) {
+            storeSlugFromUrl = pathParts[2].trim();
         }
 
-        function openAuthModal() {
-            document.getElementById('seller-auth-modal').classList.remove('hidden');
-            document.getElementById('step-signin').classList.remove('hidden');
-            document.getElementById('step-setup-store').classList.add('hidden');
-            document.getElementById('modal-step-title').innerText = 'ចូលគណនីម្ចាស់ហាង';
+        async function initPage() {
+            // បើភ្ញៀវចូលតាម Link ហាងជាក់លាក់ (/shop/xxx)
+            if (storeSlugFromUrl) {
+                try {
+                    const res = await fetch(`/api/store/get/${storeSlugFromUrl}`);
+                    if (res.ok) {
+                        const store = await res.json();
+                        document.getElementById('store-name-display').innerText = store.name;
+                        document.title = store.name;
+                        if (store.logo) {
+                            document.getElementById('store-logo-img').src = store.logo;
+                            document.getElementById('store-logo-img').classList.remove('hidden');
+                            document.getElementById('store-logo-emoji').classList.add('hidden');
+                        }
+                    }
+                } catch (e) { }
+            }
+
+            // ពិនិត្យមើលថាតើអ្នកប្រើប្រាស់ជាម្ចាស់ហាងឬអត់
+            const myStoreSlug = localStorage.getItem(SELLER_STORE_KEY);
+            if (myStoreSlug) {
+                document.getElementById('seller-btn-label').innerText = '⚙️ Dashboard';
+                document.getElementById('btn-copy-link').classList.remove('hidden');
+            }
+
+            loadProducts();
+            updateCartCount();
         }
 
-        function closeAuthModal() {
-            document.getElementById('seller-auth-modal').classList.add('hidden');
-        }
-
-        // Sign In with Google (Mock Auth ងាយស្រួល និងរហ័ស)
-        function handleGoogleSignIn() {
-            const mockName = prompt('សូមបញ្ចូលឈ្មោះគណនី Google របស់អ្នក (ឧ. Chan Boren):', 'Chan Boren');
-            if (!mockName) return;
-
-            currentAuthEmail = (mockName.toLowerCase().replace(/\s+/g, '') || 'seller') + '@gmail.com';
-            goToStepSetup(currentAuthEmail, 'ហាង ' + mockName);
-        }
-
-        document.getElementById('email-login-form').onsubmit = (e) => {
-            e.preventDefault();
-            currentAuthEmail = document.getElementById('login-email-input').value.trim();
-            goToStepSetup(currentAuthEmail, '');
-        };
-
-        function goToStepSetup(email, defaultStoreName) {
-            document.getElementById('step-signin').classList.add('hidden');
-            document.getElementById('step-setup-store').classList.remove('hidden');
-            document.getElementById('modal-step-title').innerText = 'រៀបចំឈ្មោះហាង & Logo';
-            document.getElementById('display-auth-email').innerText = email;
-            if (defaultStoreName) {
-                document.getElementById('setup-store-name').value = defaultStoreName;
+        function handleSellerButtonClick() {
+            const myStoreSlug = localStorage.getItem(SELLER_STORE_KEY);
+            if (myStoreSlug) {
+                window.location.href = `/dashboard?store=${myStoreSlug}`;
+            } else {
+                openStoreModal();
             }
         }
 
-        function previewSetupLogo(event) {
+        function openStoreModal() {
+            document.getElementById('store-modal').classList.remove('hidden');
+            document.getElementById('step-auth').classList.remove('hidden');
+            document.getElementById('step-create-store').classList.add('hidden');
+        }
+
+        function closeStoreModal() {
+            document.getElementById('store-modal').classList.add('hidden');
+        }
+
+        function handleGoogleSignIn() {
+            const name = prompt('ចូលគណនី Google (បញ្ចូលឈ្មោះរបស់អ្នក):', 'Boren');
+            if (name) {
+                currentAuthEmail = (name.toLowerCase().replace(/\s+/g, '') || 'owner') + '@gmail.com';
+                goToStoreSetup(name);
+            }
+        }
+
+        document.getElementById('email-auth-form').onsubmit = (e) => {
+            e.preventDefault();
+            currentAuthEmail = document.getElementById('auth-email-input').value.trim();
+            goToStoreSetup('');
+        };
+
+        function goToStoreSetup(name) {
+            document.getElementById('step-auth').classList.add('hidden');
+            document.getElementById('step-create-store').classList.remove('hidden');
+            document.getElementById('modal-title').innerText = 'បង្កើតឈ្មោះហាង និង Link ផ្ទាល់ខ្លួន';
+            if (name) {
+                document.getElementById('str-name').value = 'ហាង ' + name;
+                autoGenerateSlug();
+            }
+        }
+
+        function autoGenerateSlug() {
+            const name = document.getElementById('str-name').value;
+            const slugInput = document.getElementById('str-slug');
+            const generated = name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
+            if (generated) slugInput.value = generated;
+        }
+
+        function previewLogo(event) {
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function (e) {
-                    base64StoreLogo = e.target.result;
-                    document.getElementById('setup-logo-preview').src = base64StoreLogo;
-                    document.getElementById('setup-logo-preview-box').classList.remove('hidden');
+                    base64Logo = e.target.result;
+                    document.getElementById('logo-preview-img').src = base64Logo;
+                    document.getElementById('logo-preview-box').classList.remove('hidden');
                 };
                 reader.readAsDataURL(file);
             }
         }
 
-        // បញ្ចប់ការ Setup ឈ្មោះហាង និង Logo -> រួចបើក Dashboard
-        document.getElementById('store-profile-form').onsubmit = async (e) => {
+        // Save & Create Store
+        document.getElementById('create-store-form').onsubmit = async (e) => {
             e.preventDefault();
-            const storeName = document.getElementById('setup-store-name').value.trim();
+            const name = document.getElementById('str-name').value.trim();
+            const slug = document.getElementById('str-slug').value.trim();
 
-            if (!base64StoreLogo) {
-                return alert('សូមជ្រើសរើសរូបភាព Logo ហាងជាមុនសិន!');
-            }
-
-            const btn = document.getElementById('btn-finish-setup');
+            const btn = document.getElementById('btn-submit-store');
             btn.disabled = true;
             btn.innerText = 'កំពុងបង្កើតហាង...';
 
             try {
-                const res = await fetch('/api/store/register', {
+                const res = await fetch('/api/store/create', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         email: currentAuthEmail,
-                        name: storeName,
-                        logoBase64: base64StoreLogo
+                        name,
+                        slug,
+                        logoBase64: base64Logo
                     })
                 });
 
+                const data = await res.json();
                 if (res.ok) {
-                    localStorage.setItem(SELLER_AUTH_KEY, currentAuthEmail);
-                    alert('✓ អបអរសាទរ! ហាងត្រូវបានបង្កើតជោគជ័យ។ ប្រព័ន្ធនឹងនាំអ្នកទៅកាន់ Dashboard ឥឡូវនេះ!');
-                    window.location.href = '/dashboard';
+                    localStorage.setItem(SELLER_STORE_KEY, slug);
+                    alert(`✓ អបអរសាទរ! ហាងរបស់អ្នកត្រូវបានបង្កើតជោគជ័យ។\nLink ហាងផ្ទាល់ខ្លួនរបស់អ្នកគឺ៖ ${window.location.origin}/shop/${slug}`);
+                    window.location.href = `/dashboard?store=${slug}`;
                 } else {
-                    alert('កំហុសក្នុងការចុះឈ្មោះ');
+                    alert(data.error || 'កំហុសក្នុងការបង្កើតហាង');
                 }
             } catch (err) {
                 alert('បរាជ័យក្នុងការតភ្ជាប់ Server');
             } finally {
                 btn.disabled = false;
-                btn.innerText = '🚀 បញ្ចប់ការរៀបចំ & បើក Dashboard';
+                btn.innerText = '🚀 បង្កើតហាង & ចូល Dashboard →';
             }
         };
 
-        // Cart & Products
-        function getCart() {
-            try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch (e) { return []; }
-        }
-
-        function saveCart(cart) {
-            localStorage.setItem(CART_KEY, JSON.stringify(cart));
-            updateCartCount();
-        }
-
-        function updateCartCount() {
-            const cart = getCart();
-            const totalQty = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
-            const countEl = document.getElementById('cart-count');
-            if (countEl) countEl.innerText = totalQty;
+        function copyStoreLink() {
+            const slug = storeSlugFromUrl || localStorage.getItem(SELLER_STORE_KEY);
+            if (!slug) return;
+            const link = `${window.location.origin}/shop/${slug}`;
+            navigator.clipboard.writeText(link);
+            alert(`✓ បានចម្លង Link ហាងរបស់អ្នក:\n${link}\nអ្នកអាចយកទៅផ្ញើឱ្យភ្ញៀវទិញបាន!`);
         }
 
         async function loadProducts() {
             try {
-                const res = await fetch('/api/products');
-                productList = await res.json();
+                const querySlug = storeSlugFromUrl || localStorage.getItem(SELLER_STORE_KEY) || '';
+                const res = await fetch(`/api/products?slug=${querySlug}`);
+                allProducts = await res.json();
                 const grid = document.getElementById('product-grid');
 
-                if (!productList || !productList.length) {
-                    grid.innerHTML = '<div class="col-span-full text-center py-12 text-gray-400 text-sm">មិនទាន់មានទំនិញដាក់លក់នៅឡើយទេ</div>';
+                if (!allProducts.length) {
+                    grid.innerHTML = '<div class="col-span-full text-center py-12 text-gray-400 text-xs">មិនទាន់មានទំនិញដាក់លក់ក្នុងហាងនេះនៅឡើយទេ</div>';
                     return;
                 }
 
-                grid.innerHTML = productList.map(p => {
-                    const prodImg = p.image || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500';
-                    return `
-                        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition p-3 sm:p-3.5 flex flex-col justify-between">
-                            <div>
-                                <div class="w-full h-36 sm:h-44 rounded-xl overflow-hidden bg-gray-50 mb-2.5 sm:mb-3 border border-gray-100">
-                                    <img src="${prodImg}" alt="${p.title}" class="w-full h-full object-cover">
-                                </div>
-                                <span class="bg-gray-100 text-gray-600 text-[10px] font-bold px-2 py-0.5 rounded uppercase">${p.category || 'clothes'}</span>
-                                <h3 class="font-bold text-gray-800 text-xs sm:text-sm mt-1.5 line-clamp-1">${p.title || 'គ្មានឈ្មោះ'}</h3>
-                                <div class="text-sm sm:text-base font-black text-indigo-600 mt-1">$${Number(p.price || 0).toFixed(2)}</div>
-                            </div>
-                            <div class="mt-3 sm:mt-4 flex gap-1.5 sm:gap-2">
-                                <button onclick="openDetailModal('${p.id}')" class="w-1/2 border border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50 text-gray-700 text-[11px] sm:text-xs font-bold py-1.5 sm:py-2 rounded-xl transition">លម្អិត</button>
-                                <button onclick="openOptionModal('${p.id}')" class="w-1/2 bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] sm:text-xs font-bold py-1.5 sm:py-2 rounded-xl transition">ទិញ</button>
-                            </div>
+                grid.innerHTML = allProducts.map(p => `
+                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-3 flex flex-col justify-between">
+                        <div>
+                            <img src="${p.image || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=300'}" class="w-full h-36 object-cover rounded-xl mb-2 bg-gray-50 border">
+                            <h3 class="font-bold text-xs text-gray-800 truncate">${p.title}</h3>
+                            <div class="text-sm font-black text-indigo-600 mt-1">$${Number(p.price || 0).toFixed(2)}</div>
                         </div>
-                    `;
-                }).join('');
-
-                updateCartCount();
-            } catch (err) { }
+                        <button onclick="openBuyModal('${p.id}')" class="w-full mt-3 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-1.5 rounded-xl transition">
+                            ទិញ
+                        </button>
+                    </div>
+                `).join('');
+            } catch (e) { }
         }
 
-        function openOptionModal(id) {
-            currentProduct = productList.find(item => String(item.id) === String(id));
-            if (!currentProduct) return;
+        function openBuyModal(id) {
+            selectedProduct = allProducts.find(p => String(p.id) === String(id));
+            if (!selectedProduct) return;
 
-            document.getElementById('opt-prod-id').value = currentProduct.id;
-            document.getElementById('opt-title').innerText = currentProduct.title || 'គ្មានឈ្មោះ';
-            document.getElementById('opt-img').src = currentProduct.image || '';
-            document.getElementById('opt-price').innerText = '$' + Number(currentProduct.price || 0).toFixed(2);
-            document.getElementById('opt-stock').innerText = 'ស្តុកនៅសល់៖ ' + (currentProduct.stock || 0);
+            document.getElementById('buy-title').innerText = selectedProduct.title;
+            document.getElementById('buy-price').innerText = '$' + Number(selectedProduct.price || 0).toFixed(2);
+            document.getElementById('buy-img').src = selectedProduct.image || '';
 
-            const attr = currentProduct.attributes || {};
-            let sizes = attr.size ? String(attr.size).split(',').map(s => s.trim()) : ['S', 'M', 'L', 'XL'];
-            selectedSize = sizes[0] || 'Standard';
+            const sizes = (selectedProduct.attributes?.size || 'S, M, L').split(',');
+            selectedSize = sizes[0]?.trim() || 'Standard';
 
-            document.getElementById('opt-size-container').innerHTML = sizes.map((s, idx) => `
-                <button type="button" onclick="selectSize('${s}', this)" 
-                    class="size-btn px-3 py-1.5 border rounded-lg text-xs font-bold transition ${idx === 0 ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'}">
-                    ${s}
+            document.getElementById('buy-sizes').innerHTML = sizes.map((s, idx) => `
+                <button type="button" onclick="selectSize('${s.trim()}', this)" 
+                    class="size-btn px-2.5 py-1 text-xs border rounded-lg font-bold ${idx === 0 ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700'}">
+                    ${s.trim()}
                 </button>
             `).join('');
 
-            document.getElementById('opt-qty').value = 1;
-            updateTotalPrice();
-            document.getElementById('option-modal').classList.remove('hidden');
+            document.getElementById('buy-qty').value = 1;
+            document.getElementById('buy-modal').classList.remove('hidden');
         }
 
         function selectSize(size, el) {
             selectedSize = size;
-            document.querySelectorAll('.size-btn').forEach(btn => {
-                btn.className = 'size-btn px-3 py-1.5 border rounded-lg text-xs font-bold transition bg-white text-gray-700 border-gray-200 hover:bg-gray-50';
-            });
-            el.className = 'size-btn px-3 py-1.5 border rounded-lg text-xs font-bold transition bg-indigo-600 text-white border-indigo-600 shadow-sm';
+            document.querySelectorAll('.size-btn').forEach(b => b.className = 'size-btn px-2.5 py-1 text-xs border rounded-lg font-bold bg-white text-gray-700');
+            el.className = 'size-btn px-2.5 py-1 text-xs border rounded-lg font-bold bg-indigo-600 text-white border-indigo-600';
         }
 
-        function changeQty(delta) {
-            const input = document.getElementById('opt-qty');
-            let val = parseInt(input.value) + delta;
-            if (val < 1) val = 1;
-            if (currentProduct && currentProduct.stock && val > currentProduct.stock) val = currentProduct.stock;
-            input.value = val;
-            updateTotalPrice();
+        function changeQty(d) {
+            const el = document.getElementById('buy-qty');
+            let v = parseInt(el.value) + d;
+            if (v < 1) v = 1;
+            el.value = v;
         }
 
-        function updateTotalPrice() {
-            if (!currentProduct) return;
-            const qty = parseInt(document.getElementById('opt-qty').value || 1);
-            document.getElementById('opt-total-price').innerText = '$' + ((currentProduct.price || 0) * qty).toFixed(2);
+        function closeBuyModal() {
+            document.getElementById('buy-modal').classList.add('hidden');
         }
 
-        function closeOptionModal() {
-            document.getElementById('option-modal').classList.add('hidden');
-        }
-
-        document.getElementById('option-form').onsubmit = (e) => {
+        document.getElementById('buy-form').onsubmit = (e) => {
             e.preventDefault();
-            if (!currentProduct) return;
-            const qty = parseInt(document.getElementById('opt-qty').value || 1);
-            let cart = getCart();
-            const itemKey = `${currentProduct.id}_${selectedSize}`;
-            const existingIndex = cart.findIndex(item => item.itemKey === itemKey);
+            if (!selectedProduct) return;
 
-            if (existingIndex > -1) {
-                cart[existingIndex].qty += qty;
-            } else {
-                cart.push({
-                    itemKey: itemKey,
-                    id: currentProduct.id,
-                    title: currentProduct.title,
-                    price: parseFloat(currentProduct.price || 0),
-                    image: currentProduct.image || '',
-                    attributes: { size: selectedSize },
-                    qty: qty
-                });
-            }
+            const qty = parseInt(document.getElementById('buy-qty').value || 1);
+            let cart = [];
+            try { cart = JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch (e) { }
 
-            saveCart(cart);
-            closeOptionModal();
-            document.getElementById('confirm-item-title').innerText = `ទំនិញ «${currentProduct.title}» (Size: ${selectedSize}, ចំនួន: ${qty}) ត្រូវបានដាក់ចូលកន្ត្រក។`;
-            document.getElementById('confirm-cart-modal').classList.remove('hidden');
+            cart.push({
+                itemKey: `${selectedProduct.id}_${selectedSize}`,
+                id: selectedProduct.id,
+                title: selectedProduct.title,
+                price: parseFloat(selectedProduct.price || 0),
+                image: selectedProduct.image || '',
+                attributes: { size: selectedSize },
+                qty,
+                store_slug: storeSlugFromUrl || selectedProduct.store_slug || 'default'
+            });
+
+            localStorage.setItem(CART_KEY, JSON.stringify(cart));
+            updateCartCount();
+            closeBuyModal();
+            alert('✓ បានដាក់ចូលកន្ត្រកទំនិញ!');
         };
 
-        function closeConfirmModal() {
-            document.getElementById('confirm-cart-modal').classList.add('hidden');
+        function updateCartCount() {
+            let cart = [];
+            try { cart = JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch (e) { }
+            document.getElementById('cart-count').innerText = cart.reduce((s, it) => s + (it.qty || 1), 0);
         }
 
-        function openDetailModal(id) {
-            const p = productList.find(item => String(item.id) === String(id));
-            if (!p) return;
-            document.getElementById('modal-img').src = p.image || '';
-            document.getElementById('modal-category').innerText = p.category || 'clothes';
-            document.getElementById('modal-title').innerText = p.title || 'គ្មានឈ្មោះ';
-            document.getElementById('modal-price').innerText = '$' + Number(p.price || 0).toFixed(2);
-            document.getElementById('modal-stock').innerText = 'នៅក្នុងស្តុក៖ ' + (p.stock || 0) + ' មុខ';
-            document.getElementById('modal-buy-btn').onclick = function () {
-                closeDetailModal();
-                openOptionModal(p.id);
-            };
-            document.getElementById('detail-modal').classList.remove('hidden');
-        }
-
-        function closeDetailModal() {
-            document.getElementById('detail-modal').classList.add('hidden');
-        }
-
-        // Init
-        loadStoreProfile();
-        updateCartCount();
-        loadProducts();
+        initPage();
     </script>
 </body>
 
