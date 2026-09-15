@@ -119,6 +119,7 @@
                 <img id="vendor-qr-img" src="" alt="KHQR" class="w-60 h-60 object-contain mx-auto rounded-lg">
             </div>
 
+            <!-- ប្រអប់ Upload វិក្កយបត្រ -->
             <div class="bg-indigo-50/60 border-2 border-dashed border-indigo-200 rounded-xl p-4 mb-4 text-left">
                 <label class="block text-xs font-bold text-indigo-900 mb-1">
                     📸 ភ្ជាប់រូបភាពវិក្កយបត្របាញ់លុយ (Payment Slip) <span class="text-red-500">*</span>
@@ -158,7 +159,7 @@
             </div>
         </div>
 
-        <!-- ដំណាក់កាលទី ៤: ផ្ទាំងពេលហាងបដិសេធ (Rejected Box) -->
+        <!-- ដំណាក់កាលទី ៤: ផ្ទាំងពេលហាងបដិសេធ -->
         <div id="step-rejected" class="hidden text-center border-t pt-5">
             <div
                 class="w-14 h-14 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-2 text-2xl font-black">
@@ -170,7 +171,7 @@
                 <p id="reject-reason-text" class="text-xs text-red-700 font-medium"></p>
             </div>
 
-            <!-- ប្រអប់ Upload វិក្កយបត្រថ្មីឡើងវិញ -->
+            <!-- ប្រអប់ Upload វិក្កយបត្រថ្មី -->
             <div class="bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl p-4 mb-4 text-left">
                 <label class="block text-xs font-bold text-gray-800 mb-1">
                     📸 ផ្ញើរូបភាពវិក្កយបត្រថ្មីឡើងវិញ
@@ -191,7 +192,7 @@
             </button>
         </div>
 
-        <!-- ដំណាក់កាលទី ៥: ជោគជ័យ (PAID) -->
+        <!-- ដំណាក់កាលទី ៥: ជោគជ័យ -->
         <div id="step-success" class="hidden text-center border-t pt-5">
             <div
                 class="w-14 h-14 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-2 text-2xl font-black">
@@ -216,6 +217,9 @@
         const amount = cart.reduce((sum, item) => sum + ((item.price || 0) * (item.qty || 1)), 0);
         document.getElementById('display-amount').innerText = amount.toFixed(2);
 
+        // ទាញយក store_slug ពីទំនិញក្នុងកន្ត្រក
+        const targetStoreSlug = (cart[0] && cart[0].store_slug) ? cart[0].store_slug : 'default';
+
         let base64Slip = '';
         let base64Reupload = '';
         let customerInfo = {};
@@ -227,6 +231,7 @@
             if (!cart.length) return alert('កន្ត្រកទំនិញនៅទទេ!');
 
             customerInfo = {
+                store_slug: targetStoreSlug,
                 customerName: document.getElementById('name').value.trim(),
                 bankAccountName: document.getElementById('bank-acc-name').value.trim(),
                 phone: document.getElementById('phone').value.trim(),
@@ -237,7 +242,7 @@
             };
 
             try {
-                const res = await fetch('/api/checkout/vendor-qr');
+                const res = await fetch(`/api/checkout/vendor-qr?slug=${targetStoreSlug}`);
                 if (res.ok) {
                     const data = await res.json();
                     document.getElementById('vendor-qr-img').src = data.qrImage;
@@ -301,7 +306,11 @@
             btn.disabled = true;
             btn.innerText = 'កំពុងផ្ញើទិន្នន័យ...';
 
-            const payload = { ...customerInfo, slipImage: base64Slip };
+            const payload = {
+                ...customerInfo,
+                store_slug: targetStoreSlug,
+                slipImage: base64Slip
+            };
 
             try {
                 const res = await fetch('/api/checkout/confirm-payment', {
@@ -340,29 +349,22 @@
                 const res = await fetch(`/api/orders/check-status/${activeTranId}`);
                 if (res.ok) {
                     const data = await res.json();
-
-                    // ករណីម្ចាស់ហាងយល់ព្រម
                     if (data.status === 'PAID') {
                         clearInterval(pollInterval);
                         document.getElementById('step-waiting').classList.add('hidden');
                         document.getElementById('step-rejected').classList.add('hidden');
                         document.getElementById('step-success').classList.remove('hidden');
                         localStorage.removeItem(CART_KEY);
-                    }
-                    // ករណីម្ចាស់ហាងបដិសេធ (លោតសារប្រាប់ភ្ញៀវ)
-                    else if (data.status === 'REJECTED') {
+                    } else if (data.status === 'REJECTED') {
                         clearInterval(pollInterval);
                         document.getElementById('step-waiting').classList.add('hidden');
                         document.getElementById('step-rejected').classList.remove('hidden');
-                        document.getElementById('reject-reason-text').innerText = data.rejectReason || 'វិក្កយបត្រមិនត្រឹមត្រូវ ឬមិនទាន់ទទួលបានប្រាក់';
+                        document.getElementById('reject-reason-text').innerText = data.rejectReason || 'វិក្កយបត្រមិនត្រឹមត្រូវ';
                     }
                 }
-            } catch (e) {
-                console.error(e);
-            }
+            } catch (e) { }
         }
 
-        // ផ្ញើវិក្កយបត្រថ្មីឡើងវិញ
         async function submitReuploadSlip() {
             if (!base64Reupload) return alert('សូមជ្រើសរើសរូបភាពវិក្កយបត្រថ្មីជាមុនសិន!');
 
@@ -385,8 +387,6 @@
                     document.getElementById('reslip-preview-box').classList.add('hidden');
                     document.getElementById('reupload-slip-file').value = '';
                     startPolling();
-                } else {
-                    alert('បរាជ័យក្នុងការផ្ញើ');
                 }
             } catch (e) {
                 alert('បរាជ័យក្នុងការតភ្ជាប់');

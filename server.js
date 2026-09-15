@@ -37,6 +37,9 @@ function readData() {
     try {
         if (fs.existsSync(DATA_FILE)) {
             memoryDB = JSON.parse(fs.readFileSync(DATA_FILE, 'utf-8'));
+            if (!memoryDB.stores) memoryDB.stores = [];
+            if (!memoryDB.products) memoryDB.products = [];
+            if (!memoryDB.orders) memoryDB.orders = [];
             return memoryDB;
         }
     } catch (e) { }
@@ -75,16 +78,11 @@ app.get('/dashboard', (req, res) => res.sendFile(path.join(publicDir, 'dashboard
 app.get('/cart', (req, res) => res.sendFile(path.join(publicDir, 'cart.html')));
 app.get('/checkout', (req, res) => res.sendFile(path.join(publicDir, 'checkout.html')));
 
-// Link ហាងផ្ទាល់ខ្លួន សម្រាប់ភ្ញៀវចូលទិញ (ឧ. /shop/boren-store)
 app.get('/shop/:slug', (req, res) => {
     res.sendFile(path.join(publicDir, 'index.html'));
 });
 
-// -------------------------------------------------------------
-// STORE ONBOARDING & AUTH API
-// -------------------------------------------------------------
-
-// ឆែកមើលហាងតាមរយៈ Slug URL ឬ Email
+// Store Info API
 app.get('/api/store/get/:slug', (req, res) => {
     const data = readData();
     const store = (data.stores || []).find(s => s.slug === req.params.slug);
@@ -92,7 +90,6 @@ app.get('/api/store/get/:slug', (req, res) => {
     res.json(store);
 });
 
-// បង្កើតហាងថ្មី (Register Store with custom slug & logo)
 app.post('/api/store/create', (req, res) => {
     const { email, name, slug, logoBase64 } = req.body || {};
     if (!name || !slug || !email) {
@@ -101,17 +98,10 @@ app.post('/api/store/create', (req, res) => {
 
     const cleanSlug = slug.toLowerCase().replace(/[^a-z0-9-_]/g, '');
     const data = readData();
-    if (!data.stores) data.stores = [];
 
-    let existing = data.stores.find(s => s.slug === cleanSlug && s.email !== email);
-    if (existing) {
-        return res.status(400).json({ error: 'Link ហាងនេះមានគេប្រើរួចហើយ សូមប្តូរថ្មី!' });
-    }
-
-    let store = data.stores.find(s => s.email === email);
+    let store = data.stores.find(s => s.slug === cleanSlug);
     if (store) {
         store.name = name.trim();
-        store.slug = cleanSlug;
         if (logoBase64) store.logo = logoBase64;
     } else {
         store = {
@@ -130,7 +120,7 @@ app.post('/api/store/create', (req, res) => {
     res.json({ status: 'success', store });
 });
 
-// KHQR Upload សម្រាប់ហាង
+// KHQR Upload API
 app.post('/api/vendor/khqr', upload.single('qrImageFile'), (req, res) => {
     const storeSlug = req.body.slug;
     if (!req.file) return res.status(400).json({ error: 'សូមជ្រើសរើសរូបភាព!' });
@@ -145,7 +135,6 @@ app.post('/api/vendor/khqr', upload.single('qrImageFile'), (req, res) => {
     res.json({ status: 'success', qrImage: qrUrl });
 });
 
-// Checkout KHQR Info
 app.get('/api/checkout/vendor-qr', (req, res) => {
     const storeSlug = req.query.slug;
     const data = readData();
@@ -156,13 +145,14 @@ app.get('/api/checkout/vendor-qr', (req, res) => {
     res.json({ qrImage: qrUrl, vendorName: store.name || 'ហាងអនឡាញ' });
 });
 
-// Products Filter តាមហាង (Store Slug)
+// Products API (គាំទ្រ Stock)
 app.get('/api/products', (req, res) => {
     const storeSlug = req.query.slug;
     const data = readData();
     let prods = data.products || [];
-    if (storeSlug) {
-        prods = prods.filter(p => p.store_slug === storeSlug);
+    if (storeSlug && storeSlug !== 'undefined' && storeSlug !== 'null') {
+        const filtered = prods.filter(p => p.store_slug === storeSlug);
+        if (filtered.length > 0) return res.json(filtered);
     }
     res.json(prods);
 });
@@ -176,15 +166,28 @@ app.post('/api/products', (req, res) => {
         title: (b.title || 'ទំនិញថ្មី').trim(),
         category: b.category || 'clothes',
         price: parseFloat(b.price || 0),
-        stock: parseInt(b.stock || 0),
+        stock: parseInt(b.stock !== undefined ? b.stock : 10), // ចំនួនស្តុកកំណត់ដោយម្ចាស់ហាង
         attributes: { size: (b.sizes || 'S, M, L').trim() },
         image: b.imageBase64 || ''
     };
 
-    if (!data.products) data.products = [];
     data.products.unshift(newProd);
     writeData(data);
     res.json({ status: 'success', product: newProd });
+});
+
+// កែប្រែចំនួនស្តុកទំនិញរហ័ស (Quick Update Stock)
+app.put('/api/products/:id/stock', (req, res) => {
+    const reqId = String(req.params.id);
+    const { stock } = req.body;
+    const data = readData();
+    const prod = (data.products || []).find(p => String(p.id) === reqId);
+
+    if (!prod) return res.status(404).json({ error: 'រកមិនឃើញទំនិញ' });
+    prod.stock = Math.max(0, parseInt(stock || 0));
+    writeData(data);
+
+    res.json({ status: 'success', stock: prod.stock });
 });
 
 app.delete('/api/products/:id', (req, res) => {
@@ -203,13 +206,14 @@ app.post('/api/checkout/confirm-payment', (req, res) => {
 
         const data = readData();
         const tranId = 'TX' + Date.now();
+
         const newOrder = {
             tranId,
             store_slug: b.store_slug || 'default',
             customerName: (b.customerName || 'អតិថិជន').trim(),
             bankAccountName: (b.bankAccountName || 'មិនបានបញ្ជាក់').trim(),
             phone: (b.phone || '-').trim(),
-            deliveryMethod: (b.deliveryMethod || 'វីរៈប៊ុនថាំ').trim(),
+            deliveryMethod: (b.deliveryMethod || 'វីរៈប៊ុនថាំ (VET Express)').trim(),
             address: b.address || 'មិនមានអាសយដ្ឋាន',
             amount: parseFloat(b.amount || 0).toFixed(2),
             items: b.items || [],
@@ -219,7 +223,6 @@ app.post('/api/checkout/confirm-payment', (req, res) => {
             createdAt: new Date().toLocaleTimeString('km-KH')
         };
 
-        if (!data.orders) data.orders = [];
         data.orders.unshift(newOrder);
         writeData(data);
 
@@ -227,6 +230,22 @@ app.post('/api/checkout/confirm-payment', (req, res) => {
     } catch (e) {
         res.status(500).json({ error: 'Server Error' });
     }
+});
+
+app.post('/api/checkout/reupload-slip', (req, res) => {
+    const { tranId, slipImage } = req.body || {};
+    if (!tranId || !slipImage) return res.status(400).json({ error: 'ទិន្នន័យមិនគ្រប់គ្រាន់' });
+
+    const data = readData();
+    const order = (data.orders || []).find(o => o.tranId === tranId);
+    if (!order) return res.status(404).json({ error: 'រកមិនឃើញ Order' });
+
+    order.slipImage = slipImage;
+    order.status = 'PENDING';
+    order.rejectReason = '';
+    writeData(data);
+
+    res.json({ status: 'success' });
 });
 
 app.get('/api/orders/check-status/:tranId', (req, res) => {
@@ -240,18 +259,31 @@ app.get('/api/admin/orders', (req, res) => {
     const storeSlug = req.query.slug;
     const data = readData();
     let orders = data.orders || [];
-    if (storeSlug) {
-        orders = orders.filter(o => o.store_slug === storeSlug);
+
+    if (storeSlug && storeSlug !== 'default' && storeSlug !== 'undefined') {
+        const storeOrders = orders.filter(o => o.store_slug === storeSlug);
+        if (storeOrders.length > 0) return res.json(storeOrders);
     }
     res.json(orders);
 });
 
+// នៅពេលយល់ព្រមទទួលប្រាក់ កាត់ស្តុកទំនិញស្វ័យប្រវត្តិ
 app.post('/api/admin/orders/confirm', (req, res) => {
     const { tranId } = req.body;
     const data = readData();
     const order = (data.orders || []).find(o => o.tranId === tranId);
     if (order) {
         order.status = 'PAID';
+
+        // កាត់ស្តុកទំនិញដែលបានលក់
+        if (order.items && order.items.length) {
+            order.items.forEach(it => {
+                const prod = (data.products || []).find(p => String(p.id) === String(it.id));
+                if (prod && prod.stock !== undefined) {
+                    prod.stock = Math.max(0, prod.stock - (it.qty || 1));
+                }
+            });
+        }
         writeData(data);
     }
     res.json({ message: 'ជោគជ័យ' });

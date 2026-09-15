@@ -34,7 +34,7 @@
             <div>
                 <h1 class="text-lg sm:text-2xl font-black text-indigo-600 tracking-tight" id="dash-store-name">
                     ផ្ទាំងគ្រប់គ្រងហាង</h1>
-                <p class="text-xs text-gray-500">គ្រប់គ្រងផលិតផល និងការបញ្ជាទិញរបស់ហាងអ្នក</p>
+                <p class="text-xs text-gray-500">គ្រប់គ្រងស្តុកទំនិញ ផលិតផល និងការបញ្ជាទិញ</p>
             </div>
             <div class="flex items-center gap-2 w-full sm:w-auto">
                 <button onclick="copyMyStoreLink()"
@@ -49,7 +49,6 @@
             </div>
         </div>
 
-        <!-- បង្ហាញ Link ផ្ទាល់ខ្លួន -->
         <div
             class="mt-3 pt-3 border-t flex items-center justify-between bg-indigo-50/50 p-2.5 rounded-xl border border-indigo-100">
             <span class="text-xs text-indigo-900">
@@ -77,34 +76,46 @@
     <!-- ២. ផ្នែកដាក់លក់ផលិតផលថ្មី -->
     <section class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-100 mb-5">
         <h2 class="font-bold text-sm sm:text-base text-gray-900 mb-1">📦 បញ្ចូលផលិតផលដាក់លក់</h2>
+        <p class="text-xs text-gray-500 mb-3">បញ្ចូលឈ្មោះ តម្លៃ ចំនួនស្តុក និងទំហំដែលមានក្នុងស្តុក</p>
+
         <form id="prod-form" class="space-y-3 mt-3">
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div class="sm:col-span-2">
-                    <label class="block text-xs font-bold text-gray-700 mb-1">ឈ្មោះផលិតផល</label>
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                <div class="sm:col-span-6">
+                    <label class="block text-xs font-bold text-gray-700 mb-1">ឈ្មោះផលិតផល <span
+                            class="text-red-500">*</span></label>
                     <input id="p-title" required placeholder="ឧ. អាវខូវប៊យដៃវែង"
-                        class="w-full border p-2 rounded-xl text-xs bg-white outline-none">
+                        class="w-full border p-2 rounded-xl text-xs bg-white outline-none focus:border-indigo-500">
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1">តម្លៃ ($)</label>
+                <div class="sm:col-span-3">
+                    <label class="block text-xs font-bold text-gray-700 mb-1">តម្លៃ ($) <span
+                            class="text-red-500">*</span></label>
                     <input id="p-price" type="number" step="0.01" required placeholder="18.00"
-                        class="w-full border p-2 rounded-xl text-xs bg-white outline-none">
+                        class="w-full border p-2 rounded-xl text-xs bg-white outline-none focus:border-indigo-500">
+                </div>
+                <div class="sm:col-span-3">
+                    <label class="block text-xs font-bold text-emerald-700 mb-1">ចំនួនក្នុងស្តុក (Stock) <span
+                            class="text-red-500">*</span></label>
+                    <input id="p-stock" type="number" min="0" required placeholder="20" value="20"
+                        class="w-full border-2 border-emerald-400 bg-emerald-50/50 p-2 rounded-xl text-xs font-bold text-emerald-900 outline-none focus:border-emerald-600">
                 </div>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1">ទំហំក្នុងស្តុក (Sizes)</label>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">ទំហំក្នុងស្តុក (Sizes) <span
+                            class="text-red-500">*</span></label>
                     <input id="p-sizes" required placeholder="S, M, L, XL" value="S, M, L, XL"
-                        class="w-full border p-2 rounded-xl text-xs bg-white outline-none">
+                        class="w-full border p-2 rounded-xl text-xs bg-white outline-none focus:border-indigo-500">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1">រូបភាពផលិតផល</label>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">រូបភាពផលិតផល <span
+                            class="text-red-500">*</span></label>
                     <input id="p-img" type="file" accept="image/*" required onchange="previewProdImg(event)"
                         class="w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-xs file:bg-indigo-50 file:text-indigo-700 border rounded-xl p-1 bg-white">
                 </div>
             </div>
 
-            <button type="submit"
+            <button type="submit" id="btn-submit-prod"
                 class="bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-2.5 rounded-xl text-xs transition shadow-sm">
                 + ដាក់លក់ទំនិញ
             </button>
@@ -113,13 +124,32 @@
 
     <!-- ៣. បញ្ជីផលិតផលក្នុងហាង -->
     <section class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-100 mb-5">
-        <h2 class="font-bold text-sm sm:text-base text-gray-900 mb-3">📊 ផលិតផលក្នុងហាងរបស់អ្នក</h2>
+        <div class="flex justify-between items-center mb-3">
+            <div>
+                <h2 class="font-bold text-sm sm:text-base text-gray-900">📊 ផលិតផល & ស្តុកទំនិញក្នុងហាងរបស់អ្នក</h2>
+                <p class="text-xs text-gray-500">ពិនិត្យចំនួនស្តុក ឬចុចប៊ូតុង + / - ដើម្បីកែប្រែចំនួនស្តុកភ្លាមៗ</p>
+            </div>
+            <button onclick="loadProducts()"
+                class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-3 py-1 rounded-lg transition">
+                🔄 Refresh ស្តុក
+            </button>
+        </div>
         <div id="product-list" class="space-y-2.5"></div>
     </section>
 
-    <!-- ៤. ផ្នែក Order ការបញ្ជាទិញពីភ្ញៀវ -->
+    <!-- ៤. ផ្នែក Order ការបញ្ជាទិញពីភ្ញៀវ (មានរូប និងទំហំ Size ច្បាស់ៗ) -->
     <section class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-100">
-        <h2 class="font-bold text-sm sm:text-base text-gray-900 mb-3">🔔 ការបញ្ជាទិញពីអតិថិជន (Orders)</h2>
+        <div class="flex justify-between items-center mb-3">
+            <h2 class="font-bold text-sm sm:text-base text-gray-900 flex items-center gap-2">
+                <span>🔔 ការបញ្ជាទិញពីអតិថិជន (Orders)</span>
+                <span id="order-count-badge"
+                    class="bg-indigo-600 text-white text-[11px] px-2 py-0.5 rounded-full font-bold">0</span>
+            </h2>
+            <button onclick="loadOrders()"
+                class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-3 py-1 rounded-lg transition">
+                🔄 Refresh Orders
+            </button>
+        </div>
         <div id="order-list" class="space-y-3"></div>
     </section>
 
@@ -163,55 +193,124 @@
             e.preventDefault();
             if (!base64ProdImg) return alert('សូមជ្រើសរើសរូបភាពផលិតផល!');
 
+            const stockVal = parseInt(document.getElementById('p-stock').value || 0);
+
             const payload = {
                 store_slug: storeSlug,
                 title: document.getElementById('p-title').value.trim(),
                 price: document.getElementById('p-price').value,
+                stock: stockVal,
                 sizes: document.getElementById('p-sizes').value.trim(),
                 imageBase64: base64ProdImg
             };
 
-            const res = await fetch('/api/products', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+            const btn = document.getElementById('btn-submit-prod');
+            btn.disabled = true;
+            btn.innerText = 'កំពុងរក្សាទុក...';
 
-            if (res.ok) {
-                alert('✓ ដាក់លក់ផលិតផលជោគជ័យ!');
-                document.getElementById('prod-form').reset();
-                base64ProdImg = '';
-                loadProducts();
+            try {
+                const res = await fetch('/api/products', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    alert('✓ ដាក់លក់ផលិតផល និងកំណត់ស្តុកជោគជ័យ!');
+                    document.getElementById('prod-form').reset();
+                    document.getElementById('p-stock').value = 20;
+                    base64ProdImg = '';
+                    loadProducts();
+                } else {
+                    alert('កំហុសក្នុងការដាក់លក់');
+                }
+            } catch (err) {
+                alert('បរាជ័យក្នុងការតភ្ជាប់');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = '+ ដាក់លក់ទំនិញ';
             }
         };
 
         async function loadProducts() {
-            const res = await fetch(`/api/products?slug=${storeSlug}`);
-            const prods = await res.json();
-            const container = document.getElementById('product-list');
+            try {
+                const res = await fetch(`/api/products?slug=${storeSlug}`);
+                const prods = await res.json();
+                const container = document.getElementById('product-list');
 
-            if (!prods.length) {
-                container.innerHTML = '<div class="text-xs text-gray-400 text-center py-4">មិនទាន់មានផលិតផលនៅឡើយទេ</div>';
-                return;
-            }
+                if (!prods.length) {
+                    container.innerHTML = '<div class="text-xs text-gray-400 text-center py-6 bg-gray-50 rounded-xl border">មិនទាន់មានផលិតផលនៅឡើយទេ</div>';
+                    return;
+                }
 
-            container.innerHTML = prods.map(p => `
-                <div class="flex items-center justify-between p-2.5 bg-gray-50 rounded-xl border">
-                    <div class="flex items-center gap-3">
-                        <img src="${p.image}" class="w-12 h-12 object-cover rounded-lg border bg-white">
-                        <div>
-                            <h4 class="font-bold text-xs text-gray-900">${p.title}</h4>
-                            <span class="text-[11px] text-indigo-600 font-bold">$${Number(p.price).toFixed(2)}</span>
-                            <span class="text-[10px] text-gray-400 ml-2">Size: ${p.attributes?.size}</span>
+                container.innerHTML = prods.map(p => {
+                    const currentStock = p.stock !== undefined ? parseInt(p.stock) : 0;
+
+                    let stockBadge = `<span class="bg-green-100 text-green-700 text-[11px] font-bold px-2 py-0.5 rounded border border-green-200">ស្តុកនៅសល់៖ ${currentStock}</span>`;
+                    if (currentStock <= 0) {
+                        stockBadge = `<span class="bg-red-100 text-red-700 text-[11px] font-bold px-2 py-0.5 rounded border border-red-200">អស់ពីស្តុក (Out of Stock)</span>`;
+                    } else if (currentStock <= 5) {
+                        stockBadge = `<span class="bg-amber-100 text-amber-700 text-[11px] font-bold px-2 py-0.5 rounded border border-amber-200">ជិតអស់៖ នៅសល់ ${currentStock}</span>`;
+                    }
+
+                    return `
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-gray-50 rounded-xl border gap-2.5">
+                            <div class="flex items-center gap-3">
+                                <img src="${p.image || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=200'}" class="w-14 h-14 object-cover rounded-lg border bg-white flex-shrink-0">
+                                <div class="min-w-0">
+                                    <h4 class="font-bold text-xs sm:text-sm text-gray-900 truncate">${p.title}</h4>
+                                    <div class="flex items-center gap-2 mt-0.5">
+                                        <span class="text-xs text-indigo-600 font-bold">$${Number(p.price).toFixed(2)}</span>
+                                        <span class="text-[10px] text-gray-500 bg-gray-200/70 px-1.5 py-0.2 rounded font-semibold">Size: ${p.attributes?.size || 'M, L'}</span>
+                                    </div>
+                                    <div class="mt-1">${stockBadge}</div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0">
+                                <div class="flex items-center gap-1.5 bg-white border border-gray-200 rounded-lg p-1">
+                                    <span class="text-[10px] text-gray-500 font-bold px-1">កែស្តុក៖</span>
+                                    <button onclick="updateStockDirect('${p.id}', ${currentStock - 1})" class="w-6 h-6 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded text-xs font-bold text-gray-700 transition">-</button>
+                                    <span class="w-8 text-center text-xs font-black text-gray-800">${currentStock}</span>
+                                    <button onclick="updateStockDirect('${p.id}', ${currentStock + 1})" class="w-6 h-6 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded text-xs font-bold text-gray-700 transition">+</button>
+                                    <button onclick="promptEditStock('${p.id}', ${currentStock})" class="text-[10px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded font-bold ml-1 transition">✏️ វាយលេខ</button>
+                                </div>
+                                <button onclick="deleteProd('${p.id}')" class="text-xs text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 px-2.5 py-1.5 rounded-lg font-bold transition">លុប</button>
+                            </div>
                         </div>
-                    </div>
-                    <button onclick="deleteProd('${p.id}')" class="text-xs text-red-500 hover:text-red-700 bg-red-50 px-2.5 py-1 rounded-lg font-bold">លុប</button>
-                </div>
-            `).join('');
+                    `;
+                }).join('');
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function updateStockDirect(prodId, newStock) {
+            if (newStock < 0) newStock = 0;
+            try {
+                const res = await fetch(`/api/products/${prodId}/stock`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ stock: newStock })
+                });
+                if (res.ok) {
+                    loadProducts();
+                }
+            } catch (e) {
+                alert('កំហុសក្នុងការកែប្រែស្តុក');
+            }
+        }
+
+        function promptEditStock(prodId, currentStock) {
+            const input = prompt(`បញ្ចូលចំនួនស្តុកថ្មីសម្រាប់ទំនិញនេះ (បច្ចុប្បន្ន: ${currentStock})៖`, currentStock);
+            if (input === null) return;
+            const parsed = parseInt(input);
+            if (isNaN(parsed) || parsed < 0) return alert('សូមបញ្ចូលចំនួនជាលេខវិជ្ជមាន!');
+            updateStockDirect(prodId, parsed);
         }
 
         async function deleteProd(id) {
-            if (!confirm('តើអ្នកចង់លុបទំនិញនេះមែនទេ?')) return;
+            if (!confirm('តើអ្នកពិតជាចង់លុបទំនិញនេះចេញពីស្តុកមែនទេ?')) return;
             await fetch(`/api/products/${id}`, { method: 'DELETE' });
             loadProducts();
         }
@@ -227,66 +326,154 @@
             if (res.ok) alert('✓ បាន Upload KHQR របស់ហាងជោគជ័យ!');
         };
 
+        // -------------------------------------------------------------
+        // LOAD ORDERS (បង្ហាញរូបភាពទំនិញ និងទំហំ SIZE យ៉ាងច្បាស់)
+        // -------------------------------------------------------------
         async function loadOrders() {
-            const res = await fetch(`/api/admin/orders?slug=${storeSlug}`);
-            const orders = await res.json();
-            const container = document.getElementById('order-list');
+            try {
+                const res = await fetch(`/api/admin/orders?slug=${storeSlug}`);
+                const orders = await res.json();
+                const container = document.getElementById('order-list');
+                const badge = document.getElementById('order-count-badge');
 
-            if (!orders.length) {
-                container.innerHTML = '<div class="text-xs text-gray-400 text-center py-6 bg-gray-50 rounded-xl border">មិនទាន់មានការបញ្ជាទិញនៅឡើយទេ</div>';
-                return;
+                if (badge) badge.innerText = orders.length;
+
+                if (!orders || !orders.length) {
+                    container.innerHTML = '<div class="text-xs text-gray-400 text-center py-6 bg-gray-50 rounded-xl border">មិនទាន់មានការបញ្ជាទិញនៅឡើយទេ</div>';
+                    return;
+                }
+
+                container.innerHTML = orders.map(o => {
+                    const status = (o.status || 'PENDING').toUpperCase();
+                    const isPaid = status === 'PAID';
+                    const isRejected = status === 'REJECTED';
+
+                    // បង្កើត HTML បង្ហាញទំនិញដែលភ្ញៀវបានទិញ (រូប + ឈ្មោះ + Size + ចំនួន + តម្លៃ)
+                    let itemsHtml = '';
+                    if (o.items && o.items.length > 0) {
+                        itemsHtml = `
+                            <div class="mt-3 pt-2.5 border-t border-dashed border-gray-200">
+                                <div class="text-[11px] font-bold text-gray-600 mb-1.5 flex items-center gap-1">
+                                    <span>🛍️ ទំនិញដែលបានកុម្ម៉ង់ (${o.items.length})៖</span>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    ${o.items.map(it => {
+                            const sizeText = (it.attributes && it.attributes.size) ? it.attributes.size : (it.size || 'Standard');
+                            const imgUrl = it.image || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=150';
+                            const qty = it.qty || 1;
+                            const itemPrice = Number(it.price || 0).toFixed(2);
+
+                            return `
+                                            <div class="flex items-center gap-2.5 p-2 bg-white rounded-xl border border-gray-200/80 shadow-xs">
+                                                <img src="${imgUrl}" class="w-12 h-12 object-cover rounded-lg border border-gray-100 flex-shrink-0 bg-gray-50">
+                                                <div class="min-w-0 flex-1">
+                                                    <div class="font-bold text-xs text-gray-900 truncate">${it.title || 'ទំនិញ'}</div>
+                                                    <div class="flex items-center gap-2 mt-0.5">
+                                                        <span class="bg-indigo-50 text-indigo-700 text-[10px] font-black px-1.5 py-0.5 rounded border border-indigo-100">
+                                                            ទំហំ (Size): ${sizeText}
+                                                        </span>
+                                                        <span class="text-[11px] text-gray-500 font-bold">x${qty}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="text-right">
+                                                    <span class="text-xs font-black text-indigo-600">$${itemPrice}</span>
+                                                </div>
+                                            </div>
+                                        `;
+                        }).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    return `
+                        <div class="p-4 bg-gray-50 rounded-2xl border border-gray-200 text-xs mb-3 shadow-xs">
+                            <!-- បន្ទាត់ខាងលើ: លេខកូដ TX និង ស្ថានភាព -->
+                            <div class="flex justify-between items-center pb-2.5 mb-2.5 border-b border-gray-200">
+                                <span class="font-mono text-gray-500 font-bold tracking-tight">${o.tranId}</span>
+                                <span class="font-bold px-2.5 py-0.5 rounded-full text-[10px] ${isPaid ? 'bg-green-100 text-green-700 border border-green-200' : (isRejected ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-amber-100 text-amber-700 border border-amber-200')}">
+                                    ${isPaid ? '✓ បង់រួច' : (isRejected ? '✕ បដិសេធ' : '⏳ រង់ចាំពិនិត្យ')}
+                                </span>
+                            </div>
+
+                            <!-- ព័ត៌មានអតិថិជន និង វិក្កយបត្រ (Slip) -->
+                            <div class="flex justify-between items-start gap-3">
+                                <div>
+                                    <div class="font-black text-sm text-gray-900">${o.customerName} <span class="font-normal text-xs text-gray-500">(${o.phone || '-'})</span></div>
+                                    <div class="text-[11px] text-indigo-600 font-bold uppercase mt-0.5 flex items-center gap-1">
+                                        <span>🏦</span> <span>${o.bankAccountName || 'មិនបានបញ្ជាក់'}</span>
+                                    </div>
+                                    <div class="text-[11px] text-gray-600 mt-1 flex items-start gap-1">
+                                        <span>📍</span> <span>${o.address || '-'}</span>
+                                    </div>
+                                    <div class="text-[10px] text-gray-400 mt-0.5 flex items-center gap-1">
+                                        <span>🚚</span> <span>${o.deliveryMethod || '-'}</span>
+                                    </div>
+                                    ${isRejected && o.rejectReason ? `<div class="mt-2 text-[11px] text-red-600 bg-red-50 p-2 rounded-xl border border-red-200"><b>មូលហេតុបដិសេធ៖</b> ${o.rejectReason}</div>` : ''}
+                                </div>
+
+                                <div class="text-right flex-shrink-0">
+                                    <div class="font-black text-indigo-600 text-base sm:text-lg">$${o.amount}</div>
+                                    ${o.slipImage ? `
+                                        <a href="${o.slipImage}" target="_blank" class="inline-block mt-1 bg-white p-1 rounded-lg border border-gray-200 hover:border-indigo-400 transition shadow-xs" title="ចុចដើម្បីមើលរូបភាពធំ">
+                                            <img src="${o.slipImage}" class="w-14 h-16 object-cover rounded">
+                                            <span class="text-[9px] text-indigo-600 block font-bold mt-0.5">មើល Slip</span>
+                                        </a>
+                                    ` : '<span class="text-red-400 text-[10px] block mt-1">គ្មាន Slip</span>'}
+                                </div>
+                            </div>
+
+                            <!-- បង្ហាញរូបភាព និងទំហំ Size នៃទំនិញដែលបានទិញ -->
+                            ${itemsHtml}
+
+                            <!-- ប៊ូតុងសកម្មភាពសម្រាប់ Order ដែលកំពុងរង់ចាំ (PENDING) -->
+                            ${!isPaid && !isRejected ? `
+                                <div class="flex gap-2 mt-3 pt-3 border-t border-gray-200">
+                                    <button onclick="rejectOrder('${o.tranId}')" class="w-1/2 py-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-xl font-bold text-xs transition">
+                                        ✕ បដិសេធ
+                                    </button>
+                                    <button onclick="confirmOrder('${o.tranId}')" class="w-1/2 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs transition shadow-sm">
+                                        ✓ យល់ព្រមទទួលប្រាក់
+                                    </button>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                }).join('');
+            } catch (err) {
+                console.error("Load orders error:", err);
             }
-
-            container.innerHTML = orders.map(o => `
-                <div class="p-3.5 bg-gray-50 rounded-xl border text-xs">
-                    <div class="flex justify-between items-center pb-2 mb-2 border-b">
-                        <span class="font-mono text-gray-500">${o.tranId}</span>
-                        <span class="font-bold ${o.status === 'PAID' ? 'text-green-600' : (o.status === 'REJECTED' ? 'text-red-600' : 'text-amber-600')}">
-                            ${o.status === 'PAID' ? '✓ បង់រួច' : (o.status === 'REJECTED' ? '✕ បដិសេធ' : '⏳ រង់ចាំពិនិត្យ')}
-                        </span>
-                    </div>
-                    <div class="flex justify-between">
-                        <div>
-                            <div class="font-bold text-gray-900">${o.customerName} (${o.phone})</div>
-                            <div class="text-[11px] text-gray-500">📍 ${o.address}</div>
-                        </div>
-                        <div class="text-right">
-                            <div class="font-black text-indigo-600 text-sm">$${o.amount}</div>
-                            ${o.slipImage ? `<a href="${o.slipImage}" target="_blank" class="text-[10px] text-indigo-600 underline font-bold">មើល Slip</a>` : ''}
-                        </div>
-                    </div>
-                    ${o.status === 'PENDING' ? `
-                        <div class="flex gap-2 mt-2 pt-2 border-t">
-                            <button onclick="confirmOrder('${o.tranId}')" class="w-1/2 py-1.5 bg-emerald-600 text-white rounded-lg font-bold text-xs">✓ យល់ព្រម</button>
-                            <button onclick="rejectOrder('${o.tranId}')" class="w-1/2 py-1.5 bg-red-50 text-red-600 border border-red-200 rounded-lg font-bold text-xs">✕ បដិសេធ</button>
-                        </div>
-                    ` : ''}
-                </div>
-            `).join('');
         }
 
         async function confirmOrder(tranId) {
-            await fetch('/api/admin/orders/confirm', {
+            const res = await fetch('/api/admin/orders/confirm', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ tranId })
             });
-            loadOrders();
+            if (res.ok) {
+                alert('✓ បានយល់ព្រមទទួលប្រាក់ និងកាត់ស្តុកទំនិញស្វ័យប្រវត្តិ!');
+                loadOrders();
+                loadProducts();
+            }
         }
 
         async function rejectOrder(tranId) {
-            const reason = prompt('សរសេរមូលហេតុបដិសេធ:', 'មិនទាន់ឃើញលុយចូលកុងទេ');
+            const reason = prompt('សូមសរសេរមូលហេតុបដិសេធ:', 'មិនទាន់ឃើញលុយចូលកុងទេ សូមពិនិត្យឡើងវិញ');
             if (!reason) return;
-            await fetch('/api/admin/orders/reject', {
+            const res = await fetch('/api/admin/orders/reject', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ tranId, reason })
             });
-            loadOrders();
+            if (res.ok) {
+                alert('✓ បានផ្ញើសារបដិសេធរួចរាល់!');
+                loadOrders();
+            }
         }
 
         initDashboard();
-        setInterval(loadOrders, 4000);
+        setInterval(loadOrders, 3000);
     </script>
 </body>
 
