@@ -11,7 +11,6 @@ app.use(express.urlencoded({ limit: '20mb', extended: true }));
 
 const publicDir = path.join(__dirname, 'public');
 
-// កូដសម្ងាត់សម្រាប់ម្ចាស់ហាងចូល Dashboard
 const ADMIN_SECRET_KEY = "mysecret8888";
 
 const isVercel = process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME;
@@ -31,9 +30,7 @@ if (isVercel) {
                 fs.writeFileSync(DATA_FILE, fs.readFileSync(origPath, 'utf-8'));
             }
         }
-    } catch (e) {
-        console.error("Init Vercel /tmp error:", e);
-    }
+    } catch (e) { }
 }
 
 let memoryDB = null;
@@ -41,15 +38,14 @@ let memoryDB = null;
 function readData() {
     try {
         if (fs.existsSync(DATA_FILE)) {
-            const content = fs.readFileSync(DATA_FILE, 'utf-8');
-            memoryDB = JSON.parse(content);
+            memoryDB = JSON.parse(fs.readFileSync(DATA_FILE, 'utf-8'));
             return memoryDB;
         }
     } catch (e) { }
 
     if (!memoryDB) {
         memoryDB = {
-            users: [{ id: 1, name: "ហាង ម៉ូដទាន់សម័យ", credits: 15, image_limit: 50, images_used: 0, khqr_image: "" }],
+            users: [{ id: 1, name: "KM-Market", logo: "", owner_email: "", credits: 15, khqr_image: "" }],
             products: [],
             orders: []
         };
@@ -73,39 +69,59 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// បើកឱ្យទាញយក Static Files ប៉ុន្តែហាមប្រាម dashboard.html ជាដាច់ខាត
-app.use(express.static(publicDir, {
-    index: false
-}));
+app.use(express.static(publicDir, { index: false }));
 
-// Route សាធារណៈសម្រាប់អ្នកទិញទូទៅ
+// Public Routes
 app.get('/', (req, res) => res.sendFile(path.join(publicDir, 'index.html')));
 app.get('/cart', (req, res) => res.sendFile(path.join(publicDir, 'cart.html')));
 app.get('/checkout', (req, res) => res.sendFile(path.join(publicDir, 'checkout.html')));
 
-// បើអ្នកទិញចង់ចូល dashboard ឬ dashboard.html វានឹងរុញទៅទំព័រដើមវិញភ្លាម
-app.get(['/dashboard', '/dashboard.html'], (req, res) => {
-    res.redirect('/');
-});
+app.get(['/dashboard', '/dashboard.html'], (req, res) => res.redirect('/'));
 
-// ROUTE សម្ងាត់ផ្ដាច់មុខសម្រាប់តែម្ចាស់ហាង (មាន Key ទើបមើលឃើញ)
 app.get('/admin', (req, res) => {
-    const key = req.query.key;
-    if (key === ADMIN_SECRET_KEY) {
+    if (req.query.key === ADMIN_SECRET_KEY) {
         return res.sendFile(path.join(publicDir, 'dashboard.html'));
     }
-    // បើគ្មាន key ឬ key ខុស រុញទៅទំព័រមុខហាងដូចភ្ញៀវធម្មតា
     res.redirect('/');
 });
 
-// Middleware ការពារ Admin API មិនឱ្យអ្នកក្រៅហៅបាន
 function requireAdminKey(req, res, next) {
     const authKey = req.headers['x-admin-key'] || req.query.key;
     if (authKey === ADMIN_SECRET_KEY) return next();
-    res.status(403).json({ error: 'អ្នកមិនមានសិទ្ធិចូលមើលទិន្នន័យនេះទេ!' });
+    res.status(403).json({ error: 'គ្មានសិទ្ធិ' });
 }
 
-// KHQR & Profile
+// -------------------------------------------------------------
+// SETUP STORE PROFILE (ឈ្មោះហាង, Logo, Email)
+// -------------------------------------------------------------
+app.get('/api/store/info', (req, res) => {
+    const data = readData();
+    const store = data.users[0] || {};
+    res.json({
+        name: store.name || 'KM-Market',
+        logo: store.logo || '',
+        isConfigured: !!store.owner_email
+    });
+});
+
+app.post('/api/store/setup', (req, res) => {
+    const { name, logoBase64, email } = req.body || {};
+    if (!name || !email) {
+        return res.status(400).json({ error: 'សូមបំពេញឈ្មោះហាង និង Email!' });
+    }
+
+    const data = readData();
+    data.users[0].name = name.trim();
+    data.users[0].owner_email = email.trim();
+    if (logoBase64) {
+        data.users[0].logo = logoBase64;
+    }
+    writeData(data);
+
+    res.json({ status: 'success', store: data.users[0] });
+});
+
+// KHQR & Vendor
 app.post('/api/vendor/khqr', upload.single('qrImageFile'), (req, res) => {
     if (!req.file) return res.status(400).json({ error: 'សូមជ្រើសរើសរូបភាព!' });
     const qrUrl = '/uploads/' + req.file.filename;
@@ -156,7 +172,7 @@ app.post('/api/checkout/confirm-payment', (req, res) => {
 
         res.json({ status: 'success', tranId });
     } catch (err) {
-        res.status(500).json({ error: 'មានបញ្ហាក្នុងការបង្កើត Order' });
+        res.status(500).json({ error: 'កំហុស Server' });
     }
 });
 
@@ -173,7 +189,7 @@ app.post('/api/checkout/reupload-slip', (req, res) => {
     order.rejectReason = '';
     writeData(data);
 
-    res.json({ status: 'success', message: 'បានផ្ញើវិក្កយបត្រថ្មី' });
+    res.json({ status: 'success' });
 });
 
 app.get('/api/orders/check-status/:tranId', (req, res) => {
@@ -183,7 +199,7 @@ app.get('/api/orders/check-status/:tranId', (req, res) => {
     res.json({ status: order.status, rejectReason: order.rejectReason || '' });
 });
 
-// Admin Only Endpoints (ការពារដោយ Secret Key)
+// Admin Orders
 app.get('/api/admin/orders', requireAdminKey, (req, res) => res.json(readData().orders || []));
 
 app.post('/api/admin/orders/confirm', requireAdminKey, (req, res) => {
