@@ -34,7 +34,7 @@
 
             <!-- Logo: ចុច Double-Click លើ Logo នេះដើម្បីដោះសោរប៊ូតុង Dashboard -->
             <div onclick="handleSecretClick()" class="flex items-center gap-2 cursor-pointer select-none"
-                title="KM-Market">
+                title="ចុច ២ ដងដើម្បីដោះសោរ">
                 <span class="text-2xl">🛍️</span>
                 <span class="text-xl font-black text-indigo-600 tracking-tight">KM-Market</span>
             </div>
@@ -173,14 +173,12 @@
 
     <script>
         const CART_KEY = 'km_market_cart';
+        const OWNER_STORED_PIN_KEY = 'km_owner_custom_pin'; // រក្សាទុកលេខ PIN របស់ម្ចាស់ហាង
         const ADMIN_UNLOCKED_KEY = 'km_owner_is_admin';
         let productList = [];
         let selectedSize = '';
         let currentProduct = null;
 
-        // -------------------------------------------------------------
-        // យន្តការលាក់/បង្ហាញប៊ូតុង Dashboard សម្រាប់តែម្ចាស់ហាង
-        // -------------------------------------------------------------
         function checkOwnerStatus() {
             const isAdmin = localStorage.getItem(ADMIN_UNLOCKED_KEY);
             const btn = document.getElementById('btn-admin-dashboard');
@@ -193,31 +191,59 @@
             }
         }
 
-        // ចុច ២ ដងលើ Logo ដើម្បីបើកសោរប៊ូតុង Dashboard
+        // ចុច ២ ដងលើ Logo
         let clickCount = 0;
         let clickTimer = null;
         function handleSecretClick() {
             clickCount++;
             if (clickCount === 1) {
-                clickTimer = setTimeout(() => { clickCount = 0; }, 500);
+                clickTimer = setTimeout(() => { clickCount = 0; }, 400);
             } else if (clickCount === 2) {
                 clearTimeout(clickTimer);
                 clickCount = 0;
 
-                const currentStatus = localStorage.getItem(ADMIN_UNLOCKED_KEY);
-                if (currentStatus === 'true') {
-                    if (confirm('តើអ្នកចង់លាក់ប៊ូតុង Dashboard វិញមែនទេ?')) {
+                const savedPin = localStorage.getItem(OWNER_STORED_PIN_KEY);
+                const isUnlocked = localStorage.getItem(ADMIN_UNLOCKED_KEY) === 'true';
+
+                // ករណីធ្លាប់បើកសោររួចហើយ ចង់លាក់ប៊ូតុងវិញ
+                if (isUnlocked) {
+                    if (confirm('🔒 តើអ្នកចង់លាក់ប៊ូតុង Dashboard នេះវិញមែនទេ?')) {
                         localStorage.removeItem(ADMIN_UNLOCKED_KEY);
                         checkOwnerStatus();
+                        alert('បានលាក់ប៊ូតុងរួចរាល់!');
                     }
-                } else {
-                    const pin = prompt('🔐 សូមបញ្ចូលលេខកូដសម្ងាត់ម្ចាស់ហាង (PIN):');
-                    if (pin === '8888') {
+                    return;
+                }
+
+                // ករណីទី ១៖ ចូលលើកដំបូង (មិនទាន់មាន PIN) -> ឱ្យម្ចាស់ហាងកំណត់លេខ PIN ផ្ទាល់ខ្លួន
+                if (!savedPin) {
+                    const newPin = prompt('👋 សូមស្វាគមន៍ម្ចាស់ហាង!\nសូមកំណត់លេខកូដសម្ងាត់ (PIN) ផ្ទាល់ខ្លួនរបស់អ្នក (ឧ. 1234 ឬ 8888):');
+                    if (!newPin || newPin.trim() === '') {
+                        return alert('ការកំណត់មិនជោគជ័យ៖ សូមកុំទុកចន្លោះទទេ!');
+                    }
+
+                    const confirmPin = prompt('សូមបញ្ចូលលេខកូដសម្ងាត់នោះម្តងទៀតដើម្បីផ្ទៀងផ្ទាត់៖');
+                    if (newPin.trim() !== (confirmPin ? confirmPin.trim() : '')) {
+                        return alert('❌ លេខកូដទាំងពីរដងមិនដូចគ្នាទេ! សូមសាកល្បងម្តងទៀត។');
+                    }
+
+                    // រក្សាទុក PIN ផ្ទាល់ខ្លួនរបស់ម្ចាស់ហាង
+                    localStorage.setItem(OWNER_STORED_PIN_KEY, newPin.trim());
+                    localStorage.setItem(ADMIN_UNLOCKED_KEY, 'true');
+                    checkOwnerStatus();
+                    alert('✓ អបអរសាទរ! លេខកូដសម្ងាត់ត្រូវបានរក្សាទុក ហើយប៊ូតុង Dashboard បានបើកជោគជ័យ!');
+                }
+                // ករណីទី ២៖ ធ្លាប់បានកំណត់លេខ PIN រួចហើយ -> តម្រូវឱ្យវាយលេខ PIN ត្រឹមត្រូវ
+                else {
+                    const inputPin = prompt('🔐 សូមបញ្ចូលលេខកូដសម្ងាត់ PIN ម្ចាស់ហាងរបស់អ្នក៖');
+                    if (inputPin === null) return; // ចុច Cancel
+
+                    if (inputPin.trim() === savedPin.trim()) {
                         localStorage.setItem(ADMIN_UNLOCKED_KEY, 'true');
                         checkOwnerStatus();
-                        alert('✓ បានបើកប៊ូតុង Dashboard ជោគជ័យ!');
-                    } else if (pin !== null) {
-                        alert('លេខកូដមិនត្រឹមត្រូវទេ!');
+                        alert('✓ ផ្ទៀងផ្ទាត់ត្រឹមត្រូវ! ប៊ូតុង Dashboard ត្រូវបានបើក។');
+                    } else {
+                        alert('❌ លេខកូដសម្ងាត់មិនត្រឹមត្រូវទេ!');
                     }
                 }
             }
@@ -415,7 +441,7 @@
             document.getElementById('detail-modal').classList.add('hidden');
         }
 
-        // ដំណើរការដំបូង
+        // ពិនិត្យស្ថានភាព
         checkOwnerStatus();
         updateCartCount();
         loadProducts();
