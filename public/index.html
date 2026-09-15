@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="km">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ហាងទំនិញអនឡាញ - KM-Market</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Siemreap&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            font-family: 'Khmer OS Siemreap', 'Siemreap', sans-serif !important;
+        }
+
+        input,
+        select,
+        textarea,
+        button {
+            font-family: 'Khmer OS Siemreap', 'Siemreap', sans-serif !important;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-800 antialiased min-h-screen flex flex-col justify-between">
+
+    <!-- Header សម្រាប់អ្នកទិញ -->
+    <header class="bg-white shadow-sm border-b sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
+            <a href="/" class="flex items-center gap-2">
+                <span class="text-2xl">🛍️</span>
+                <span class="text-xl font-black text-indigo-600 tracking-tight">KM-Market</span>
+            </a>
+            <div>
+                <a href="/cart.html"
+                    class="relative bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs px-4 py-2 rounded-xl flex items-center gap-2 transition">
+                    <span>🛒 កន្ត្រកទំនិញ</span>
+                    <span id="cart-count"
+                        class="bg-red-500 text-white text-[11px] px-2 py-0.5 rounded-full font-bold">0</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Grid -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex-1 w-full">
+        <div class="mb-6">
+            <h1 class="text-2xl font-black text-gray-900 tracking-tight">ទំនិញទើបដាក់លក់ថ្មីៗ</h1>
+            <p class="text-xs text-gray-500 mt-1">រើសទំនិញដែលអ្នកពេញចិត្ត រួចកុម្ម៉ង់ទិញយ៉ាងងាយស្រួល</p>
+        </div>
+
+        <div id="product-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
+        </div>
+    </main>
+
+    <!-- Modal បង្ហាញព័ត៌មានលម្អិតទំនិញ ( Detail Modal ) -->
+    <div id="detail-modal"
+        class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border text-center">
+            <div class="w-full h-56 rounded-xl overflow-hidden bg-gray-50 mb-3 border">
+                <img id="modal-img" src="" class="w-full h-full object-cover">
+            </div>
+            <span id="modal-category"
+                class="bg-gray-100 text-gray-600 text-[10px] font-bold px-2 py-0.5 rounded uppercase"></span>
+            <h3 id="modal-title" class="font-bold text-gray-900 text-base mt-2"></h3>
+            <div id="modal-price" class="text-xl font-black text-indigo-600 my-1"></div>
+            <div id="modal-stock" class="text-xs text-gray-500 mb-4"></div>
+            <div class="flex gap-2">
+                <button onclick="closeDetailModal()"
+                    class="w-1/2 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold transition">បិទ</button>
+                <button id="modal-buy-btn"
+                    class="w-1/2 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition">ជ្រើសរើសទិញ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal ជ្រើសរើស Size និងចំនួន ( Buy Options Modal ) -->
+    <div id="option-modal"
+        class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border">
+            <div class="flex gap-3 items-center pb-3 border-b mb-3">
+                <img id="opt-img" src="" class="w-16 h-16 object-cover rounded-xl border bg-gray-50">
+                <div class="flex-1 min-w-0">
+                    <h3 id="opt-title" class="font-bold text-gray-900 text-sm truncate"></h3>
+                    <div id="opt-price" class="text-indigo-600 font-black text-base mt-0.5"></div>
+                    <div id="opt-stock" class="text-[11px] text-gray-500"></div>
+                </div>
+            </div>
+
+            <form id="option-form" class="space-y-4">
+                <input type="hidden" id="opt-prod-id">
+
+                <!-- ជ្រើសរើស Size -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1.5">ជ្រើសរើសទំហំ (Size) <span
+                            class="text-red-500">*</span></label>
+                    <div id="opt-size-container" class="flex flex-wrap gap-2"></div>
+                </div>
+
+                <!-- ជ្រើសរើសចំនួន -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1.5">ចំនួន (Quantity)</label>
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center border rounded-xl overflow-hidden bg-gray-50">
+                            <button type="button" onclick="changeQty(-1)"
+                                class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold transition">-</button>
+                            <input type="number" id="opt-qty" value="1" min="1" readonly
+                                class="w-12 text-center bg-transparent font-bold text-sm outline-none">
+                            <button type="button" onclick="changeQty(1)"
+                                class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold transition">+</button>
+                        </div>
+                        <span class="text-xs text-gray-400">សរុប៖ <b id="opt-total-price"
+                                class="text-indigo-600">$0.00</b></span>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex gap-2 pt-2 border-t">
+                    <button type="button" onclick="closeOptionModal()"
+                        class="w-1/2 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold transition">
+                        បោះបង់ (Cancel)
+                    </button>
+                    <button type="submit"
+                        class="w-1/2 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow">
+                        ដាក់ចូលកន្ត្រក (Buy)
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Popup បញ្ជាក់ពេលដាក់ចូលកន្ត្រករួច ( Buy & Continue ) -->
+    <div id="confirm-cart-modal"
+        class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border text-center">
+            <div
+                class="w-14 h-14 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl font-bold">
+                ✓
+            </div>
+            <h3 class="font-bold text-base text-gray-800 mb-1">បានបញ្ចូលទៅក្នុងកន្ត្រក!</h3>
+            <p id="confirm-item-title" class="text-xs text-gray-500 mb-5 line-clamp-2 px-2"></p>
+
+            <div class="flex gap-3">
+                <button onclick="closeConfirmModal()"
+                    class="w-1/2 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl text-xs transition">
+                    ទិញបន្ត (Continue)
+                </button>
+                <a href="/cart.html"
+                    class="w-1/2 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs transition shadow flex items-center justify-center gap-1">
+                    ទៅកន្ត្រក (Checkout) &rarr;
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const CART_KEY = 'km_market_cart';
+        let productList = [];
+        let selectedSize = '';
+        let currentProduct = null;
+
+        function getCart() {
+            try {
+                return JSON.parse(localStorage.getItem(CART_KEY)) || [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveCart(cart) {
+            localStorage.setItem(CART_KEY, JSON.stringify(cart));
+            updateCartCount();
+        }
+
+        function updateCartCount() {
+            const cart = getCart();
+            const totalQty = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
+            const countEl = document.getElementById('cart-count');
+            if (countEl) countEl.innerText = totalQty;
+        }
+
+        async function loadProducts() {
+            try {
+                const res = await fetch('/api/products');
+                productList = await res.json();
+                const grid = document.getElementById('product-grid');
+
+                if (!productList || !productList.length) {
+                    grid.innerHTML = '<div class="col-span-full text-center py-12 text-gray-400 text-sm">មិនទាន់មានទំនិញដាក់លក់នៅឡើយទេ</div>';
+                    return;
+                }
+
+                grid.innerHTML = productList.map(p => {
+                    const prodImg = p.image || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500';
+
+                    return `
+                        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition p-3.5 flex flex-col justify-between">
+                            <div>
+                                <div class="w-full h-44 rounded-xl overflow-hidden bg-gray-50 mb-3 border border-gray-100">
+                                    <img src="${prodImg}" 
+                                         alt="${p.title || 'Product'}" 
+                                         class="w-full h-full object-cover">
+                                </div>
+                                <span class="bg-gray-100 text-gray-600 text-[10px] font-bold px-2 py-0.5 rounded">${p.category || 'clothes'}</span>
+                                <h3 class="font-bold text-gray-800 text-sm mt-1.5 line-clamp-1">${p.title || 'គ្មានឈ្មោះ'}</h3>
+                                <div class="text-base font-black text-indigo-600 mt-1">$${Number(p.price || 0).toFixed(2)}</div>
+                            </div>
+
+                            <div class="mt-4 flex gap-2">
+                                <button onclick="openDetailModal('${p.id}')" 
+                                    class="w-1/2 border border-gray-300 hover:border-gray-400 bg-white hover:bg-gray-50 text-gray-700 text-xs font-bold py-2 rounded-xl transition">
+                                    លម្អិត
+                                </button>
+                                <button onclick="openOptionModal('${p.id}')" 
+                                    class="w-1/2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2 rounded-xl transition">
+                                    ទិញ
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                updateCartCount();
+            } catch (err) {
+                console.error("Load products error:", err);
+            }
+        }
+
+        // បើក Modal ជ្រើសរើស Size & ចំនួន
+        function openOptionModal(id) {
+            currentProduct = productList.find(item => String(item.id) === String(id));
+            if (!currentProduct) return;
+
+            document.getElementById('opt-prod-id').value = currentProduct.id;
+            document.getElementById('opt-title').innerText = currentProduct.title || 'គ្មានឈ្មោះ';
+            document.getElementById('opt-img').src = currentProduct.image || '';
+            document.getElementById('opt-price').innerText = '$' + Number(currentProduct.price || 0).toFixed(2);
+            document.getElementById('opt-stock').innerText = 'ស្តុកនៅសល់៖ ' + (currentProduct.stock || 0);
+
+            // បង្កើតបញ្ជី Size ស្វ័យប្រវត្តិ
+            const attr = currentProduct.attributes || {};
+            let sizes = [];
+
+            if (attr.size) {
+                sizes = String(attr.size).split(',').map(s => s.trim());
+            } else if (attr.shoe_size) {
+                sizes = String(attr.shoe_size).split(',').map(s => s.trim());
+            } else {
+                sizes = currentProduct.category === 'shoes' ? ['39', '40', '41', '42'] : ['S', 'M', 'L', 'XL'];
+            }
+
+            selectedSize = sizes[0] || 'Standard';
+
+            const container = document.getElementById('opt-size-container');
+            container.innerHTML = sizes.map((s, idx) => `
+                <button type="button" onclick="selectSize('${s}', this)" 
+                    class="size-btn px-3 py-1.5 border rounded-lg text-xs font-bold transition ${idx === 0 ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'}">
+                    ${s}
+                </button>
+            `).join('');
+
+            document.getElementById('opt-qty').value = 1;
+            updateTotalPrice();
+            document.getElementById('option-modal').classList.remove('hidden');
+        }
+
+        function selectSize(size, el) {
+            selectedSize = size;
+            document.querySelectorAll('.size-btn').forEach(btn => {
+                btn.className = 'size-btn px-3 py-1.5 border rounded-lg text-xs font-bold transition bg-white text-gray-700 border-gray-200 hover:bg-gray-50';
+            });
+            el.className = 'size-btn px-3 py-1.5 border rounded-lg text-xs font-bold transition bg-indigo-600 text-white border-indigo-600 shadow-sm';
+        }
+
+        function changeQty(delta) {
+            const input = document.getElementById('opt-qty');
+            let val = parseInt(input.value) + delta;
+            if (val < 1) val = 1;
+            if (currentProduct && currentProduct.stock && val > currentProduct.stock) {
+                val = currentProduct.stock;
+            }
+            input.value = val;
+            updateTotalPrice();
+        }
+
+        function updateTotalPrice() {
+            if (!currentProduct) return;
+            const qty = parseInt(document.getElementById('opt-qty').value || 1);
+            const total = (currentProduct.price || 0) * qty;
+            document.getElementById('opt-total-price').innerText = '$' + total.toFixed(2);
+        }
+
+        function closeOptionModal() {
+            document.getElementById('option-modal').classList.add('hidden');
+        }
+
+        // ដាក់បញ្ចូលកន្ត្រកតាម Option ដែលបានរើស
+        document.getElementById('option-form').onsubmit = (e) => {
+            e.preventDefault();
+            if (!currentProduct) return;
+
+            const qty = parseInt(document.getElementById('opt-qty').value || 1);
+            let cart = getCart();
+
+            // ឆែកតាម id និង size
+            const itemKey = `${currentProduct.id}_${selectedSize}`;
+            const existingIndex = cart.findIndex(item => item.itemKey === itemKey);
+
+            if (existingIndex > -1) {
+                cart[existingIndex].qty += qty;
+            } else {
+                cart.push({
+                    itemKey: itemKey,
+                    id: currentProduct.id,
+                    title: currentProduct.title,
+                    price: parseFloat(currentProduct.price || 0),
+                    image: currentProduct.image || '',
+                    attributes: {
+                        size: selectedSize,
+                        ...(currentProduct.attributes || {})
+                    },
+                    qty: qty
+                });
+            }
+
+            saveCart(cart);
+            closeOptionModal();
+
+            // បង្ហាញ Popup បញ្ជាក់
+            document.getElementById('confirm-item-title').innerText = `ទំនិញ «${currentProduct.title}» (Size: ${selectedSize}, ចំនួន: ${qty}) ត្រូវបានដាក់ចូលកន្ត្រក។`;
+            document.getElementById('confirm-cart-modal').classList.remove('hidden');
+        };
+
+        function closeConfirmModal() {
+            document.getElementById('confirm-cart-modal').classList.add('hidden');
+        }
+
+        function openDetailModal(id) {
+            const p = productList.find(item => String(item.id) === String(id));
+            if (!p) return;
+
+            document.getElementById('modal-img').src = p.image || '';
+            document.getElementById('modal-category').innerText = p.category || 'clothes';
+            document.getElementById('modal-title').innerText = p.title || 'គ្មានឈ្មោះ';
+            document.getElementById('modal-price').innerText = '$' + Number(p.price || 0).toFixed(2);
+            document.getElementById('modal-stock').innerText = 'នៅក្នុងស្តុក៖ ' + (p.stock || 0) + ' មុខ';
+
+            document.getElementById('modal-buy-btn').onclick = function () {
+                closeDetailModal();
+                openOptionModal(p.id);
+            };
+
+            document.getElementById('detail-modal').classList.remove('hidden');
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detail-modal').classList.add('hidden');
+        }
+
+        updateCartCount();
+        loadProducts();
+    </script>
+</body>
+
+</html>

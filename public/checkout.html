@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="km">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ទូទាត់ប្រាក់ KHQR</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Siemreap&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            font-family: 'Khmer OS Siemreap', 'Siemreap', sans-serif !important;
+        }
+
+        input,
+        select,
+        textarea,
+        button {
+            font-family: 'Khmer OS Siemreap', 'Siemreap', sans-serif !important;
+        }
+
+        /* ជួសជុល Style សម្រាប់ Select Dropdown ឱ្យរលូន */
+        select {
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234b5563' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1em 1em;
+            padding-right: 2.5rem;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+    </style>
+</head>
+
+<body class="p-4 sm:p-6 max-w-lg mx-auto bg-gray-50 text-gray-800 antialiased min-h-screen">
+
+    <div class="mb-4">
+        <a href="/cart.html" class="text-indigo-600 text-sm font-semibold hover:underline flex items-center gap-1">
+            <span>&larr;</span> ត្រឡប់ទៅកន្ត្រកវិញ
+        </a>
+    </div>
+
+    <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-gray-100">
+        <!-- Header -->
+        <div class="flex items-center justify-between pb-4 mb-4 border-b">
+            <div class="flex items-center gap-2">
+                <span class="bg-red-600 text-white font-black text-xs px-2 py-1 rounded">KHQR</span>
+                <h1 class="text-lg font-bold text-gray-800">ទូទាត់ប្រាក់តាម KHQR</h1>
+            </div>
+            <span class="text-xs bg-indigo-50 text-indigo-600 font-bold px-2 py-1 rounded">ABA & All Banks</span>
+        </div>
+
+        <!-- Total Box -->
+        <div class="bg-gray-50 p-4 rounded-xl mb-4 flex justify-between items-center border border-gray-100">
+            <span class="text-sm text-gray-600">ទឹកប្រាក់សរុប៖</span>
+            <span class="text-2xl font-black text-indigo-600 tracking-tight">$<span
+                    id="display-amount">0.00</span></span>
+        </div>
+
+        <!-- ដំណាក់កាលទី ១: បំពេញព័ត៌មានដឹកជញ្ជូន -->
+        <div id="step-form">
+            <form id="shipping-form" class="space-y-3.5">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">ឈ្មោះអ្នកទិញ</label>
+                        <input id="name" required placeholder="ឧ. ចាន់ បូរិន"
+                            class="w-full h-11 border border-gray-300 px-3 rounded-lg text-sm bg-white focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">ឈ្មោះកុងធនាគារអ្នកផ្ញើ</label>
+                        <input id="bank-acc-name" required placeholder="ឧ. NORN CHAN BOREN"
+                            class="w-full h-11 border border-gray-300 px-3 rounded-lg text-sm bg-white uppercase focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">លេខទូរស័ព្ទ</label>
+                        <input id="phone" required placeholder="ឧ. 012 345 678"
+                            class="w-full h-11 border border-gray-300 px-3 rounded-lg text-sm bg-white focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">ផ្ញើតាម (សេវាដឹកជញ្ជូន)</label>
+                        <!-- Select Dropdown ដែលបានកែសម្រួលរួច -->
+                        <select id="delivery-method" required
+                            class="w-full h-11 border border-gray-300 px-3 rounded-lg text-sm bg-white cursor-pointer focus:ring-2 focus:ring-indigo-500 outline-none block">
+                            <option value="វីរៈប៊ុនថាំ (VET Express)">វីរៈប៊ុនថាំ (VET Express)</option>
+                            <option value="J&T Express">J&T Express</option>
+                            <option value="កាពីតូល (Capitol)">កាពីតូល (Capitol)</option>
+                            <option value="ដឹកភ្លាមៗក្នុងក្រុង (Grab/Express)">ដឹកភ្លាមៗក្នុងក្រុង (Grab/Express)
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">ទីតាំង / អាសយដ្ឋានទទួលទំនិញ</label>
+                    <textarea id="address" required rows="2"
+                        placeholder="ផ្ទះលេខ, ផ្លូវ, សង្កាត់, ខណ្ឌ, រាជធានី/ខេត្ត..."
+                        class="w-full border border-gray-300 p-2.5 rounded-lg text-sm bg-white focus:ring-2 focus:ring-indigo-500 outline-none resize-none"></textarea>
+                </div>
+
+                <button type="submit"
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold h-11 rounded-lg text-sm transition shadow mt-2">
+                    បន្តទៅស្កេនបង់ប្រាក់ KHQR &rarr;
+                </button>
+            </form>
+        </div>
+
+        <!-- ដំណាក់កាលទី ២: ស្កេន QR និង Upload វិក្កយបត្រ -->
+        <div id="step-payment" class="hidden mt-2 text-center border-t pt-4">
+            <p class="text-sm font-bold text-gray-800">ស្កេនបង់ប្រាក់ទៅកាន់កុងហាង</p>
+            <p class="text-xs text-gray-500 mb-3">សូមបើក App ធនាគារ (ABA, ACLEDA...) ដើម្បីស្កេនបង់ប្រាក់</p>
+
+            <div class="inline-block p-3 bg-white border-2 border-red-500 rounded-2xl shadow-md mb-4">
+                <img id="vendor-qr-img" src="" alt="KHQR" class="w-60 h-60 object-contain mx-auto rounded-lg">
+            </div>
+
+            <!-- ប្រអប់ Upload វិក្កយបត្រ -->
+            <div class="bg-indigo-50/60 border-2 border-dashed border-indigo-200 rounded-xl p-4 mb-4 text-left">
+                <label class="block text-xs font-bold text-indigo-900 mb-1">
+                    📸 ភ្ជាប់រូបភាពវិក្កយបត្របាញ់លុយ (Payment Slip) <span class="text-red-500">*</span>
+                </label>
+                <p class="text-[11px] text-gray-500 mb-2">សូមថតអេក្រង់ (Screenshot) វិក្កយបត្រដែលបានបាញ់លុយរួច
+                    រួចដាក់ចូលទីនេះ</p>
+                <input type="file" id="slip-file" accept="image/*" required onchange="previewSlip(event)"
+                    class="w-full text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 cursor-pointer border rounded-lg p-1 bg-white">
+
+                <div id="slip-preview-box" class="hidden mt-3 flex items-center gap-3 bg-white p-2 rounded-lg border">
+                    <img id="slip-preview-img" src="" class="w-16 h-20 object-cover rounded border">
+                    <div>
+                        <span class="text-xs text-green-600 font-bold block">✓ បានជ្រើសរើសវិក្កយបត្រ!</span>
+                        <span class="text-[11px] text-gray-400">ចុចប៊ូតុងខាងក្រោមដើម្បីផ្ញើទៅហាង</span>
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" id="btn-submit-order" onclick="submitFinalOrder()"
+                class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-12 rounded-xl text-sm transition shadow-md flex items-center justify-center gap-2">
+                <span>✓ ខ្ញុំបានបាញ់លុយរួចរាល់ (ផ្ញើការកុម្ម៉ង់)</span>
+            </button>
+        </div>
+
+        <!-- ដំណាក់កាលទី ៣: ផ្ទាំងរង់ចាំ និងជោគជ័យ -->
+        <div id="step-waiting" class="hidden text-center border-t pt-5">
+            <div class="inline-block p-3 bg-amber-50 rounded-full text-amber-600 mb-3">
+                <svg class="w-10 h-10 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                </svg>
+            </div>
+            <h3 class="text-base font-bold text-gray-800 mb-1">បានផ្ញើវិក្កយបត្រទៅកាន់ហាងរួចរាល់!</h3>
+            <p class="text-xs text-amber-600 font-medium mb-3">⏳ កំពុងរង់ចាំម្ចាស់ហាងពិនិត្យ និងយល់ព្រមទទួលប្រាក់...</p>
+            <div class="text-xs text-gray-500 bg-gray-100 py-2 rounded-lg mb-4">
+                លេខប្រតិបត្តិការ: <b id="tran-display" class="font-mono text-gray-800"></b>
+            </div>
+        </div>
+
+        <div id="step-success" class="hidden text-center border-t pt-5">
+            <div
+                class="w-14 h-14 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-2 text-2xl font-black">
+                ✓
+            </div>
+            <h3 class="text-lg font-bold text-gray-800">ការទូទាត់ប្រាក់ជោគជ័យ!</h3>
+            <p class="text-xs text-gray-500 mb-4">ម្ចាស់ហាងបានផ្ទៀងផ្ទាត់វិក្កយបត្រ និងកំពុងរៀបចំផ្ញើទំនិញជូនអ្នក។</p>
+            <a href="/"
+                class="block w-full bg-gray-800 hover:bg-black text-white py-2.5 rounded-lg text-xs font-bold transition">ត្រឡប់ទៅទំព័រដើម</a>
+        </div>
+    </div>
+
+    <script>
+        const CART_KEY = 'km_market_cart';
+        let cart = [];
+        try {
+            cart = JSON.parse(localStorage.getItem(CART_KEY)) || [];
+        } catch (e) {
+            cart = [];
+        }
+
+        const amount = cart.reduce((sum, item) => sum + ((item.price || 0) * (item.qty || 1)), 0);
+        document.getElementById('display-amount').innerText = amount.toFixed(2);
+
+        let base64Slip = '';
+        let customerInfo = {};
+        let activeTranId = null;
+        let pollInterval = null;
+
+        // ចុចបន្តទៅស្កេន QR
+        document.getElementById('shipping-form').onsubmit = async (e) => {
+            e.preventDefault();
+            if (!cart.length) return alert('កន្ត្រកទំនិញនៅទទេ!');
+
+            customerInfo = {
+                customerName: document.getElementById('name').value.trim(),
+                bankAccountName: document.getElementById('bank-acc-name').value.trim(),
+                phone: document.getElementById('phone').value.trim(),
+                deliveryMethod: document.getElementById('delivery-method').value.trim(),
+                address: document.getElementById('address').value.trim(),
+                amount: amount.toFixed(2),
+                items: cart
+            };
+
+            // ទាញយក QR របស់ហាង
+            try {
+                const res = await fetch('/api/checkout/vendor-qr');
+                if (res.ok) {
+                    const data = await res.json();
+                    document.getElementById('vendor-qr-img').src = data.qrImage;
+                } else {
+                    document.getElementById('vendor-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=KHQR-${amount.toFixed(2)}USD`;
+                }
+            } catch (err) {
+                document.getElementById('vendor-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=KHQR-${amount.toFixed(2)}USD`;
+            }
+
+            document.getElementById('step-form').classList.add('hidden');
+            document.getElementById('step-payment').classList.remove('hidden');
+        };
+
+        function previewSlip(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    base64Slip = e.target.result;
+                    document.getElementById('slip-preview-img').src = base64Slip;
+                    document.getElementById('slip-preview-box').classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        async function submitFinalOrder() {
+            if (!base64Slip) {
+                return alert('⚠️ សូម Upload រូបភាពវិក្កយបត្របាញ់លុយ (Slip) ជាមុនសិន!');
+            }
+
+            const btn = document.getElementById('btn-submit-order');
+            btn.disabled = true;
+            btn.innerText = 'កំពុងផ្ញើទិន្នន័យ...';
+
+            const payload = {
+                ...customerInfo,
+                slipImage: base64Slip
+            };
+
+            try {
+                const res = await fetch('/api/checkout/confirm-payment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json();
+                if (res.ok) {
+                    activeTranId = data.tranId;
+                    document.getElementById('step-payment').classList.add('hidden');
+                    document.getElementById('step-waiting').classList.remove('hidden');
+                    document.getElementById('tran-display').innerText = activeTranId;
+
+                    pollInterval = setInterval(checkStatusFromAdmin, 2000);
+                } else {
+                    alert('កំហុស៖ ' + (data.error || 'មិនអាចផ្ញើការកុម្ម៉ង់បានទេ'));
+                    btn.disabled = false;
+                    btn.innerText = '✓ ខ្ញុំបានបាញ់លុយរួចរាល់ (ផ្ញើការកុម្ម៉ង់)';
+                }
+            } catch (err) {
+                alert('បរាជ័យក្នុងការតភ្ជាប់ទៅ Server');
+                btn.disabled = false;
+                btn.innerText = '✓ ខ្ញុំបានបាញ់លុយរួចរាល់ (ផ្ញើការកុម្ម៉ង់)';
+            }
+        }
+
+        async function checkStatusFromAdmin() {
+            if (!activeTranId) return;
+            try {
+                const res = await fetch(`/api/orders/check-status/${activeTranId}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.status === 'PAID') {
+                        clearInterval(pollInterval);
+                        document.getElementById('step-waiting').classList.add('hidden');
+                        document.getElementById('step-success').classList.remove('hidden');
+                        localStorage.removeItem(CART_KEY);
+                    }
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+    </script>
+</body>
+
+</html>
