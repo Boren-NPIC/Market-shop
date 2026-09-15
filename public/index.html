@@ -4,17 +4,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>វេទិកាហាងអនឡាញ</title>
+    <title id="page-title">SMD Market - ផ្សារទំនិញអនឡាញឈានមុខគេ</title>
     <script src="https://cdn.tailwindcss.com"></script>
 
+    <!-- Google Fonts: Kantumruy Pro & Siemreap -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Siemreap&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:ital,wght@0,600;0,700;0,800;0,900;1,700&family=Siemreap&display=swap"
+        rel="stylesheet">
 
     <style>
         * {
             font-family: 'Khmer OS Siemreap', 'Siemreap', sans-serif !important;
             -webkit-tap-highlight-color: transparent;
+        }
+
+        .banner-title {
+            font-family: 'Kantumruy Pro', sans-serif !important;
+            font-weight: 800;
+            line-height: 1.45 !important;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        p,
+        span,
+        button,
+        a {
+            line-height: 1.65;
         }
 
         input,
@@ -26,28 +47,179 @@
     </style>
 </head>
 
-<body class="bg-gray-50 text-gray-800 antialiased min-h-screen flex flex-col justify-between">
+<body
+    class="bg-gradient-to-br from-[#f8f9ff] via-[#f1f4fe] to-[#fbf7ff] text-gray-800 antialiased min-h-screen flex flex-col justify-between">
 
     <!-- ============================================================= -->
-    <!-- ផ្នែកទី ១៖ ផ្ទាំង LOGIN / GOOGLE AUTH & SETUP ហាង (បង្ហាញពេលចូលដំបូង) -->
+    <!-- ១. HEADER (AUTO BIND តាម SHOP SLUG ឬ MARKETPLACE) -->
     <!-- ============================================================= -->
-    <div id="onboarding-gate"
-        class="fixed inset-0 bg-slate-900/90 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto hidden">
-        <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border text-center my-auto">
+    <header
+        class="sticky top-0 z-40 bg-white/85 backdrop-blur-xl border-b border-indigo-100/80 shadow-[0_4px_25px_-5px_rgba(99,102,241,0.12)]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3 sm:gap-6">
+
+            <a id="brand-home-link" href="/" class="flex items-center gap-2.5 flex-shrink-0 select-none group">
+                <div id="brand-logo-box"
+                    class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 text-white flex items-center justify-center text-xl shadow-md shadow-indigo-200 group-hover:scale-105 transition-transform overflow-hidden border border-indigo-100">
+                    <span id="brand-logo-emoji">🏪</span>
+                    <img id="brand-logo-img" src="" class="w-full h-full object-cover hidden">
+                </div>
+                <div>
+                    <span id="brand-name-display"
+                        class="text-lg sm:text-xl font-black bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent tracking-tight block leading-tight">
+                        SMD Market
+                    </span>
+                    <span id="brand-sub-display"
+                        class="text-[9px] text-indigo-500 font-bold tracking-widest uppercase block">
+                        E-COMMERCE PLATFORM
+                    </span>
+                </div>
+            </a>
 
             <div
-                class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-3xl shadow-inner">
-                🏪
+                class="hidden md:flex flex-1 max-w-lg items-center border-2 border-indigo-100 hover:border-indigo-300 focus-within:border-indigo-600 rounded-2xl overflow-hidden bg-white px-3 py-1.5 shadow-xs transition-all">
+                <span class="text-gray-400 text-sm mr-2">🔍</span>
+                <input id="search-input" onkeyup="filterProducts()" type="text"
+                    placeholder="ស្វែងរកទំនិញ អាវ ខោ ស្បែកជើង..."
+                    class="w-full text-xs outline-none bg-transparent text-gray-700">
             </div>
 
-            <!-- ដំណាក់កាលទី ១៖ Sign in with Google / Email -->
-            <div id="step-auth-gate">
-                <h2 class="text-xl font-black text-gray-900 tracking-tight mb-1">សូមស្វាគមន៍មកកាន់ប្រព័ន្ធហាង</h2>
-                <p class="text-xs text-gray-500 mb-6">សូមចូលគណនីរបស់អ្នកដើម្បីចាប់ផ្តើមបង្កើត និងគ្រប់គ្រងហាងអនឡាញ</p>
+            <div class="flex items-center gap-2 sm:gap-3">
 
-                <!-- ប៊ូតុង Sign in with Google -->
+                <div id="auth-guest-view" class="flex items-center gap-2 text-xs font-bold">
+                    <button onclick="openAuthModal('login')"
+                        class="text-gray-700 hover:text-indigo-600 px-2.5 py-1.5 transition whitespace-nowrap">
+                        ចូលគណនី
+                    </button>
+                    <button onclick="openAuthModal('register')"
+                        class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-xl border border-indigo-200 transition whitespace-nowrap">
+                        ចុះឈ្មោះ
+                    </button>
+                </div>
+
+                <!-- ប៊ូតុង Dashboard និងប៊ូតុងចូលហាងផ្ទាល់ខ្លួន -->
+                <div id="auth-seller-view" class="hidden items-center gap-2 text-xs">
+                    <a id="btn-visit-my-shop" href="#"
+                        class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold px-3 py-2 rounded-xl border border-emerald-200 transition whitespace-nowrap flex items-center gap-1">
+                        <span>🛍️</span> <span>មើលហាងខ្ញុំ</span>
+                    </a>
+                    <a href="/dashboard"
+                        class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-md shadow-purple-200 hover:scale-105 transition">
+                        <span>⚙️</span> <span>Dashboard</span>
+                    </a>
+                </div>
+
+                <button id="btn-create-store-top" onclick="handleStartSellingClick()"
+                    class="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 text-white text-xs sm:text-sm font-black py-2 px-3.5 sm:px-4 rounded-2xl flex items-center gap-1.5 shadow-lg shadow-orange-500/25 hover:scale-105 active:scale-95 transition-all">
+                    <span>🛍️</span> <span>+ បង្កើតហាង / លក់</span>
+                </button>
+
+                <!-- កន្ត្រកទំនិញ -->
+                <a href="/cart.html"
+                    class="relative bg-white hover:bg-indigo-50/50 border-2 border-indigo-100 hover:border-indigo-300 text-gray-700 font-bold text-xs p-2 rounded-2xl flex items-center gap-1 transition shadow-xs group">
+                    <span class="text-base group-hover:scale-110 transition-transform">🛒</span>
+                    <span id="cart-count"
+                        class="bg-gradient-to-r from-red-500 to-rose-600 text-white text-[10px] font-black min-w-[18px] h-4 px-1 rounded-full flex items-center justify-center shadow-xs">
+                        0
+                    </span>
+                </a>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- ============================================================= -->
+    <!-- ២. HERO BANNER (លាក់ស្វ័យប្រវត្តិពេលចូលមើលហាងផ្ទាល់ខ្លួន) -->
+    <!-- ============================================================= -->
+    <div id="main-hero-banner" class="max-w-7xl mx-auto px-4 sm:px-6 pt-6 w-full">
+        <div
+            class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white p-6 sm:p-10 shadow-xl shadow-indigo-100">
+            <div class="relative z-10 max-w-2xl">
+                <span
+                    class="inline-block bg-white/20 backdrop-blur-md text-white text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-2">
+                    ⚡ វេទិកាពាណិជ្ជកម្មអេឡិចត្រូនិចទំនើប
+                </span>
+
+                <h1 class="banner-title text-2xl sm:text-4xl text-white tracking-normal mt-2">
+                    ទិញទំនិញដោយ<span
+                        class="text-amber-300 drop-shadow-[0_2px_12px_rgba(252,211,77,0.5)]">ទំនុកចិត្ត</span> <br>
+                    ឬបង្កើតហាងលក់ដោយ<span
+                        class="text-emerald-300 drop-shadow-[0_2px_12px_rgba(110,231,183,0.5)]">ឥតគិតថ្លៃ</span>
+                </h1>
+
+                <p class="text-white/90 text-xs sm:text-sm mt-3 max-w-lg leading-loose">
+                    ស្វែងរកទំនិញរាប់ពាន់មុខ ឬចូលរួមជាដៃគូអ្នកលក់បង្កើតប្រាក់ចំណូលជាមួយ SMD Market ថ្ងៃនេះ។
+                </p>
+                <div class="flex flex-wrap items-center gap-3 mt-6">
+                    <a href="#product-section"
+                        class="bg-white text-indigo-700 font-bold text-xs sm:text-sm px-5 py-2.5 rounded-2xl hover:bg-gray-100 transition shadow-md">
+                        ទិញទំនិញឥឡូវនេះ &darr;
+                    </a>
+                    <button onclick="handleStartSellingClick()"
+                        class="bg-indigo-950/40 hover:bg-indigo-950/60 border border-white/30 text-white font-bold text-xs sm:text-sm px-5 py-2.5 rounded-2xl transition">
+                        បើកហាងលក់ទំនិញ &rarr;
+                    </button>
+                </div>
+            </div>
+            <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-white/10 rounded-full blur-2xl"></div>
+        </div>
+    </div>
+
+    <!-- ============================================================= -->
+    <!-- ៣. ផ្នែកទំនិញ & CATEGORY TABS -->
+    <!-- ============================================================= -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 pt-6 sm:pt-8 w-full" id="product-section">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+            <div>
+                <h2 id="section-heading" class="text-lg sm:text-xl font-black text-gray-900 tracking-tight">
+                    ទំនិញដាក់លក់ទាំងអស់</h2>
+                <p id="section-subheading" class="text-xs text-gray-500">ជ្រើសរើសទំនិញដែលអ្នកពេញចិត្ត
+                    ឬចុចលើរូបដើម្បីមើលធំ</p>
+            </div>
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+                <button onclick="filterCategory('all')"
+                    class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-bold transition bg-indigo-600 text-white shadow-xs whitespace-nowrap">ទាំងអស់</button>
+                <button onclick="filterCategory('clothes')"
+                    class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-bold transition bg-white text-gray-700 border border-gray-200 hover:bg-indigo-50 whitespace-nowrap">សម្លៀកបំពាក់</button>
+                <button onclick="filterCategory('shoes')"
+                    class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-bold transition bg-white text-gray-700 border border-gray-200 hover:bg-indigo-50 whitespace-nowrap">ស្បែកជើង</button>
+                <button onclick="filterCategory('electronics')"
+                    class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-bold transition bg-white text-gray-700 border border-gray-200 hover:bg-indigo-50 whitespace-nowrap">អេឡិចត្រូនិច</button>
+                <button onclick="filterCategory('food')"
+                    class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-bold transition bg-white text-gray-700 border border-gray-200 hover:bg-indigo-50 whitespace-nowrap">ម្ហូបអាហារ</button>
+            </div>
+        </div>
+
+        <!-- ៤. PRODUCT GRID (មាន BADGE PROMOTION លើកាត) -->
+        <div id="product-grid"
+            class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5 sm:gap-6 pb-12"></div>
+    </div>
+
+    <!-- ============================================================= -->
+    <!-- ៥. POPUP AUTH MODAL -->
+    <!-- ============================================================= -->
+    <div id="auth-modal"
+        class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div
+            class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-indigo-100 relative my-auto">
+
+            <button onclick="closeAuthModal()"
+                class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 bg-gray-100 hover:bg-gray-200 w-8 h-8 rounded-full flex items-center justify-center text-xl font-bold transition">
+                &times;
+            </button>
+
+            <!-- LOGIN -->
+            <div id="step-login-box">
+                <div class="text-center mb-5">
+                    <div
+                        class="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-2 text-2xl shadow-inner">
+                        🔐
+                    </div>
+                    <h3 class="text-xl font-black text-gray-900 leading-snug">ចូលគណនីរបស់អ្នក</h3>
+                    <p class="text-xs text-gray-500 mt-0.5">សូមជ្រើសរើស Google ឬ Login ដោយ Email និង Password</p>
+                </div>
+
                 <button onclick="handleGoogleSignIn()" type="button"
-                    class="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-200 hover:bg-gray-50 hover:border-gray-300 py-3 px-4 rounded-2xl shadow-sm text-xs sm:text-sm font-bold text-gray-700 transition">
+                    class="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-200 hover:bg-gray-50 hover:border-gray-300 py-3 px-4 rounded-2xl shadow-xs text-xs sm:text-sm font-bold text-gray-700 transition active:scale-95">
                     <svg class="w-5 h-5" viewBox="0 0 24 24">
                         <path fill="#4285F4"
                             d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -61,29 +233,96 @@
                     <span>Sign in with Google</span>
                 </button>
 
-                <div class="flex items-center my-4">
-                    <div class="flex-1 border-t border-gray-200"></div>
-                    <span class="px-3 text-[11px] text-gray-400 font-bold uppercase">ឬ តាម Email</span>
-                    <div class="flex-1 border-t border-gray-200"></div>
+                <div class="flex items-center my-3.5">
+                    <div class="flex-1 border-t"></div>
+                    <span class="px-3 text-[10px] text-gray-400 font-bold uppercase">ឬ ប្រើ EMAIL & PASSWORD</span>
+                    <div class="flex-1 border-t"></div>
                 </div>
 
-                <form id="email-auth-form" class="space-y-3">
-                    <input type="email" id="auth-email-input" required placeholder="name@gmail.com"
-                        class="w-full border-2 border-gray-200 rounded-2xl p-3 text-xs bg-gray-50 focus:bg-white focus:border-indigo-600 outline-none transition">
+                <form id="email-password-login-form" class="space-y-3 text-left">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">អាសយដ្ឋាន Email <span
+                                class="text-red-500">*</span></label>
+                        <input type="email" id="auth-email-input" required placeholder="name@gmail.com"
+                            class="w-full border-2 border-gray-200 rounded-xl p-2.5 text-xs bg-gray-50 focus:bg-white focus:border-indigo-600 outline-none transition">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">ពាក្យសម្ងាត់ (Password) <span
+                                class="text-red-500">*</span></label>
+                        <input type="password" id="auth-password-input" required placeholder="••••••••"
+                            class="w-full border-2 border-gray-200 rounded-xl p-2.5 text-xs bg-gray-50 focus:bg-white focus:border-indigo-600 outline-none transition">
+                    </div>
+
                     <button type="submit"
-                        class="w-full bg-gray-900 hover:bg-black text-white font-bold py-3 rounded-2xl text-xs transition shadow-md">
-                        បន្តទៅជំហានបន្ទាប់ &rarr;
+                        class="w-full bg-gray-900 hover:bg-black text-white font-bold py-2.5 rounded-xl text-xs transition shadow-md">
+                        ចូលគណនី (Login) &rarr;
                     </button>
                 </form>
+
+                <div class="text-center mt-4 text-xs text-gray-500">
+                    មិនទាន់មានគណនីមែនទេ?
+                    <button onclick="toggleAuthForm('register')" class="text-indigo-600 font-bold hover:underline">
+                        ចុះឈ្មោះនៅទីនេះ
+                    </button>
+                </div>
             </div>
 
-            <!-- ដំណាក់កាលទី ២៖ បង្កើតឈ្មោះហាង, Logo, និង Link ផ្ទាល់ខ្លួន (បន្ទាប់ពី Login) -->
-            <div id="step-setup-gate" class="hidden text-left">
-                <div class="bg-indigo-50/70 p-3 rounded-2xl border border-indigo-100 text-xs text-indigo-700 mb-4">
-                    គណនីម្ចាស់ហាង៖ <b id="display-auth-email" class="font-mono text-indigo-900"></b>
+            <!-- REGISTER -->
+            <div id="step-register-box" class="hidden text-left">
+                <div class="text-center mb-5">
+                    <div
+                        class="w-14 h-14 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-2 text-2xl shadow-inner">
+                        📝
+                    </div>
+                    <h3 class="text-xl font-black text-gray-900 leading-snug">ចុះឈ្មោះគណនីថ្មី</h3>
+                    <p class="text-xs text-gray-500 mt-0.5">បង្កើតគណនីដើម្បីចាប់ផ្តើមលក់ និងទិញទំនិញ</p>
                 </div>
 
-                <h3 class="font-black text-base text-gray-900 mb-1">បង្កើត និងកំណត់ព័ត៌មានហាង</h3>
+                <form id="email-password-register-form" class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">ឈ្មោះពេញរបស់អ្នក <span
+                                class="text-red-500">*</span></label>
+                        <input type="text" id="reg-name-input" required placeholder="ឧ. បូរិន"
+                            class="w-full border-2 border-gray-200 rounded-xl p-2.5 text-xs bg-gray-50 focus:bg-white focus:border-indigo-600 outline-none transition">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">អាសយដ្ឋាន Email <span
+                                class="text-red-500">*</span></label>
+                        <input type="email" id="reg-email-input" required placeholder="name@gmail.com"
+                            class="w-full border-2 border-gray-200 rounded-xl p-2.5 text-xs bg-gray-50 focus:bg-white focus:border-indigo-600 outline-none transition">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">បង្កើតពាក្យសម្ងាត់ <span
+                                class="text-red-500">*</span></label>
+                        <input type="password" id="reg-password-input" required minlength="6"
+                            placeholder="យ៉ាងតិច ៦ ខ្ទង់"
+                            class="w-full border-2 border-gray-200 rounded-xl p-2.5 text-xs bg-gray-50 focus:bg-white focus:border-indigo-600 outline-none transition">
+                    </div>
+
+                    <button type="submit"
+                        class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-md">
+                        ចុះឈ្មោះគណនី &rarr;
+                    </button>
+                </form>
+
+                <div class="text-center mt-4 text-xs text-gray-500">
+                    មានគណនីរួចហើយមែនទេ?
+                    <button onclick="toggleAuthForm('login')" class="text-indigo-600 font-bold hover:underline">
+                        ចូលគណនីវិញ
+                    </button>
+                </div>
+            </div>
+
+            <!-- STORE SETUP -->
+            <div id="step-store-setup" class="hidden text-left">
+                <div class="bg-indigo-50/80 p-2.5 rounded-xl border border-indigo-100 text-xs text-indigo-700 mb-4">
+                    គណនី៖ <b id="display-auth-email" class="font-mono text-indigo-900"></b>
+                </div>
+
+                <h3 class="font-black text-base text-gray-900 mb-1 leading-snug">បង្កើត និងកំណត់ព័ត៌មានហាង</h3>
                 <p class="text-[11px] text-gray-500 mb-4">សូមបំពេញឈ្មោះហាង Logo និង Link ផ្ទាល់ខ្លួនរបស់អ្នក</p>
 
                 <form id="create-store-form" class="space-y-3.5">
@@ -91,21 +330,19 @@
                         <label class="block text-xs font-bold text-gray-700 mb-1">ឈ្មោះហាងរបស់អ្នក <span
                                 class="text-red-500">*</span></label>
                         <input type="text" id="str-name" onkeyup="autoGenerateSlug()" required
-                            placeholder="ឧ. បូរិន ម៉ូដទាន់សម័យ"
-                            class="w-full border rounded-xl p-2.5 text-xs bg-white focus:ring-2 focus:ring-indigo-500 outline-none">
+                            placeholder="ឧ. Store online"
+                            class="w-full border-2 border-gray-200 rounded-xl p-2.5 text-xs bg-white focus:border-indigo-600 outline-none">
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">បង្កើត Link ហាងផ្ទាល់ខ្លួន (Store URL)
-                            <span class="text-red-500">*</span></label>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Link ហាងផ្ទាល់ខ្លួន (Store URL) <span
+                                class="text-red-500">*</span></label>
                         <div
-                            class="flex items-center border rounded-xl overflow-hidden bg-gray-50 px-2.5 border-gray-300">
+                            class="flex items-center border-2 border-gray-200 rounded-xl overflow-hidden bg-gray-50 px-2.5">
                             <span class="text-[11px] text-gray-400 font-mono">.../shop/</span>
-                            <input type="text" id="str-slug" required placeholder="boren-store"
+                            <input type="text" id="str-slug" required placeholder="store-online"
                                 class="w-full bg-transparent py-2.5 text-xs font-mono font-bold text-indigo-700 outline-none">
                         </div>
-                        <span class="text-[10px] text-gray-400 block mt-1">ភ្ញៀវនឹងចូលទិញតាម Link នេះ (ប្រើតែអក្សរតូច
-                            និងលេខ)</span>
                     </div>
 
                     <div>
@@ -120,9 +357,8 @@
                     </div>
 
                     <button type="submit" id="btn-submit-store"
-                        class="w-full mt-3 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3.5 rounded-2xl text-xs sm:text-sm transition shadow-lg shadow-purple-200 flex items-center justify-center gap-2">
-                        <span>🚀</span>
-                        <span>បញ្ចប់ការបង្កើត & ចូល Dashboard &rarr;</span>
+                        class="w-full mt-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold py-3.5 rounded-2xl text-xs sm:text-sm transition shadow-lg shadow-indigo-200">
+                        🚀 បញ្ចប់ការបង្កើត & ចូល Dashboard &rarr;
                     </button>
                 </form>
             </div>
@@ -130,100 +366,70 @@
         </div>
     </div>
 
-    <!-- ============================================================= -->
-    <!-- ផ្នែកទី ២៖ ទំព័រហាងទំនិញ (Header, Products, Cart) -->
-    <!-- ============================================================= -->
-    <header class="bg-white shadow-sm border-b sticky top-0 z-30">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex justify-between items-center">
-
-            <!-- Logo & ឈ្មោះហាង -->
-            <div class="flex items-center gap-2.5">
-                <div id="store-logo-box"
-                    class="w-9 h-9 rounded-xl overflow-hidden bg-indigo-50 border border-indigo-100 flex items-center justify-center text-xl font-bold shadow-sm">
-                    <span id="store-logo-emoji">🛍️</span>
-                    <img id="store-logo-img" src="" class="w-full h-full object-cover hidden">
-                </div>
-                <div>
-                    <span id="store-name-display"
-                        class="text-base sm:text-xl font-black text-indigo-600 tracking-tight block">ហាងអនឡាញ</span>
-                </div>
-            </div>
-
-            <!-- ប៊ូតុងខាងស្តាំ -->
-            <div class="flex items-center gap-2 sm:gap-3">
-                <!-- ប៊ូតុង Dashboard (បង្ហាញតែពេលជាម្ចាស់ហាង) -->
-                <a id="btn-owner-dashboard" href="/dashboard"
-                    class="hidden bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition items-center gap-1.5 shadow-sm">
-                    <span>⚙️</span>
-                    <span>Dashboard</span>
-                </a>
-
-                <!-- ប៊ូតុងកន្ត្រករបស់អ្នកទិញ -->
-                <a href="/cart.html"
-                    class="relative bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold text-xs px-3 sm:px-4 py-2 rounded-xl flex items-center gap-2 transition">
-                    <span>🛒</span>
-                    <span id="cart-count"
-                        class="bg-red-500 text-white text-[11px] px-2 py-0.5 rounded-full font-bold">0</span>
-                </a>
-            </div>
-        </div>
-    </header>
-
-    <!-- Main Grid ទំនិញក្នុងហាង -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 flex-1 w-full">
-        <div class="mb-5 sm:mb-6 flex justify-between items-end">
-            <div>
-                <h1 class="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">ទំនិញដាក់លក់ក្នុងហាង</h1>
-                <p class="text-xs text-gray-500 mt-0.5">ជ្រើសរើសទំនិញដើម្បីកុម្ម៉ង់ទិញភ្លាមៗ</p>
-            </div>
-            <button onclick="copyStoreLink()" id="btn-copy-link"
-                class="hidden text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold px-3 py-1.5 rounded-lg border border-indigo-200 transition">
-                🔗 Copy Link ហាង
+    <!-- MODAL មើលរូបភាពធំ (LIGHTBOX) -->
+    <div id="image-viewer-modal" onclick="closeImageViewer()"
+        class="fixed inset-0 bg-slate-950/85 backdrop-blur-md hidden z-50 flex items-center justify-center p-4 cursor-zoom-out">
+        <div class="relative max-w-lg max-h-[85vh] w-full flex items-center justify-center"
+            onclick="event.stopPropagation()">
+            <button onclick="closeImageViewer()"
+                class="absolute -top-12 right-0 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 w-9 h-9 rounded-full flex items-center justify-center text-2xl font-bold transition">
+                &times;
             </button>
+            <img id="viewer-full-img" src=""
+                class="max-w-full max-h-[80vh] object-contain rounded-2xl shadow-2xl border border-white/10 bg-white/5">
         </div>
+    </div>
 
-        <div id="product-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5 sm:gap-6">
-        </div>
-    </main>
-
-    <!-- Modal ជ្រើសរើសទិញ -->
+    <!-- MODAL ជ្រើសរើស SIZE & ចំនួន ដើម្បីទិញ -->
     <div id="buy-modal"
-        class="fixed inset-0 bg-black/50 backdrop-blur-xs hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border">
+        class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-5 shadow-2xl border">
             <div class="flex gap-3 items-center pb-3 border-b mb-3">
-                <img id="buy-img" src="" class="w-16 h-16 object-cover rounded-xl border bg-gray-50 flex-shrink-0">
+                <img id="buy-img" src="" class="w-16 h-16 object-cover rounded-2xl border bg-gray-50 flex-shrink-0">
                 <div class="flex-1 min-w-0">
-                    <h3 id="buy-title" class="font-bold text-gray-900 text-sm truncate"></h3>
+                    <h3 id="buy-title" class="font-bold text-gray-900 text-sm truncate leading-snug"></h3>
                     <div id="buy-price" class="text-indigo-600 font-black text-base mt-0.5"></div>
                     <div id="buy-stock-info" class="text-[11px] text-gray-500 mt-0.5"></div>
                 </div>
             </div>
 
+            <!-- ស្លាកប្រូម៉ូសិនក្នុង Buy Modal -->
+            <div id="buy-promotion-box"
+                class="hidden mb-3 p-2 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 font-bold flex items-center gap-1.5">
+                <span>🎁</span> <span id="buy-promotion-text"></span>
+            </div>
+
             <form id="buy-form" class="space-y-3">
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1">ទំហំ (Size)</label>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">ជ្រើសរើសទំហំ (Size) <span
+                            class="text-red-500">*</span></label>
                     <div id="buy-sizes" class="flex flex-wrap gap-1.5"></div>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1">ចំនួន</label>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">ចំនួន (Quantity)</label>
                     <div class="flex items-center gap-2">
                         <button type="button" onclick="changeQty(-1)"
-                            class="w-8 h-8 bg-gray-100 rounded-lg border font-bold">-</button>
+                            class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-xl border font-bold transition text-gray-700">-</button>
                         <input id="buy-qty" type="number" value="1" readonly
-                            class="w-12 text-center text-xs font-bold border rounded-lg h-8">
+                            class="w-12 text-center text-xs font-bold border rounded-xl h-8 bg-transparent">
                         <button type="button" onclick="changeQty(1)"
-                            class="w-8 h-8 bg-gray-100 rounded-lg border font-bold">+</button>
+                            class="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-xl border font-bold transition text-gray-700">+</button>
                     </div>
                 </div>
                 <div class="flex gap-2 pt-2 border-t">
                     <button type="button" onclick="closeBuyModal()"
-                        class="w-1/2 py-2.5 bg-gray-100 text-gray-700 rounded-xl text-xs font-bold">បោះបង់</button>
+                        class="w-1/2 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold transition">បោះបង់</button>
                     <button type="submit"
-                        class="w-1/2 py-2.5 bg-indigo-600 text-white rounded-xl text-xs font-bold shadow">ដាក់ចូលកន្ត្រក</button>
+                        class="w-1/2 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white rounded-xl text-xs font-bold shadow-md shadow-indigo-200 transition">ដាក់ចូលកន្ត្រក</button>
                 </div>
             </form>
         </div>
     </div>
+
+    <!-- Footer -->
+    <footer class="py-6 text-center text-xs text-gray-400 border-t border-indigo-50">
+        © 2026 SMD Market. រក្សាសិទ្ធិគ្រប់យ៉ាង។
+    </footer>
 
     <script>
         const CART_KEY = 'km_market_cart';
@@ -231,62 +437,146 @@
 
         let currentAuthEmail = '';
         let base64Logo = '';
-        let storeSlugFromUrl = '';
         let allProducts = [];
         let selectedProduct = null;
         let selectedSize = '';
+        let currentCat = 'all';
 
-        // ពិនិត្យមើល URL (/shop/boren-store)
-        const pathParts = window.location.pathname.split('/');
-        if (pathParts[1] === 'shop' && pathParts[2]) {
-            storeSlugFromUrl = pathParts[2].trim();
-        }
+        const pathSegments = window.location.pathname.split('/').filter(Boolean);
+        const isShopRoute = pathSegments[0] === 'shop' && pathSegments[1];
+        const currentShopSlug = isShopRoute ? pathSegments[1].toLowerCase().trim() : '';
 
         async function initApp() {
             const savedStoreSlug = localStorage.getItem(SELLER_STORE_KEY);
 
-            // ក្បួនគ្រប់គ្រង Gate (បើភ្ញៀវចូលតាម Link ហាង /shop/xxx មិនបាច់បង្ហាញ Gate ទេ)
-            if (storeSlugFromUrl) {
-                document.getElementById('onboarding-gate').classList.add('hidden');
-                loadTargetStore(storeSlugFromUrl);
-            }
-            // បើចូលមក Website ដើមដំបូង (/) ហើយមិនទាន់មានហាង -> បង្ហាញផ្ទាំង Login/Google Sign in ភ្លាម
-            else if (!savedStoreSlug) {
-                document.getElementById('onboarding-gate').classList.remove('hidden');
-                document.getElementById('step-auth-gate').classList.remove('hidden');
-                document.getElementById('step-setup-gate').classList.add('hidden');
-            }
-            // បើធ្លាប់បង្កើតហាងរួចហើយ ចូលមក Website ដើម
-            else {
-                document.getElementById('onboarding-gate').classList.add('hidden');
-                document.getElementById('btn-owner-dashboard').classList.remove('hidden');
-                document.getElementById('btn-owner-dashboard').classList.add('flex');
-                document.getElementById('btn-copy-link').classList.remove('hidden');
-                loadTargetStore(savedStoreSlug);
+            if (isShopRoute) {
+                // ១. ករណីភ្ញៀវចូលមើលហាងជាក់លាក់ (/shop/store-online)
+                document.getElementById('brand-home-link').href = `/shop/${currentShopSlug}`;
+                document.getElementById('auth-seller-view').classList.add('hidden');
+                document.getElementById('auth-seller-view').classList.remove('flex');
+                document.getElementById('auth-guest-view').classList.add('hidden');
+                document.getElementById('btn-create-store-top').classList.add('hidden');
+
+                await loadShopProfile(currentShopSlug);
+                await loadProducts(currentShopSlug);
+            } else {
+                // ២. ករណីនៅទំព័រដើមធំ (/)
+                updateHeaderAuthStatus();
+                if (savedStoreSlug) {
+                    const visitBtn = document.getElementById('btn-visit-my-shop');
+                    if (visitBtn) {
+                        visitBtn.href = `/shop/${savedStoreSlug}`;
+                        visitBtn.innerText = `🛍️ ចូលហាងខ្ញុំ (${savedStoreSlug})`;
+                    }
+                }
+                await loadProducts('');
             }
 
-            loadProducts();
             updateCartCount();
         }
 
-        // Sign in with Google (Mock Google Dialog)
+        async function loadShopProfile(slug) {
+            try {
+                const res = await fetch(`/api/store/get/${slug}?t=${Date.now()}`);
+                if (res.ok) {
+                    const store = await res.json();
+                    document.getElementById('brand-name-display').innerText = store.name;
+                    document.getElementById('brand-sub-display').innerText = "ONLINE STORE";
+                    document.getElementById('page-title').innerText = `${store.name} - ហាងអនឡាញ`;
+
+                    if (store.logo) {
+                        document.getElementById('brand-logo-img').src = store.logo;
+                        document.getElementById('brand-logo-img').classList.remove('hidden');
+                        document.getElementById('brand-logo-emoji').classList.add('hidden');
+                    }
+
+                    document.getElementById('section-heading').innerText = `ទំនិញដាក់លក់ក្នុងហាង «${store.name}»`;
+                    document.getElementById('section-subheading').innerText = `ទំនិញផ្លូវការពីហាង ${store.name}`;
+                    document.getElementById('main-hero-banner').classList.add('hidden');
+                } else {
+                    document.getElementById('section-heading').innerText = "រកមិនឃើញហាងនេះឡើយ";
+                }
+            } catch (err) {
+                console.error("Load shop error:", err);
+            }
+        }
+
+        function updateHeaderAuthStatus() {
+            const savedStoreSlug = localStorage.getItem(SELLER_STORE_KEY);
+            const guestView = document.getElementById('auth-guest-view');
+            const sellerView = document.getElementById('auth-seller-view');
+
+            if (savedStoreSlug) {
+                guestView.classList.add('hidden');
+                sellerView.classList.remove('hidden');
+                sellerView.classList.add('flex');
+            } else {
+                guestView.classList.remove('hidden');
+                sellerView.classList.add('hidden');
+                sellerView.classList.remove('flex');
+            }
+        }
+
+        function handleStartSellingClick() {
+            const savedStoreSlug = localStorage.getItem(SELLER_STORE_KEY);
+            if (savedStoreSlug) {
+                window.location.href = `/dashboard?store=${savedStoreSlug}`;
+            } else {
+                openAuthModal('login');
+            }
+        }
+
+        function openAuthModal(mode) {
+            document.getElementById('auth-modal').classList.remove('hidden');
+            document.getElementById('step-store-setup').classList.add('hidden');
+            toggleAuthForm(mode || 'login');
+        }
+
+        function closeAuthModal() {
+            document.getElementById('auth-modal').classList.add('hidden');
+        }
+
+        function toggleAuthForm(type) {
+            if (type === 'register') {
+                document.getElementById('step-login-box').classList.add('hidden');
+                document.getElementById('step-register-box').classList.remove('hidden');
+            } else {
+                document.getElementById('step-login-box').classList.remove('hidden');
+                document.getElementById('step-register-box').classList.add('hidden');
+            }
+        }
+
         function handleGoogleSignIn() {
             const mockName = prompt('ចូលគណនី Google (បញ្ចូលឈ្មោះរបស់អ្នក):', 'Boren');
             if (!mockName) return;
 
             currentAuthEmail = (mockName.toLowerCase().replace(/\s+/g, '') || 'owner') + '@gmail.com';
-            goToStepSetup(currentAuthEmail, 'ហាង ' + mockName);
+            goToStoreSetup(currentAuthEmail, 'Store online');
         }
 
-        document.getElementById('email-auth-form').onsubmit = (e) => {
+        document.getElementById('email-password-login-form').onsubmit = (e) => {
             e.preventDefault();
-            currentAuthEmail = document.getElementById('auth-email-input').value.trim();
-            goToStepSetup(currentAuthEmail, '');
+            const email = document.getElementById('auth-email-input').value.trim();
+            const password = document.getElementById('auth-password-input').value.trim();
+            if (!email || !password) return alert('សូមបញ្ចូល Email និង Password!');
+            currentAuthEmail = email;
+            goToStoreSetup(currentAuthEmail, 'Store online');
         };
 
-        function goToStepSetup(email, defaultStoreName) {
-            document.getElementById('step-auth-gate').classList.add('hidden');
-            document.getElementById('step-setup-gate').classList.remove('hidden');
+        document.getElementById('email-password-register-form').onsubmit = (e) => {
+            e.preventDefault();
+            const name = document.getElementById('reg-name-input').value.trim();
+            const email = document.getElementById('reg-email-input').value.trim();
+            const password = document.getElementById('reg-password-input').value.trim();
+            if (!email || !password) return alert('សូមបំពេញព័ត៌មានឱ្យគ្រប់គ្រាន់!');
+            currentAuthEmail = email;
+            goToStoreSetup(currentAuthEmail, name || 'Store online');
+        };
+
+        function goToStoreSetup(email, defaultStoreName) {
+            document.getElementById('step-login-box').classList.add('hidden');
+            document.getElementById('step-register-box').classList.add('hidden');
+            document.getElementById('step-store-setup').classList.remove('hidden');
             document.getElementById('display-auth-email').innerText = email;
             if (defaultStoreName) {
                 document.getElementById('str-name').value = defaultStoreName;
@@ -314,7 +604,6 @@
             }
         }
 
-        // បញ្ចប់ការបង្កើតហាង -> រួចនាំចូល Dashboard
         document.getElementById('create-store-form').onsubmit = async (e) => {
             e.preventDefault();
             const name = document.getElementById('str-name').value.trim();
@@ -339,7 +628,7 @@
                 const data = await res.json();
                 if (res.ok) {
                     localStorage.setItem(SELLER_STORE_KEY, slug);
-                    alert(`✓ អបអរសាទរ! ហាងត្រូវបានបង្កើតជោគជ័យ។\nLink ហាងរបស់អ្នកគឺ៖ ${window.location.origin}/shop/${slug}\nប្រព័ន្ធនឹងនាំអ្នកទៅកាន់ Dashboard ឥឡូវនេះ!`);
+                    alert(`✓ អបអរសាទរ! ហាងត្រូវបានបង្កើតជោគជ័យ។\nLink ហាងរបស់អ្នកគឺ៖ ${window.location.origin}/shop/${slug}`);
                     window.location.href = `/dashboard?store=${slug}`;
                 } else {
                     alert(data.error || 'កំហុសក្នុងការបង្កើតហាង');
@@ -352,67 +641,106 @@
             }
         };
 
-        async function loadTargetStore(slug) {
+        async function loadProducts(storeFilterSlug) {
             try {
-                const res = await fetch(`/api/store/get/${slug}`);
-                if (res.ok) {
-                    const store = await res.json();
-                    document.getElementById('store-name-display').innerText = store.name;
-                    document.title = store.name;
-                    if (store.logo) {
-                        document.getElementById('store-logo-img').src = store.logo;
-                        document.getElementById('store-logo-img').classList.remove('hidden');
-                        document.getElementById('store-logo-emoji').classList.add('hidden');
-                    }
-                }
-            } catch (e) { }
-        }
-
-        function copyStoreLink() {
-            const slug = storeSlugFromUrl || localStorage.getItem(SELLER_STORE_KEY);
-            if (!slug) return;
-            const link = `${window.location.origin}/shop/${slug}`;
-            navigator.clipboard.writeText(link);
-            alert(`✓ បានចម្លង Link ហាងរបស់អ្នក:\n${link}\nអ្នកអាចផ្ញើឱ្យភ្ញៀវទិញបាន!`);
-        }
-
-        async function loadProducts() {
-            try {
-                const querySlug = storeSlugFromUrl || localStorage.getItem(SELLER_STORE_KEY) || '';
-                const res = await fetch(`/api/products?slug=${querySlug}`);
+                const url = storeFilterSlug ? `/api/products?slug=${storeFilterSlug}&t=${Date.now()}` : `/api/products?t=${Date.now()}`;
+                const res = await fetch(url);
                 allProducts = await res.json();
-                const grid = document.getElementById('product-grid');
+                renderProductCards(allProducts);
+            } catch (e) {
+                console.error(e);
+            }
+        }
 
-                if (!allProducts.length) {
-                    grid.innerHTML = '<div class="col-span-full text-center py-12 text-gray-400 text-xs">មិនទាន់មានទំនិញដាក់លក់ក្នុងហាងនេះនៅឡើយទេ</div>';
-                    return;
-                }
+        // =============================================================
+        // RENDER PRODUCTS CARD (បង្ហាញស្លាក PROMOTION ច្បាស់)
+        // =============================================================
+        function renderProductCards(products) {
+            const grid = document.getElementById('product-grid');
+            if (!products || !products.length) {
+                grid.innerHTML = '<div class="col-span-full text-center py-12 text-gray-400 text-xs bg-white/80 backdrop-blur rounded-3xl border border-indigo-100 shadow-xs">មិនទាន់មានទំនិញដាក់លក់ក្នុងហាងនេះនៅឡើយទេ</div>';
+                return;
+            }
 
-                grid.innerHTML = allProducts.map(p => {
-                    const stock = p.stock !== undefined ? parseInt(p.stock) : 0;
-                    const isOutOfStock = stock <= 0;
+            grid.innerHTML = products.map(p => {
+                const stock = p.stock !== undefined ? parseInt(p.stock) : 0;
+                const isOutOfStock = stock <= 0;
+                const imgUrl = p.image || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=400';
 
-                    return `
-                        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-3 flex flex-col justify-between">
-                            <div>
-                                <div class="relative w-full h-36 bg-gray-50 rounded-xl overflow-hidden mb-2 border">
-                                    <img src="${p.image || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=300'}" class="w-full h-full object-cover">
-                                    ${isOutOfStock ? '<div class="absolute inset-0 bg-black/50 flex items-center justify-center text-white text-[11px] font-bold">អស់ស្តុក</div>' : ''}
-                                </div>
-                                <h3 class="font-bold text-xs text-gray-800 truncate">${p.title}</h3>
-                                <div class="flex items-center justify-between mt-1">
-                                    <span class="text-sm font-black text-indigo-600">$${Number(p.price || 0).toFixed(2)}</span>
-                                    <span class="text-[10px] text-gray-400">ស្តុក៖ ${stock}</span>
+                // ចាប់យកអត្ថបទ Promotion
+                const promoText = p.promotion || p.promo || '';
+                const promoBadge = (promoText && promoText.trim() !== '') ? `
+                    <div style="display:inline-flex; align-items:center; gap:4px; background:#e11d48; color:#ffffff; font-size:11px; font-weight:bold; padding:3px 8px; border-radius:8px; margin-bottom:6px; box-shadow:0 2px 6px rgba(225,29,72,0.3);">
+                        <span>🎁</span> <span>${promoText.trim()}</span>
+                    </div>
+                ` : '';
+
+                return `
+                    <div class="bg-white rounded-3xl border-2 border-indigo-100/70 hover:border-indigo-400 p-3.5 shadow-sm hover:shadow-xl hover:shadow-indigo-100/80 transition-all duration-300 flex flex-col justify-between h-full group hover:-translate-y-1">
+                        <div>
+                            <div onclick="openImageViewer('${imgUrl}')" 
+                                 class="relative w-full aspect-square bg-gradient-to-b from-slate-50 to-indigo-50/40 rounded-2xl overflow-hidden mb-3 border border-indigo-50 flex items-center justify-center p-1.5 cursor-zoom-in group/img">
+                                <img src="${imgUrl}" alt="${p.title}" class="w-full h-full object-contain group-hover/img:scale-105 transition-transform duration-300">
+                                ${isOutOfStock ? '<div class="absolute inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center text-white text-xs font-bold rounded-2xl">អស់ពីស្តុក</div>' : ''}
+                                <div class="absolute bottom-2 right-2 bg-black/40 text-white rounded-full p-1 opacity-0 group-hover/img:opacity-100 transition-opacity">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"></path></svg>
                                 </div>
                             </div>
-                            <button onclick="openBuyModal('${p.id}')" ${isOutOfStock ? 'disabled' : ''} 
-                                class="w-full mt-3 ${isOutOfStock ? 'bg-gray-300 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'} text-white text-xs font-bold py-1.5 rounded-xl transition">
-                                ${isOutOfStock ? 'អស់ពីស្តុក' : 'ទិញ'}
-                            </button>
+
+                            <!-- ស្លាកប្រូម៉ូសិន -->
+                            ${promoBadge}
+
+                            <h3 class="font-bold text-xs sm:text-sm text-gray-900 line-clamp-2 leading-relaxed min-h-[2.4rem]" title="${p.title}">
+                                ${p.title}
+                            </h3>
+
+                            <div class="flex items-center justify-between mt-2 pt-2 border-t border-indigo-50">
+                                <span class="text-sm sm:text-base font-black text-indigo-600 tracking-tight">
+                                    $${Number(p.price || 0).toFixed(2)}
+                                </span>
+                                <span class="text-[10px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-100">
+                                    ស្តុក: ${stock}
+                                </span>
+                            </div>
                         </div>
-                    `;
-                }).join('');
-            } catch (e) { }
+
+                        <button onclick="openBuyModal('${p.id}')" ${isOutOfStock ? 'disabled' : ''} 
+                            class="w-full mt-3.5 ${isOutOfStock ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white shadow-md shadow-indigo-200/80'} text-xs font-bold py-2.5 rounded-2xl transition-all">
+                            ${isOutOfStock ? 'អស់ពីស្តុក' : 'ទិញ'}
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filterProducts() {
+            const q = document.getElementById('search-input').value.toLowerCase().trim();
+            const filtered = allProducts.filter(p => (p.title || '').toLowerCase().includes(q));
+            renderProductCards(filtered);
+        }
+
+        function filterCategory(cat) {
+            currentCat = cat;
+            document.querySelectorAll('.cat-pill').forEach(btn => {
+                btn.className = 'cat-pill px-3.5 py-1.5 rounded-xl text-xs font-bold transition bg-white text-gray-700 border border-gray-200 hover:bg-indigo-50 whitespace-nowrap';
+            });
+            event.target.className = 'cat-pill px-3.5 py-1.5 rounded-xl text-xs font-bold transition bg-indigo-600 text-white shadow-xs whitespace-nowrap';
+
+            if (cat === 'all') {
+                renderProductCards(allProducts);
+            } else {
+                const filtered = allProducts.filter(p => (p.category || 'clothes') === cat);
+                renderProductCards(filtered);
+            }
+        }
+
+        function openImageViewer(imgUrl) {
+            document.getElementById('viewer-full-img').src = imgUrl;
+            document.getElementById('image-viewer-modal').classList.remove('hidden');
+        }
+
+        function closeImageViewer() {
+            document.getElementById('image-viewer-modal').classList.add('hidden');
         }
 
         function openBuyModal(id) {
@@ -424,12 +752,22 @@
             document.getElementById('buy-img').src = selectedProduct.image || '';
             document.getElementById('buy-stock-info').innerText = 'នៅក្នុងស្តុក៖ ' + (selectedProduct.stock || 0);
 
+            const promoBox = document.getElementById('buy-promotion-box');
+            const promoText = document.getElementById('buy-promotion-text');
+            const promoVal = selectedProduct.promotion || selectedProduct.promo || '';
+            if (promoVal && promoVal.trim() !== '') {
+                promoText.innerText = promoVal.trim();
+                promoBox.classList.remove('hidden');
+            } else {
+                promoBox.classList.add('hidden');
+            }
+
             const sizes = (selectedProduct.attributes?.size || 'S, M, L').split(',');
             selectedSize = sizes[0]?.trim() || 'Standard';
 
             document.getElementById('buy-sizes').innerHTML = sizes.map((s, idx) => `
                 <button type="button" onclick="selectSize('${s.trim()}', this)" 
-                    class="size-btn px-2.5 py-1 text-xs border rounded-lg font-bold ${idx === 0 ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700'}">
+                    class="size-btn px-3 py-1.5 text-xs border rounded-xl font-bold transition ${idx === 0 ? 'bg-indigo-600 text-white border-indigo-600 shadow-xs' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'}">
                     ${s.trim()}
                 </button>
             `).join('');
@@ -440,8 +778,10 @@
 
         function selectSize(size, el) {
             selectedSize = size;
-            document.querySelectorAll('.size-btn').forEach(b => b.className = 'size-btn px-2.5 py-1 text-xs border rounded-lg font-bold bg-white text-gray-700');
-            el.className = 'size-btn px-2.5 py-1 text-xs border rounded-lg font-bold bg-indigo-600 text-white border-indigo-600';
+            document.querySelectorAll('#buy-sizes .size-btn').forEach(b => {
+                b.className = 'size-btn px-3 py-1.5 text-xs border rounded-xl font-bold transition bg-white text-gray-700 border-gray-200 hover:bg-gray-50';
+            });
+            el.className = 'size-btn px-3 py-1.5 text-xs border rounded-xl font-bold transition bg-indigo-600 text-white border-indigo-600 shadow-xs';
         }
 
         function changeQty(d) {
@@ -472,13 +812,13 @@
                 image: selectedProduct.image || '',
                 attributes: { size: selectedSize },
                 qty,
-                store_slug: storeSlugFromUrl || selectedProduct.store_slug || 'default'
+                store_slug: currentShopSlug || selectedProduct.store_slug || 'default'
             });
 
             localStorage.setItem(CART_KEY, JSON.stringify(cart));
             updateCartCount();
             closeBuyModal();
-            alert('✓ បានដាក់ចូលកន្ត្រកទំនិញ!');
+            alert(`✓ បានដាក់ទំនិញ «${selectedProduct.title}» (Size: ${selectedSize}, ចំនួន: ${qty}) ចូលកន្ត្រកជោគជ័យ!`);
         };
 
         function updateCartCount() {

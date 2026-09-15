@@ -4,312 +4,417 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ទូទាត់ប្រាក់ KHQR</title>
+    <title id="checkout-page-title">ទូទាត់ប្រាក់</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- ប្រើ dom-to-image-more គាំទ្រពុម្ពអក្សរខ្មែរ 100% មិនជាន់គ្នា -->
+    <script src="https://cdn.jsdelivr.net/npm/dom-to-image-more@2.8.0/dist/dom-to-image-more.min.js"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Siemreap&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@600;700;800&family=Siemreap&display=swap"
+        rel="stylesheet">
 
     <style>
         * {
             font-family: 'Khmer OS Siemreap', 'Siemreap', sans-serif !important;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        input,
-        select,
-        textarea,
-        button {
-            font-family: 'Khmer OS Siemreap', 'Siemreap', sans-serif !important;
+        h1,
+        h2,
+        h3,
+        h4,
+        b,
+        .receipt-font {
+            font-family: 'Kantumruy Pro', 'Siemreap', sans-serif !important;
         }
 
-        select {
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234b5563' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 0.75rem center;
-            background-size: 1em 1em;
-            padding-right: 2.5rem;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
+        p,
+        span,
+        button,
+        a {
+            line-height: 1.6;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+
+            #receipt-printable-area,
+            #receipt-printable-area * {
+                visibility: visible;
+            }
+
+            #receipt-printable-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                margin: 0;
+                padding: 10px;
+                border: none !important;
+                box-shadow: none !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
         }
     </style>
 </head>
 
-<body class="p-4 sm:p-6 max-w-lg mx-auto bg-gray-50 text-gray-800 antialiased min-h-screen">
+<body
+    class="bg-gradient-to-br from-[#f8f9ff] via-[#f1f4fe] to-[#fbf7ff] text-gray-800 antialiased min-h-screen flex flex-col justify-between">
 
-    <div class="mb-4">
-        <a href="/cart.html" class="text-indigo-600 text-sm font-semibold hover:underline flex items-center gap-1">
-            <span>&larr;</span> ត្រឡប់ទៅកន្ត្រកវិញ
-        </a>
-    </div>
-
-    <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-gray-100">
-        <!-- Header -->
-        <div class="flex items-center justify-between pb-4 mb-4 border-b">
-            <div class="flex items-center gap-2">
-                <span class="bg-red-600 text-white font-black text-xs px-2 py-1 rounded">KHQR</span>
-                <h1 class="text-lg font-bold text-gray-800">ទូទាត់ប្រាក់តាម KHQR</h1>
-            </div>
-            <span class="text-xs bg-indigo-50 text-indigo-600 font-bold px-2 py-1 rounded">ABA & All Banks</span>
-        </div>
-
-        <!-- Total Box -->
-        <div class="bg-gray-50 p-4 rounded-xl mb-4 flex justify-between items-center border border-gray-100">
-            <span class="text-sm text-gray-600">ទឹកប្រាក់សរុប៖</span>
-            <span class="text-2xl font-black text-indigo-600 tracking-tight">$<span
-                    id="display-amount">0.00</span></span>
-        </div>
-
-        <!-- ដំណាក់កាលទី ១: បំពេញព័ត៌មានដឹកជញ្ជូន -->
-        <div id="step-form">
-            <form id="shipping-form" class="space-y-3.5">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">ឈ្មោះអ្នកទិញ</label>
-                        <input id="name" required placeholder="ឧ. ចាន់ បូរិន"
-                            class="w-full h-11 border border-gray-300 px-3 rounded-lg text-sm bg-white focus:ring-2 focus:ring-indigo-500 outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">ឈ្មោះកុងធនាគារអ្នកផ្ញើ</label>
-                        <input id="bank-acc-name" required placeholder="ឧ. NORN CHAN BOREN"
-                            class="w-full h-11 border border-gray-300 px-3 rounded-lg text-sm bg-white uppercase focus:ring-2 focus:ring-indigo-500 outline-none">
-                    </div>
+    <!-- Header ហាង -->
+    <header
+        class="sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-indigo-100 shadow-[0_4px_25px_-5px_rgba(99,102,241,0.1)] no-print">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+            <a id="shop-back-link" href="/" class="flex items-center gap-2.5 select-none">
+                <div id="checkout-logo-box"
+                    class="w-10 h-10 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-xl overflow-hidden shadow-xs">
+                    <span id="checkout-logo-emoji">🏪</span>
+                    <img id="checkout-logo-img" src="" class="w-full h-full object-cover hidden">
                 </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">លេខទូរស័ព្ទ</label>
-                        <input id="phone" required placeholder="ឧ. 012 345 678"
-                            class="w-full h-11 border border-gray-300 px-3 rounded-lg text-sm bg-white focus:ring-2 focus:ring-indigo-500 outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">ផ្ញើតាម (សេវាដឹកជញ្ជូន)</label>
-                        <select id="delivery-method" required
-                            class="w-full h-11 border border-gray-300 px-3 rounded-lg text-sm bg-white cursor-pointer focus:ring-2 focus:ring-indigo-500 outline-none block">
-                            <option value="វីរៈប៊ុនថាំ (VET Express)">វីរៈប៊ុនថាំ (VET Express)</option>
-                            <option value="J&T Express">J&T Express</option>
-                            <option value="កាពីតូល (Capitol)">កាពីតូល (Capitol)</option>
-                            <option value="ដឹកភ្លាមៗក្នុងក្រុង (Grab/Express)">ដឹកភ្លាមៗក្នុងក្រុង (Grab/Express)
-                            </option>
-                        </select>
-                    </div>
-                </div>
-
                 <div>
-                    <label class="block text-xs font-semibold text-gray-700 mb-1">ទីតាំង / អាសយដ្ឋានទទួលទំនិញ</label>
-                    <textarea id="address" required rows="2"
-                        placeholder="ផ្ទះលេខ, ផ្លូវ, សង្កាត់, ខណ្ឌ, រាជធានី/ខេត្ត..."
-                        class="w-full border border-gray-300 p-2.5 rounded-lg text-sm bg-white focus:ring-2 focus:ring-indigo-500 outline-none resize-none"></textarea>
+                    <span id="checkout-store-name"
+                        class="text-base sm:text-lg font-black bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent tracking-tight block">
+                        កំពុងទាញយក...
+                    </span>
+                    <span
+                        class="text-[9px] text-indigo-500 font-bold uppercase tracking-widest block -mt-0.5">ទូទាត់ប្រាក់</span>
                 </div>
+            </a>
 
-                <button type="submit"
-                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold h-11 rounded-lg text-sm transition shadow mt-2">
-                    បន្តទៅស្កេនបង់ប្រាក់ KHQR &rarr;
-                </button>
-            </form>
+            <a href="/cart.html"
+                class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-3 py-2 rounded-xl transition">
+                &larr; ត្រឡប់ទៅកន្ត្រក
+            </a>
         </div>
+    </header>
 
-        <!-- ដំណាក់កាលទី ២: ស្កេន QR និង Upload វិក្កយបត្រ -->
-        <div id="step-payment" class="hidden mt-2 text-center border-t pt-4">
-            <p class="text-sm font-bold text-gray-800">ស្កេនបង់ប្រាក់ទៅកាន់កុងហាង</p>
-            <p class="text-xs text-gray-500 mb-3">សូមបើក App ធនាគារ (ABA, ACLEDA...) ដើម្បីស្កេនបង់ប្រាក់</p>
+    <!-- ផ្នែកទី ១៖ ផ្ទាំងទូទាត់ប្រាក់ & ស្កេន KHQR -->
+    <main id="view-checkout-form" class="max-w-4xl mx-auto px-4 py-6 flex-1 w-full">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
 
-            <div class="inline-block p-3 bg-white border-2 border-red-500 rounded-2xl shadow-md mb-4">
-                <img id="vendor-qr-img" src="" alt="KHQR" class="w-60 h-60 object-contain mx-auto rounded-lg">
-            </div>
+            <div
+                class="md:col-span-5 bg-white p-5 sm:p-6 rounded-3xl border border-indigo-100 shadow-sm text-center flex flex-col justify-between">
+                <div>
+                    <div
+                        class="inline-block bg-indigo-50 text-indigo-700 text-xs font-bold px-3 py-1 rounded-full mb-3 border border-indigo-100">
+                        💳 ស្កេនបាញ់លុយតាម KHQR
+                    </div>
 
-            <!-- ប្រអប់ Upload វិក្កយបត្រ -->
-            <div class="bg-indigo-50/60 border-2 border-dashed border-indigo-200 rounded-xl p-4 mb-4 text-left">
-                <label class="block text-xs font-bold text-indigo-900 mb-1">
-                    📸 ភ្ជាប់រូបភាពវិក្កយបត្របាញ់លុយ (Payment Slip) <span class="text-red-500">*</span>
-                </label>
-                <p class="text-[11px] text-gray-500 mb-2">សូមជ្រើសរើសរូបថត Screenshot វិក្កយបត្របាញ់លុយ</p>
-                <input type="file" id="slip-file" accept="image/*" required
-                    onchange="compressAndPreviewSlip(event, 'slip-preview-img', 'slip-preview-box')"
-                    class="w-full text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 cursor-pointer border rounded-lg p-1 bg-white">
+                    <div
+                        class="w-64 max-w-full aspect-square mx-auto bg-white p-3 rounded-2xl border-2 border-indigo-100 shadow-inner flex items-center justify-center relative overflow-hidden mb-3">
+                        <img id="store-khqr-img" src="" alt="KHQR" class="w-full h-full object-contain hidden">
+                        <div id="no-khqr-placeholder" class="text-xs text-gray-400 p-4">
+                            <span class="text-3xl block mb-2">⚠️</span>
+                            ម្ចាស់ហាងមិនទាន់បាន Upload រូប KHQR នៅឡើយទេ
+                        </div>
+                    </div>
 
-                <div id="slip-preview-box" class="hidden mt-3 flex items-center gap-3 bg-white p-2 rounded-lg border">
-                    <img id="slip-preview-img" src="" class="w-16 h-20 object-cover rounded border">
-                    <div>
-                        <span class="text-xs text-green-600 font-bold block">✓ បានជ្រើសរើសវិក្កយបត្រ!</span>
-                        <span class="text-[11px] text-gray-400">ទំហំត្រូវបានកែសម្រួលឱ្យស្រាលស្វ័យប្រវត្តិ</span>
+                    <div class="text-xs text-gray-500 mb-1">ចំនួនទឹកប្រាក់ត្រូវបង់សរុប៖</div>
+                    <div id="display-total-amount" class="text-2xl font-black text-indigo-600 tracking-tight">$0.00
                     </div>
                 </div>
-            </div>
 
-            <button type="button" id="btn-submit-order" onclick="submitFinalOrder()"
-                class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-12 rounded-xl text-sm transition shadow-md flex items-center justify-center gap-2">
-                <span>✓ ខ្ញុំបានបាញ់លុយរួចរាល់ (ផ្ញើការកុម្ម៉ង់)</span>
-            </button>
-        </div>
-
-        <!-- ដំណាក់កាលទី ៣: ផ្ទាំងរង់ចាំពិនិត្យ -->
-        <div id="step-waiting" class="hidden text-center border-t pt-5">
-            <div class="inline-block p-3 bg-amber-50 rounded-full text-amber-600 mb-3">
-                <svg class="w-10 h-10 animate-spin" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                </svg>
-            </div>
-            <h3 class="text-base font-bold text-gray-800 mb-1">បានផ្ញើវិក្កយបត្រទៅកាន់ហាងរួចរាល់!</h3>
-            <p class="text-xs text-amber-600 font-medium mb-3">⏳ កំពុងរង់ចាំម្ចាស់ហាងពិនិត្យ និងយល់ព្រមទទួលប្រាក់...</p>
-            <div class="text-xs text-gray-500 bg-gray-100 py-2 rounded-lg mb-4">
-                លេខប្រតិបត្តិការ: <b id="tran-display" class="font-mono text-gray-800"></b>
-            </div>
-        </div>
-
-        <!-- ដំណាក់កាលទី ៤: ផ្ទាំងពេលហាងបដិសេធ -->
-        <div id="step-rejected" class="hidden text-center border-t pt-5">
-            <div
-                class="w-14 h-14 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-2 text-2xl font-black">
-                ✕
-            </div>
-            <h3 class="text-lg font-bold text-red-600 mb-1">ការទូទាត់ប្រាក់ត្រូវបានបដិសេធ!</h3>
-            <div class="bg-red-50 border border-red-200 rounded-xl p-3 my-3 text-left">
-                <span class="text-xs font-bold text-red-800 block mb-0.5">💬 សារពីម្ចាស់ហាង៖</span>
-                <p id="reject-reason-text" class="text-xs text-red-700 font-medium"></p>
-            </div>
-
-            <!-- ប្រអប់ Upload វិក្កយបត្រថ្មី -->
-            <div class="bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl p-4 mb-4 text-left">
-                <label class="block text-xs font-bold text-gray-800 mb-1">
-                    📸 ផ្ញើរូបភាពវិក្កយបត្រថ្មីឡើងវិញ
-                </label>
-                <input type="file" id="reupload-slip-file" accept="image/*"
-                    onchange="compressAndPreviewSlip(event, 'reslip-preview-img', 'reslip-preview-box')"
-                    class="w-full text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-red-600 file:text-white hover:file:bg-red-700 cursor-pointer border rounded-lg p-1 bg-white">
-
-                <div id="reslip-preview-box" class="hidden mt-3 flex items-center gap-3 bg-white p-2 rounded-lg border">
-                    <img id="reslip-preview-img" src="" class="w-16 h-20 object-cover rounded border">
-                    <span class="text-xs text-green-600 font-bold">✓ បានជ្រើសរើសវិក្កយបត្រថ្មី!</span>
+                <div class="text-[11px] text-gray-400 mt-4 pt-3 border-t border-gray-100">
+                    សូមស្កេន KHQR ខាងលើ រួចភ្ជាប់វិក្កយបត្រ (Slip) ផ្ញើមកកាន់ហាង
                 </div>
             </div>
 
-            <button type="button" id="btn-reupload" onclick="submitReuploadSlip()"
-                class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold h-11 rounded-xl text-xs transition shadow-md">
-                ផ្ញើវិក្កយបត្រថ្មីម្តងទៀត &rarr;
-            </button>
+            <div class="md:col-span-7 bg-white p-5 sm:p-6 rounded-3xl border border-indigo-100 shadow-sm">
+                <h3 class="text-base font-black text-gray-900 mb-1">ព័ត៌មានដឹកជញ្ជូន & បង់ប្រាក់</h3>
+                <p class="text-xs text-gray-500 mb-4">បំពេញព័ត៌មានរបស់អ្នកដើម្បីឱ្យខាងហាងរៀបចំផ្ញើទំនិញ</p>
+
+                <form id="checkout-form" class="space-y-3.5">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">ឈ្មោះអ្នកទទួល <span
+                                class="text-red-500">*</span></label>
+                        <input id="c-name" required placeholder="ឧ. ចាន់ បូរិន"
+                            class="w-full border p-2.5 rounded-xl text-xs bg-gray-50 focus:bg-white focus:border-indigo-600 outline-none">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">លេខទូរស័ព្ទ <span
+                                    class="text-red-500">*</span></label>
+                            <input id="c-phone" required placeholder="012 345 678"
+                                class="w-full border p-2.5 rounded-xl text-xs bg-gray-50 focus:bg-white focus:border-indigo-600 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">សេវាដឹកជញ្ជូន</label>
+                            <select id="c-delivery"
+                                class="w-full border p-2.5 rounded-xl text-xs bg-gray-50 focus:bg-white focus:border-indigo-600 outline-none">
+                                <option value="វីរៈប៊ុនថាំ (VET)">វីរៈប៊ុនថាំ (VET)</option>
+                                <option value="J&T Express">J&T Express</option>
+                                <option value="ភ្នំពេញ ដឹកជញ្ជូនរហ័ស">ភ្នំពេញ ដឹកជញ្ជូនរហ័ស</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">អាសយដ្ឋានដឹកជញ្ជូនលម្អិត <span
+                                class="text-red-500">*</span></label>
+                        <textarea id="c-address" required rows="2"
+                            placeholder="ផ្ទះលេខ, ផ្លូវ, សង្កាត់/ឃុំ, ខណ្ឌ/ស្រុក, រាជធានី/ខេត្ត"
+                            class="w-full border p-2.5 rounded-xl text-xs bg-gray-50 focus:bg-white focus:border-indigo-600 outline-none"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-indigo-700 mb-1">រូបភាពវិក្កយបត្របាញ់លុយ (Slip) <span
+                                class="text-red-500">*</span></label>
+                        <input type="file" id="c-slip" accept="image/*" required onchange="previewSlip(event)"
+                            class="w-full text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer border rounded-xl p-1 bg-white">
+                        <div id="slip-preview-box"
+                            class="hidden mt-2 flex items-center gap-2 p-1.5 bg-gray-50 rounded-xl border">
+                            <img id="slip-preview-img" src="" class="w-12 h-14 object-cover rounded-lg border">
+                            <span class="text-[11px] text-green-600 font-bold">✓ បានភ្ជាប់ Slip រួចរាល់</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="btn-submit-order"
+                        class="w-full mt-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-3.5 rounded-2xl text-xs sm:text-sm transition shadow-lg shadow-indigo-200">
+                        🚀 បញ្ជាក់ការបញ្ជាទិញឥឡូវនេះ &rarr;
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- ផ្នែកទី ២៖ ផ្ទាំងកំពុងរង់ចាំម្ចាស់ហាងយល់ព្រម -->
+    <main id="view-order-status" class="hidden max-w-md mx-auto px-4 py-12 flex-1 w-full text-center">
+        <div class="bg-white p-8 rounded-3xl border border-indigo-100 shadow-xl relative overflow-hidden">
+            <div
+                class="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl shadow-inner animate-pulse">
+                ⏳
+            </div>
+            <h2 class="text-lg sm:text-xl font-black text-gray-900 mb-1">បានផ្ញើការបញ្ជាទិញ & Slip រួចរាល់!</h2>
+            <p class="text-xs text-gray-500 mb-4">លេខសម្គាល់៖ <b id="waiting-tran-id"
+                    class="font-mono text-indigo-600 font-bold text-sm"></b></p>
+
+            <div
+                class="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200/80 rounded-2xl p-4 text-xs text-amber-900 leading-relaxed mb-5 text-left">
+                <div class="font-bold flex items-center gap-1.5 mb-1 text-amber-800">
+                    <span>📢</span> <span>សូមកុំចាកចេញពីទំព័រនេះ៖</span>
+                </div>
+                ប្រព័ន្ធកំពុងរង់ចាំម្ចាស់ហាងពិនិត្យ និងចុចទទួលប្រាក់... វិក្កយបត្រផ្លូវការនឹងលោតមកទីនេះដោយស្វ័យប្រវត្តិ!
+            </div>
+
+            <div class="space-y-2.5">
+                <div
+                    class="flex items-center justify-center gap-2 text-xs text-indigo-600 font-bold bg-indigo-50/60 py-2.5 px-4 rounded-xl border border-indigo-100">
+                    <span class="animate-spin text-base">🔄</span>
+                    <span id="sync-status-text">កំពុងរង់ចាំការយល់ព្រមពីម្ចាស់ហាង...</span>
+                </div>
+
+                <button onclick="checkOrderStatus(true)"
+                    class="w-full py-2.5 bg-gray-900 hover:bg-black text-white rounded-xl text-xs font-bold transition shadow-sm flex items-center justify-center gap-1.5">
+                    <span>⚡</span> <span>ចុចទាញយកវិក្កយបត្រឥឡូវនេះ</span>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- ផ្នែកទី ៣៖ វិក្កយបត្រផ្លូវការ (រៀបចំ Header មិនឱ្យត្រាជាន់) -->
+    <main id="view-order-receipt" class="hidden max-w-xl mx-auto px-4 py-8 flex-1 w-full">
+
+        <div id="receipt-printable-area"
+            class="bg-white p-6 sm:p-8 rounded-3xl border-2 border-indigo-100 shadow-xl relative overflow-hidden">
+
+            <!-- Header វិក្កយបត្រ & ត្រាបានបង់ប្រាក់ -->
+            <div class="flex items-start justify-between pb-4 border-b border-gray-100 gap-3">
+                <div class="flex items-center gap-3">
+                    <div id="rec-logo-box"
+                        class="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-2xl overflow-hidden flex-shrink-0">
+                        <span id="rec-logo-emoji">🏪</span>
+                        <img id="rec-logo-img" src="" class="w-full h-full object-cover hidden">
+                    </div>
+                    <div>
+                        <h2 id="rec-store-name"
+                            class="text-lg sm:text-xl font-black text-gray-900 receipt-font leading-tight">Store Name
+                        </h2>
+                        <p class="text-[11px] text-gray-500 font-bold">វិក្កយបត្រទិញទំនិញផ្លូវការ (Official Receipt)</p>
+                    </div>
+                </div>
+
+                <div
+                    class="bg-emerald-600 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-xs flex-shrink-0 whitespace-nowrap">
+                    ✓ បានបង់ប្រាក់
+                </div>
+            </div>
+
+            <!-- ព័ត៌មានវិក្កយបត្រ -->
+            <div class="grid grid-cols-2 gap-2 my-4 text-xs bg-gray-50 p-3.5 rounded-2xl border border-gray-100">
+                <div>
+                    <span class="text-gray-400 block text-[10px]">លេខវិក្កយបត្រ (Invoice No.)</span>
+                    <span id="rec-tran-id" class="font-mono font-bold text-gray-900 text-xs"></span>
+                </div>
+                <div>
+                    <span class="text-gray-400 block text-[10px]">កាលបរិច្ឆេទ (Date)</span>
+                    <span id="rec-date" class="font-bold text-gray-900 text-xs"></span>
+                </div>
+                <div>
+                    <span class="text-gray-400 block text-[10px]">អ្នកទទួល (Customer)</span>
+                    <span id="rec-cust-name" class="font-bold text-gray-900 text-xs"></span>
+                </div>
+                <div>
+                    <span class="text-gray-400 block text-[10px]">លេខទូរស័ព្ទ (Phone)</span>
+                    <span id="rec-cust-phone" class="font-bold text-gray-900 text-xs"></span>
+                </div>
+                <div class="col-span-2 pt-1 border-t border-gray-200/60">
+                    <span class="text-gray-400 block text-[10px]">អាសយដ្ឋានដឹកជញ្ជូន (Delivery Address)</span>
+                    <span id="rec-cust-address" class="text-gray-800 text-[11px] leading-snug"></span>
+                </div>
+            </div>
+
+            <!-- បញ្ជីទំនិញដែលបានទិញ -->
+            <div class="mb-4">
+                <div class="text-xs font-bold text-gray-700 mb-2">បញ្ជីទំនិញដែលបានទិញ៖</div>
+                <div id="rec-items-list" class="divide-y divide-gray-100 border-y border-gray-100"></div>
+            </div>
+
+            <!-- សរុបទឹកប្រាក់ -->
+            <div class="flex justify-between items-center pt-2 pb-4 border-b border-gray-100">
+                <span class="text-xs font-bold text-gray-600">ទឹកប្រាក់សរុបទាំងអស់ (Total Paid)៖</span>
+                <span id="rec-total-amount" class="text-xl font-black text-indigo-600 receipt-font"></span>
+            </div>
+
+            <div class="text-center pt-4 text-xs text-gray-400">
+                🙏 សូមអរគុណសម្រាប់ការគាំទ្រទិញទំនិញពីហាងយើងខ្ញុំ! <br>
+                <span class="text-[10px]">សូមរក្សាទុកវិក្កយបត្រនេះសម្រាប់ផ្ទៀងផ្ទាត់ពេលទទួលទំនិញ</span>
+            </div>
         </div>
 
-        <!-- ដំណាក់កាលទី ៥: ជោគជ័យ -->
-        <div id="step-success" class="hidden text-center border-t pt-5">
-            <div
-                class="w-14 h-14 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-2 text-2xl font-black">
-                ✓
+        <!-- Action Buttons -->
+        <div class="mt-5 space-y-2.5 no-print">
+            <div class="grid grid-cols-2 gap-2.5">
+                <button onclick="downloadReceiptImage()" id="btn-download-img"
+                    class="py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-2xl transition shadow-md shadow-emerald-200 flex items-center justify-center gap-1.5 active:scale-95">
+                    <span>📸</span> <span>Save ជារូបភាព (PNG)</span>
+                </button>
+
+                <button onclick="window.print()"
+                    class="py-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-2xl border border-indigo-200 transition flex items-center justify-center gap-1.5 shadow-xs active:scale-95">
+                    <span>🖨️</span> <span>បោះពុម្ព / Save PDF</span>
+                </button>
             </div>
-            <h3 class="text-lg font-bold text-gray-800">ការទូទាត់ប្រាក់ជោគជ័យ!</h3>
-            <p class="text-xs text-gray-500 mb-4">ម្ចាស់ហាងបានផ្ទៀងផ្ទាត់វិក្កយបត្រ និងកំពុងរៀបចំផ្ញើទំនិញជូនអ្នក។</p>
-            <a href="/"
-                class="block w-full bg-gray-800 hover:bg-black text-white py-2.5 rounded-lg text-xs font-bold transition">ត្រឡប់ទៅទំព័រដើម</a>
+
+            <div class="grid grid-cols-2 gap-2.5">
+                <button onclick="copyReceiptLink()"
+                    class="py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs rounded-2xl border border-gray-200 transition flex items-center justify-center gap-1.5 active:scale-95">
+                    <span>🔗</span> <span>Copy Link វិក្កយបត្រ</span>
+                </button>
+
+                <a id="rec-back-to-shop-btn" href="/"
+                    class="py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold text-xs rounded-2xl transition flex items-center justify-center gap-1.5 shadow-lg shadow-indigo-200 active:scale-95">
+                    <span>🛍️</span> <span>ត្រឡប់ទៅហាងវិញ</span>
+                </a>
+            </div>
         </div>
-    </div>
+
+    </main>
+
+    <footer class="py-5 text-center text-xs text-gray-400 border-t border-indigo-50 no-print">
+        © 2026 SMD Market. រក្សាសិទ្ធិគ្រប់យ៉ាង។
+    </footer>
 
     <script>
         const CART_KEY = 'km_market_cart';
-        let cart = [];
-        try {
-            cart = JSON.parse(localStorage.getItem(CART_KEY)) || [];
-        } catch (e) {
-            cart = [];
-        }
-
-        const amount = cart.reduce((sum, item) => sum + ((item.price || 0) * (item.qty || 1)), 0);
-        document.getElementById('display-amount').innerText = amount.toFixed(2);
-
-        // ទាញយក store_slug ពីទំនិញក្នុងកន្ត្រក
-        const targetStoreSlug = (cart[0] && cart[0].store_slug) ? cart[0].store_slug : 'default';
-
+        let cartItems = [];
+        let storeSlug = '';
         let base64Slip = '';
-        let base64Reupload = '';
-        let customerInfo = {};
-        let activeTranId = null;
-        let pollInterval = null;
+        let totalAmount = 0;
+        let activeTranId = '';
+        let pollTimer = null;
 
-        document.getElementById('shipping-form').onsubmit = async (e) => {
-            e.preventDefault();
-            if (!cart.length) return alert('កន្ត្រកទំនិញនៅទទេ!');
-
-            customerInfo = {
-                store_slug: targetStoreSlug,
-                customerName: document.getElementById('name').value.trim(),
-                bankAccountName: document.getElementById('bank-acc-name').value.trim(),
-                phone: document.getElementById('phone').value.trim(),
-                deliveryMethod: document.getElementById('delivery-method').value.trim(),
-                address: document.getElementById('address').value.trim(),
-                amount: amount.toFixed(2),
-                items: cart
-            };
-
-            try {
-                const res = await fetch(`/api/checkout/vendor-qr?slug=${targetStoreSlug}`);
-                if (res.ok) {
-                    const data = await res.json();
-                    document.getElementById('vendor-qr-img').src = data.qrImage;
-                } else {
-                    document.getElementById('vendor-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=KHQR-${amount.toFixed(2)}USD`;
-                }
-            } catch (err) {
-                document.getElementById('vendor-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=KHQR-${amount.toFixed(2)}USD`;
+        async function initCheckout() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const receiptParam = urlParams.get('receipt');
+            if (receiptParam) {
+                activeTranId = receiptParam;
+                checkOrderStatus(true);
+                return;
             }
 
-            document.getElementById('step-form').classList.add('hidden');
-            document.getElementById('step-payment').classList.remove('hidden');
-        };
+            try {
+                cartItems = JSON.parse(localStorage.getItem(CART_KEY)) || [];
+            } catch (e) {
+                cartItems = [];
+            }
 
-        function compressAndPreviewSlip(event, imgId, boxId) {
-            const file = event.target.files[0];
-            if (!file) return;
+            if (!cartItems.length) {
+                alert('កន្ត្រកទំនិញរបស់អ្នកនៅទទេ!');
+                window.location.href = '/';
+                return;
+            }
 
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const img = new Image();
-                img.onload = function () {
-                    const canvas = document.createElement('canvas');
-                    let width = img.width;
-                    let height = img.height;
-                    const maxDim = 1000;
-                    if (width > maxDim || height > maxDim) {
-                        if (width > height) {
-                            height = Math.round((height * maxDim) / width);
-                            width = maxDim;
-                        } else {
-                            width = Math.round((width * maxDim) / height);
-                            height = maxDim;
-                        }
-                    }
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
+            storeSlug = cartItems[0].store_slug || 'default';
+            totalAmount = cartItems.reduce((sum, item) => sum + ((parseFloat(item.price) || 0) * (parseInt(item.qty) || 1)), 0);
+            document.getElementById('display-total-amount').innerText = '$' + totalAmount.toFixed(2);
 
-                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
-
-                    if (imgId === 'slip-preview-img') {
-                        base64Slip = compressedBase64;
-                    } else {
-                        base64Reupload = compressedBase64;
-                    }
-
-                    document.getElementById(imgId).src = compressedBase64;
-                    document.getElementById(boxId).classList.remove('hidden');
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
+            await fetchStoreDetails(storeSlug);
         }
 
-        async function submitFinalOrder() {
-            if (!base64Slip) return alert('⚠️ សូម Upload រូបភាពវិក្កយបត្របាញ់លុយ (Slip) ជាមុនសិន!');
+        async function fetchStoreDetails(slug) {
+            try {
+                const res = await fetch(`/api/store/get/${slug}?t=${Date.now()}`);
+                if (res.ok) {
+                    const store = await res.json();
+                    document.getElementById('checkout-store-name').innerText = store.name;
+                    document.getElementById('checkout-page-title').innerText = `${store.name} - ទូទាត់ប្រាក់`;
+                    document.getElementById('shop-back-link').href = `/shop/${store.slug}`;
+
+                    if (store.logo) {
+                        document.getElementById('checkout-logo-img').src = store.logo;
+                        document.getElementById('checkout-logo-img').classList.remove('hidden');
+                        document.getElementById('checkout-logo-emoji').classList.add('hidden');
+                    }
+
+                    if (store.khqr) {
+                        document.getElementById('store-khqr-img').src = store.khqr;
+                        document.getElementById('store-khqr-img').classList.remove('hidden');
+                        document.getElementById('no-khqr-placeholder').classList.add('hidden');
+                    }
+                }
+            } catch (err) {
+                console.error("Error fetching store:", err);
+            }
+        }
+
+        function previewSlip(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    base64Slip = e.target.result;
+                    document.getElementById('slip-preview-img').src = base64Slip;
+                    document.getElementById('slip-preview-box').classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        document.getElementById('checkout-form').onsubmit = async (e) => {
+            e.preventDefault();
+            if (!base64Slip) return alert('សូម Upload រូបភាពវិក្កយបត្រ (Slip)!');
 
             const btn = document.getElementById('btn-submit-order');
             btn.disabled = true;
-            btn.innerText = 'កំពុងផ្ញើទិន្នន័យ...';
+            btn.innerText = 'កំពុងផ្ញើការបញ្ជាទិញ...';
 
             const payload = {
-                ...customerInfo,
-                store_slug: targetStoreSlug,
-                slipImage: base64Slip
+                store_slug: storeSlug,
+                customerName: document.getElementById('c-name').value.trim(),
+                phone: document.getElementById('c-phone').value.trim(),
+                deliveryMethod: document.getElementById('c-delivery').value,
+                address: document.getElementById('c-address').value.trim(),
+                items: cartItems,
+                slipImage: base64Slip,
+                amount: totalAmount.toFixed(2)
             };
 
             try {
@@ -319,82 +424,163 @@
                     body: JSON.stringify(payload)
                 });
 
-                if (!res.ok) {
-                    const errData = await res.json().catch(() => ({}));
-                    throw new Error(errData.error || 'Server មិនអាចទទួលទិន្នន័យបាន');
-                }
-
                 const data = await res.json();
-                activeTranId = data.tranId;
-                document.getElementById('step-payment').classList.add('hidden');
-                document.getElementById('step-waiting').classList.remove('hidden');
-                document.getElementById('tran-display').innerText = activeTranId;
-
-                startPolling();
-            } catch (err) {
-                alert('កំហុស៖ ' + err.message);
-                btn.disabled = false;
-                btn.innerText = '✓ ខ្ញុំបានបាញ់លុយរួចរាល់ (ផ្ញើការកុម្ម៉ង់)';
-            }
-        }
-
-        function startPolling() {
-            if (pollInterval) clearInterval(pollInterval);
-            pollInterval = setInterval(checkStatusFromAdmin, 2500);
-        }
-
-        async function checkStatusFromAdmin() {
-            if (!activeTranId) return;
-            try {
-                const res = await fetch(`/api/orders/check-status/${activeTranId}`);
                 if (res.ok) {
-                    const data = await res.json();
-                    if (data.status === 'PAID') {
-                        clearInterval(pollInterval);
-                        document.getElementById('step-waiting').classList.add('hidden');
-                        document.getElementById('step-rejected').classList.add('hidden');
-                        document.getElementById('step-success').classList.remove('hidden');
-                        localStorage.removeItem(CART_KEY);
-                    } else if (data.status === 'REJECTED') {
-                        clearInterval(pollInterval);
-                        document.getElementById('step-waiting').classList.add('hidden');
-                        document.getElementById('step-rejected').classList.remove('hidden');
-                        document.getElementById('reject-reason-text').innerText = data.rejectReason || 'វិក្កយបត្រមិនត្រឹមត្រូវ';
+                    activeTranId = data.tranId;
+                    localStorage.removeItem(CART_KEY);
+
+                    document.getElementById('view-checkout-form').classList.add('hidden');
+                    document.getElementById('view-order-status').classList.remove('hidden');
+                    document.getElementById('waiting-tran-id').innerText = activeTranId;
+
+                    if (pollTimer) clearInterval(pollTimer);
+                    pollTimer = setInterval(() => checkOrderStatus(false), 1000);
+                } else {
+                    alert('កំហុសក្នុងការបញ្ជាទិញ');
+                    btn.disabled = false;
+                    btn.innerText = '🚀 បញ្ជាក់ការបញ្ជាទិញឥឡូវនេះ →';
+                }
+            } catch (err) {
+                alert('បរាជ័យក្នុងការតភ្ជាប់ Server');
+                btn.disabled = false;
+                btn.innerText = '🚀 បញ្ជាក់ការបញ្ជាទិញឥឡូវនេះ →';
+            }
+        };
+
+        async function checkOrderStatus(isManualClick) {
+            if (!activeTranId) {
+                activeTranId = document.getElementById('waiting-tran-id').innerText.trim();
+            }
+            if (!activeTranId) return;
+
+            try {
+                let res = await fetch(`/api/orders/${activeTranId}?t=${Date.now()}`);
+
+                if (!res.ok) {
+                    const fallbackRes = await fetch(`/api/admin/orders?t=${Date.now()}`);
+                    if (fallbackRes.ok) {
+                        const allOrders = await fallbackRes.json();
+                        const found = allOrders.find(o => String(o.tranId) === String(activeTranId));
+                        if (found) {
+                            handleOrderState(found, { name: storeSlug, logo: '' });
+                            return;
+                        }
                     }
                 }
-            } catch (e) { }
-        }
-
-        async function submitReuploadSlip() {
-            if (!base64Reupload) return alert('សូមជ្រើសរើសរូបភាពវិក្កយបត្រថ្មីជាមុនសិន!');
-
-            const btn = document.getElementById('btn-reupload');
-            btn.disabled = true;
-            btn.innerText = 'កំពុងផ្ញើ...';
-
-            try {
-                const res = await fetch('/api/checkout/reupload-slip', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ tranId: activeTranId, slipImage: base64Reupload })
-                });
 
                 if (res.ok) {
-                    alert('✓ បានផ្ញើវិក្កយបត្រថ្មីរួចរាល់!');
-                    document.getElementById('step-rejected').classList.add('hidden');
-                    document.getElementById('step-waiting').classList.remove('hidden');
-                    base64Reupload = '';
-                    document.getElementById('reslip-preview-box').classList.add('hidden');
-                    document.getElementById('reupload-slip-file').value = '';
-                    startPolling();
+                    const data = await res.json();
+                    handleOrderState(data.order, data.store);
+                } else if (isManualClick) {
+                    alert('⚠️ មិនទាន់រកឃើញព័ត៌មាន Order នេះនៅឡើយទេ សូមពិនិត្យមើល Server!');
                 }
-            } catch (e) {
-                alert('បរាជ័យក្នុងការតភ្ជាប់');
-            } finally {
-                btn.disabled = false;
-                btn.innerText = 'ផ្ញើវិក្កយបត្រថ្មីម្តងទៀត →';
+            } catch (err) {
+                console.error("Polling check error:", err);
             }
         }
+
+        function handleOrderState(order, store) {
+            if (!order) return;
+            const status = (order.status || '').toUpperCase();
+
+            if (status === 'PAID') {
+                if (pollTimer) clearInterval(pollTimer);
+                document.getElementById('sync-status-text').innerText = '✓ ម្ចាស់ហាងបានយល់ព្រមរួចរាល់!';
+                setTimeout(() => {
+                    renderOfficialReceipt(order, store);
+                }, 300);
+            } else if (status === 'REJECTED') {
+                if (pollTimer) clearInterval(pollTimer);
+                alert(`❌ ការបញ្ជាទិញរបស់អ្នកត្រូវបានបដិសេធ!\nមូលហេតុ៖ ${order.rejectReason || 'ការទូទាត់ប្រាក់មិនត្រឹមត្រូវ'}`);
+                window.location.href = `/shop/${order.store_slug || ''}`;
+            }
+        }
+
+        function renderOfficialReceipt(order, store) {
+            document.getElementById('view-order-status').classList.add('hidden');
+            document.getElementById('view-order-receipt').classList.remove('hidden');
+
+            document.getElementById('rec-store-name').innerText = (store && store.name) ? store.name : (order.store_slug || 'ហាងអនឡាញ');
+            if (store && store.logo) {
+                document.getElementById('rec-logo-img').src = store.logo;
+                document.getElementById('rec-logo-img').classList.remove('hidden');
+                document.getElementById('rec-logo-emoji').classList.add('hidden');
+            }
+
+            document.getElementById('rec-tran-id').innerText = order.tranId;
+            document.getElementById('rec-date').innerText = new Date(order.createdAt || Date.now()).toLocaleString('km-KH');
+            document.getElementById('rec-cust-name').innerText = order.customerName || 'អតិថិជន';
+            document.getElementById('rec-cust-phone').innerText = order.phone || '-';
+            document.getElementById('rec-cust-address').innerText = `${order.address || '-'} (${order.deliveryMethod || 'សេវាដឹកជញ្ជូន'})`;
+            document.getElementById('rec-total-amount').innerText = '$' + Number(order.amount || 0).toFixed(2);
+            document.getElementById('rec-back-to-shop-btn').href = `/shop/${order.store_slug || ''}`;
+
+            const itemsContainer = document.getElementById('rec-items-list');
+            itemsContainer.innerHTML = (order.items || []).map(it => {
+                const size = (it.attributes && it.attributes.size) ? it.attributes.size : (it.size || 'Standard');
+                const sub = (parseFloat(it.price || 0) * parseInt(it.qty || 1)).toFixed(2);
+                const img = it.image || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=150';
+
+                return `
+                    <div class="py-3 flex justify-between items-center text-xs gap-3">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <img src="${img}" class="w-12 h-12 object-cover rounded-xl border border-indigo-100 bg-gray-50 flex-shrink-0 shadow-2xs">
+                            <div class="min-w-0">
+                                <div class="font-bold text-gray-900 truncate text-xs sm:text-sm" style="line-height:1.6;">${it.title}</div>
+                                <div class="text-[11px] text-gray-500 mt-0.5">
+                                    <span class="bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded font-bold border border-indigo-100">Size: ${size}</span> 
+                                    <span class="ml-1">x${it.qty || 1}</span> ($${Number(it.price).toFixed(2)})
+                                </div>
+                            </div>
+                        </div>
+                        <div class="font-black text-gray-900 text-xs sm:text-sm flex-shrink-0">$${sub}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // មុខងារ Save រូបភាពដោយប្រើ domtoimage (អក្សរខ្មែរច្បាស់ 100% មិនជាន់គ្នា)
+        function downloadReceiptImage() {
+            const node = document.getElementById('receipt-printable-area');
+            const btn = document.getElementById('btn-download-img');
+            btn.disabled = true;
+            btn.innerText = 'កំពុង Save រូបភាព...';
+
+            const scale = 2;
+            const param = {
+                height: node.offsetHeight * scale,
+                width: node.offsetWidth * scale,
+                style: {
+                    transform: 'scale(' + scale + ')',
+                    transformOrigin: 'top left',
+                    width: node.offsetWidth + 'px',
+                    height: node.offsetHeight + 'px'
+                },
+                bgcolor: '#ffffff'
+            };
+
+            domtoimage.toPng(node, param).then(function (dataUrl) {
+                const link = document.createElement('a');
+                link.download = `Invoice_${activeTranId || 'receipt'}.png`;
+                link.href = dataUrl;
+                link.click();
+                btn.disabled = false;
+                btn.innerHTML = '<span>📸</span> <span>Save ជារូបភាព (PNG)</span>';
+            }).catch(function (error) {
+                console.error('oops, something went wrong!', error);
+                alert('សូមប្រើប្រាស់ប៊ូតុង បោះពុម្ព / Save PDF ជំនួស');
+                btn.disabled = false;
+                btn.innerHTML = '<span>📸</span> <span>Save ជារូបភាព (PNG)</span>';
+            });
+        }
+
+        function copyReceiptLink() {
+            const link = `${window.location.origin}/checkout.html?receipt=${activeTranId}`;
+            navigator.clipboard.writeText(link);
+            alert(`✓ បានចម្លង Link វិក្កយបត្រជោគជ័យ!\n${link}`);
+        }
+
+        initCheckout();
     </script>
 </body>
 

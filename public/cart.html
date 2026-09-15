@@ -3,15 +3,15 @@
 
 <head>
     <meta charset="UTF-8">
-    <!-- បន្ទាត់កូដសំខាន់បំផុតដើម្បីកុំឱ្យទូរស័ព្ទ Zoom តូច -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>កន្ត្រកទំនិញរបស់អ្នក - KM-Market</title>
+    <title id="cart-page-title">កន្ត្រកទំនិញ</title>
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Google Font Siemreap -->
+    <!-- Google Fonts: Kantumruy Pro & Siemreap -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Siemreap&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@600;700;800&family=Siemreap&display=swap"
+        rel="stylesheet">
 
     <style>
         * {
@@ -19,151 +19,222 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        input,
-        select,
-        textarea,
-        button {
-            font-family: 'Khmer OS Siemreap', 'Siemreap', sans-serif !important;
+        h1,
+        h2,
+        h3,
+        h4,
+        b {
+            font-family: 'Kantumruy Pro', 'Siemreap', sans-serif !important;
+        }
+
+        p,
+        span,
+        button,
+        a {
+            line-height: 1.6;
         }
     </style>
 </head>
 
-<body class="bg-gray-50 text-gray-800 antialiased min-h-screen flex flex-col justify-between">
+<body
+    class="bg-gradient-to-br from-[#f8f9ff] via-[#f1f4fe] to-[#fbf7ff] text-gray-800 antialiased min-h-screen flex flex-col justify-between">
 
-    <!-- Header -->
-    <header class="bg-white shadow-sm border-b sticky top-0 z-30">
-        <div class="max-w-2xl mx-auto px-4 py-3.5 flex justify-between items-center">
-            <a href="/" class="flex items-center gap-2">
-                <span class="text-2xl">🛍️</span>
-                <span class="text-lg font-black text-indigo-600 tracking-tight">KM-Market</span>
+    <!-- ============================================================= -->
+    <!-- HEADER: AUTO ឈ្មោះ និង LOGO តាមហាងដែលភ្ញៀវកំពុងទិញ -->
+    <!-- ============================================================= -->
+    <header
+        class="sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-indigo-100 shadow-[0_4px_25px_-5px_rgba(99,102,241,0.1)]">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+
+            <!-- Logo & ឈ្មោះហាង (Auto ប្តូរតាមហាង) -->
+            <a id="back-to-shop-link-logo" href="/" class="flex items-center gap-2.5 group select-none">
+                <div id="cart-logo-box"
+                    class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-500/20 to-purple-500/20 border border-indigo-100 flex items-center justify-center text-xl overflow-hidden group-hover:scale-105 transition-transform shadow-xs">
+                    <span id="cart-logo-emoji">🛍️</span>
+                    <img id="cart-logo-img" src="" class="w-full h-full object-cover hidden">
+                </div>
+                <div>
+                    <span id="cart-store-name"
+                        class="text-base sm:text-lg font-black bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent tracking-tight block">
+                        កំពុងទាញយក...
+                    </span>
+                    <span class="text-[9px] text-indigo-500 font-bold uppercase tracking-widest block -mt-0.5">ONLINE
+                        STORE</span>
+                </div>
             </a>
-            <a href="/"
-                class="text-xs font-bold text-indigo-600 hover:text-indigo-700 bg-indigo-50 px-3 py-1.5 rounded-lg flex items-center gap-1 transition">
-                <span>&larr; បន្តទិញទំនិញ</span>
+
+            <!-- ប៊ូតុងបន្តទិញទំនិញ (Auto Link ទៅកាន់ហាងវិញ) -->
+            <a id="btn-continue-shopping" href="/"
+                class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold px-3.5 py-2 rounded-xl border border-indigo-200 transition active:scale-95 flex items-center gap-1">
+                <span>&larr;</span>
+                <span>បន្តទិញទំនិញ</span>
             </a>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="max-w-2xl mx-auto px-4 py-5 flex-1 w-full">
-        <!-- Title Box -->
-        <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center gap-2">
-                <span class="text-xl">🛒</span>
-                <h1 class="text-lg font-bold text-gray-900">កន្ត្រកទំនិញរបស់អ្នក</h1>
-            </div>
-            <button onclick="clearCart()" id="btn-clear-top"
-                class="text-xs text-red-500 hover:text-red-700 font-semibold transition hidden">
+    <!-- MAIN CART CONTENT -->
+    <main class="max-w-3xl mx-auto px-4 py-6 flex-1 w-full">
+
+        <!-- Header កន្ត្រក -->
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-base sm:text-lg font-black text-gray-900 flex items-center gap-2">
+                <span>🛒</span> <span>កន្ត្រកទំនិញរបស់អ្នក</span>
+            </h1>
+            <button onclick="clearAllCart()" class="text-xs text-red-500 hover:text-red-700 font-bold hover:underline">
                 សម្អាតទាំងអស់
             </button>
         </div>
 
         <!-- បញ្ជីទំនិញក្នុងកន្ត្រក -->
-        <div id="cart-container" class="space-y-3 mb-6"></div>
+        <div id="cart-items-container" class="space-y-3 mb-6"></div>
 
-        <!-- ផ្ទាំងគណនាតម្លៃ និងប៊ូតុង Checkout -->
-        <div id="checkout-section" class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 hidden">
-            <div class="flex justify-between items-center pb-3 mb-3 border-b">
-                <span class="text-sm font-semibold text-gray-600">តម្លៃសរុបទាំងអស់៖</span>
-                <span class="text-2xl font-black text-indigo-600 tracking-tight" id="cart-total">$0.00</span>
+        <!-- សង្ខេបតម្លៃ & ប៊ូតុង Checkout -->
+        <div id="cart-summary-box" class="bg-white p-5 rounded-3xl border border-indigo-100 shadow-sm hidden">
+            <div class="flex justify-between items-center pb-4 border-b border-gray-100">
+                <span class="text-sm font-bold text-gray-600">តម្លៃសរុបទាំងអស់៖</span>
+                <span id="cart-total-price"
+                    class="text-xl sm:text-2xl font-black text-indigo-600 tracking-tight">$0.00</span>
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
-                <button onclick="clearCart()"
-                    class="w-full py-3 bg-red-50 hover:bg-red-100 text-red-600 font-bold rounded-xl text-xs sm:text-sm transition border border-red-100">
+            <div class="grid grid-cols-2 gap-3 mt-4">
+                <button onclick="clearAllCart()"
+                    class="w-full py-3 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs rounded-2xl transition">
                     សម្អាតកន្ត្រក
                 </button>
-                <a href="/checkout.html"
-                    class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs sm:text-sm transition shadow flex items-center justify-center gap-1">
+                <button onclick="proceedToCheckout()"
+                    class="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-lg shadow-emerald-200 transition active:scale-95">
                     បន្តទៅទូទាត់ &rarr;
-                </a>
+                </button>
             </div>
         </div>
+
     </main>
+
+    <!-- Footer -->
+    <footer class="py-5 text-center text-xs text-gray-400 border-t border-indigo-50">
+        © 2026 <span id="footer-store-name">SMD Market</span>. រក្សាសិទ្ធិគ្រប់យ៉ាង។
+    </footer>
 
     <script>
         const CART_KEY = 'km_market_cart';
+        let cartItems = [];
+        let currentShopSlug = '';
 
-        function getCart() {
+        async function initCartPage() {
             try {
-                return JSON.parse(localStorage.getItem(CART_KEY)) || [];
+                cartItems = JSON.parse(localStorage.getItem(CART_KEY)) || [];
             } catch (e) {
-                return [];
+                cartItems = [];
             }
+
+            // រកមើល store_slug ពីទំនិញដែលមានក្នុងកន្ត្រក
+            if (cartItems.length > 0 && cartItems[0].store_slug && cartItems[0].store_slug !== 'default') {
+                currentShopSlug = cartItems[0].store_slug;
+            } else {
+                // បើគ្មានក្នុងកន្ត្រក សាកល្បងយកពី URL query ឬ localStorage
+                const urlParams = new URLSearchParams(window.location.search);
+                currentShopSlug = urlParams.get('store') || localStorage.getItem('km_current_view_store') || '';
+            }
+
+            await loadStoreBranding(currentShopSlug);
+            renderCartItems();
         }
 
-        function saveCart(cart) {
-            localStorage.setItem(CART_KEY, JSON.stringify(cart));
-            renderCart();
-        }
+        // Auto ទាញយកឈ្មោះហាង និង Logo ពិតប្រាកដ
+        async function loadStoreBranding(slug) {
+            const defaultName = "SMD Market";
+            const shopUrl = slug ? `/shop/${slug}` : '/';
 
-        function renderCart() {
-            const cart = getCart();
-            const container = document.getElementById('cart-container');
-            const checkoutSec = document.getElementById('checkout-section');
-            const clearTop = document.getElementById('btn-clear-top');
+            // កំណត់ Link ត្រឡប់ទៅហាងវិញ
+            document.getElementById('back-to-shop-link-logo').href = shopUrl;
+            document.getElementById('btn-continue-shopping').href = shopUrl;
 
-            if (!cart || !cart.length) {
-                container.innerHTML = `
-                    <div class="bg-white rounded-2xl p-8 text-center border border-gray-100 shadow-sm my-6">
-                        <div class="w-16 h-16 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">
-                            🛒
-                        </div>
-                        <h3 class="font-bold text-base text-gray-800 mb-1">កន្ត្រកទំនិញនៅទទេ</h3>
-                        <p class="text-xs text-gray-400 mb-5">អ្នកមិនទាន់បានជ្រើសរើសទំនិញណាមួយចូលកន្ត្រកនៅឡើយទេ</p>
-                        <a href="/" class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-6 py-2.5 rounded-xl transition shadow">
-                            ទៅមើលទំនិញក្នុងហាង
-                        </a>
-                    </div>
-                `;
-                checkoutSec.classList.add('hidden');
-                clearTop.classList.add('hidden');
+            if (!slug) {
+                applyBrandingUI(defaultName, '');
                 return;
             }
 
-            checkoutSec.classList.remove('hidden');
-            clearTop.classList.remove('hidden');
+            try {
+                const res = await fetch(`/api/store/get/${slug}`);
+                if (res.ok) {
+                    const store = await res.json();
+                    applyBrandingUI(store.name, store.logo);
+                } else {
+                    applyBrandingUI(defaultName, '');
+                }
+            } catch (err) {
+                applyBrandingUI(defaultName, '');
+            }
+        }
+
+        function applyBrandingUI(name, logo) {
+            document.getElementById('cart-store-name').innerText = name;
+            document.getElementById('cart-page-title').innerText = `${name} - កន្ត្រកទំនិញ`;
+            document.getElementById('footer-store-name').innerText = name;
+
+            if (logo) {
+                document.getElementById('cart-logo-img').src = logo;
+                document.getElementById('cart-logo-img').classList.remove('hidden');
+                document.getElementById('cart-logo-emoji').classList.add('hidden');
+            } else {
+                document.getElementById('cart-logo-img').classList.add('hidden');
+                document.getElementById('cart-logo-emoji').classList.remove('hidden');
+            }
+        }
+
+        function renderCartItems() {
+            const container = document.getElementById('cart-items-container');
+            const summaryBox = document.getElementById('cart-summary-box');
+
+            if (!cartItems.length) {
+                container.innerHTML = `
+                    <div class="bg-white rounded-3xl p-8 text-center border border-indigo-100 shadow-xs">
+                        <div class="text-4xl mb-3">🛍️</div>
+                        <h3 class="font-bold text-gray-800 text-sm mb-1">កន្ត្រកទំនិញរបស់អ្នកនៅទទេ</h3>
+                        <p class="text-xs text-gray-400 mb-4">មិនទាន់មានទំនិញណាមួយត្រូវបានជ្រើសរើសនៅឡើយទេ</p>
+                        <a href="${currentShopSlug ? `/shop/${currentShopSlug}` : '/'}" 
+                           class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-md shadow-indigo-200 transition">
+                            &larr; ទៅកាន់ហាងទិញទំនិញ
+                        </a>
+                    </div>
+                `;
+                summaryBox.classList.add('hidden');
+                return;
+            }
 
             let total = 0;
+            container.innerHTML = cartItems.map((it, idx) => {
+                const price = parseFloat(it.price || 0);
+                const qty = parseInt(it.qty || 1);
+                const subtotal = price * qty;
+                total += subtotal;
 
-            container.innerHTML = cart.map((item, index) => {
-                const price = parseFloat(item.price || 0);
-                const qty = parseInt(item.qty || 1);
-                const itemTotal = price * qty;
-                total += itemTotal;
-
-                const attr = item.attributes || {};
-                let sizeLabel = attr.size || attr.shoe_size || '';
+                const size = (it.attributes && it.attributes.size) ? it.attributes.size : 'Standard';
+                const img = it.image || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=200';
 
                 return `
-                    <div class="bg-white p-3.5 sm:p-4 rounded-2xl shadow-sm border border-gray-100 flex gap-3 sm:gap-4 items-center">
-                        <!-- រូបភាពទំនិញ -->
-                        <img src="${item.image || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=200'}" 
-                             alt="${item.title}" 
-                             class="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-xl border border-gray-100 flex-shrink-0 bg-gray-50">
-
-                        <!-- ព័ត៌មានទំនិញ -->
-                        <div class="flex-1 min-w-0">
-                            <h3 class="font-bold text-sm text-gray-900 truncate">${item.title || 'គ្មានឈ្មោះ'}</h3>
-                            <div class="flex items-center gap-2 mt-0.5">
-                                <span class="text-xs text-indigo-600 font-bold">$${price.toFixed(2)}</span>
-                                ${sizeLabel ? `<span class="bg-indigo-50 text-indigo-700 text-[10px] font-bold px-1.5 py-0.5 rounded">Size: ${sizeLabel}</span>` : ''}
-                            </div>
-
-                            <!-- ប៊ូតុងបន្ថែមបន្ថយចំនួន -->
-                            <div class="flex items-center gap-2 mt-2">
-                                <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-gray-50">
-                                    <button onclick="updateQty(${index}, -1)" class="w-7 h-7 flex items-center justify-center text-xs font-bold text-gray-600 hover:bg-gray-200 transition">-</button>
-                                    <span class="w-8 text-center text-xs font-bold text-gray-800">${qty}</span>
-                                    <button onclick="updateQty(${index}, 1)" class="w-7 h-7 flex items-center justify-center text-xs font-bold text-gray-600 hover:bg-gray-200 transition">+</button>
+                    <div class="bg-white p-4 rounded-3xl border border-indigo-100 flex items-center justify-between gap-3 shadow-xs">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <img src="${img}" class="w-16 h-16 object-cover rounded-2xl border border-indigo-50 bg-gray-50 flex-shrink-0">
+                            <div class="min-w-0">
+                                <h4 class="font-bold text-xs sm:text-sm text-gray-900 truncate">${it.title}</h4>
+                                <div class="flex items-center gap-2 mt-0.5">
+                                    <span class="text-xs font-black text-indigo-600">$${price.toFixed(2)}</span>
+                                    <span class="text-[10px] bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full font-bold border border-indigo-100">
+                                        Size: ${size}
+                                    </span>
+                                </div>
+                                <div class="flex items-center gap-2 mt-2">
+                                    <button onclick="changeCartQty(${idx}, -1)" class="w-6 h-6 bg-gray-100 hover:bg-gray-200 rounded-lg text-xs font-bold text-gray-700 transition flex items-center justify-center">-</button>
+                                    <span class="text-xs font-black text-gray-800 w-6 text-center">${qty}</span>
+                                    <button onclick="changeCartQty(${idx}, 1)" class="w-6 h-6 bg-gray-100 hover:bg-gray-200 rounded-lg text-xs font-bold text-gray-700 transition flex items-center justify-center">+</button>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- តម្លៃសរុប និងប៊ូតុងលុប -->
-                        <div class="text-right flex flex-col justify-between items-end h-16 sm:h-20 py-0.5">
-                            <span class="font-black text-sm text-gray-900">$${itemTotal.toFixed(2)}</span>
-                            <button onclick="removeItem(${index})" class="text-xs text-red-500 hover:text-red-700 font-semibold bg-red-50 hover:bg-red-100 px-2 py-1 rounded-md transition">
+                        <div class="text-right flex-shrink-0">
+                            <div class="font-black text-indigo-600 text-sm sm:text-base">$${subtotal.toFixed(2)}</div>
+                            <button onclick="removeCartItem(${idx})" class="text-[11px] text-red-500 hover:text-red-700 font-bold mt-2 hover:underline">
                                 លុប
                             </button>
                         </div>
@@ -171,34 +242,37 @@
                 `;
             }).join('');
 
-            document.getElementById('cart-total').innerText = '$' + total.toFixed(2);
+            document.getElementById('cart-total-price').innerText = '$' + total.toFixed(2);
+            summaryBox.classList.remove('hidden');
         }
 
-        function updateQty(index, change) {
-            let cart = getCart();
-            if (!cart[index]) return;
+        function changeCartQty(idx, delta) {
+            cartItems[idx].qty = (cartItems[idx].qty || 1) + delta;
+            if (cartItems[idx].qty < 1) cartItems[idx].qty = 1;
+            localStorage.setItem(CART_KEY, JSON.stringify(cartItems));
+            renderCartItems();
+        }
 
-            cart[index].qty = (cart[index].qty || 1) + change;
-            if (cart[index].qty <= 0) {
-                cart.splice(index, 1);
+        function removeCartItem(idx) {
+            cartItems.splice(idx, 1);
+            localStorage.setItem(CART_KEY, JSON.stringify(cartItems));
+            renderCartItems();
+        }
+
+        function clearAllCart() {
+            if (confirm('តើអ្នកចង់សម្អាតទំនិញទាំងអស់ក្នុងកន្ត្រកមែនទេ?')) {
+                cartItems = [];
+                localStorage.removeItem(CART_KEY);
+                renderCartItems();
             }
-            saveCart(cart);
         }
 
-        function removeItem(index) {
-            let cart = getCart();
-            cart.splice(index, 1);
-            saveCart(cart);
+        function proceedToCheckout() {
+            const redirectUrl = currentShopSlug ? `/checkout.html?store=${currentShopSlug}` : '/checkout.html';
+            window.location.href = redirectUrl;
         }
 
-        function clearCart() {
-            if (!confirm('តើអ្នកពិតជាចង់លុបទំនិញទាំងអស់ចេញពីកន្ត្រកមែនទេ?')) return;
-            localStorage.removeItem(CART_KEY);
-            renderCart();
-        }
-
-        // ចាប់ផ្តើមបង្ហាញកន្ត្រក
-        renderCart();
+        initCartPage();
     </script>
 </body>
 

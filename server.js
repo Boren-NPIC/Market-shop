@@ -1,307 +1,285 @@
 const express = require('express');
-const cors = require('cors');
-const fs = require('fs');
 const path = require('path');
-const multer = require('multer');
-
 const app = express();
-app.use(cors());
-app.use(express.json({ limit: '30mb' }));
-app.use(express.urlencoded({ limit: '30mb', extended: true }));
+const PORT = process.env.PORT || 3000;
 
-const publicDir = path.join(__dirname, 'public');
+// Middleware
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use(express.static(path.join(__dirname, 'public')));
 
-const isVercel = process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME;
-const DATA_FILE = isVercel ? path.join('/tmp', 'data.json') : path.join(__dirname, 'data.json');
+// Database In-Memory
+let stores = {};
+let products = [];
+let orders = [];
 
-const uploadDir = isVercel ? path.join('/tmp', 'uploads') : path.join(publicDir, 'uploads');
-if (!fs.existsSync(uploadDir)) {
-    try { fs.mkdirSync(uploadDir, { recursive: true }); } catch (e) { }
-}
-app.use('/uploads', express.static(uploadDir));
-
-if (isVercel) {
-    try {
-        if (!fs.existsSync(DATA_FILE)) {
-            const origPath = path.join(__dirname, 'data.json');
-            if (fs.existsSync(origPath)) {
-                fs.writeFileSync(DATA_FILE, fs.readFileSync(origPath, 'utf-8'));
-            }
-        }
-    } catch (e) { }
-}
-
-let memoryDB = null;
-
-function readData() {
-    try {
-        if (fs.existsSync(DATA_FILE)) {
-            memoryDB = JSON.parse(fs.readFileSync(DATA_FILE, 'utf-8'));
-            if (!memoryDB.stores) memoryDB.stores = [];
-            if (!memoryDB.products) memoryDB.products = [];
-            if (!memoryDB.orders) memoryDB.orders = [];
-            return memoryDB;
-        }
-    } catch (e) { }
-
-    if (!memoryDB) {
-        memoryDB = {
-            stores: [],
-            products: [],
-            orders: []
-        };
-    }
-    return memoryDB;
-}
-
-function writeData(data) {
-    memoryDB = data;
-    try {
-        fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
-    } catch (e) { }
-}
-
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, uploadDir),
-    filename: (req, file, cb) => {
-        const ext = path.extname(file.originalname);
-        cb(null, 'khqr-' + Date.now() + ext);
-    }
-});
-const upload = multer({ storage });
-
-app.use(express.static(publicDir));
-
-// Routes
-app.get('/', (req, res) => res.sendFile(path.join(publicDir, 'index.html')));
-app.get('/dashboard', (req, res) => res.sendFile(path.join(publicDir, 'dashboard.html')));
-app.get('/cart', (req, res) => res.sendFile(path.join(publicDir, 'cart.html')));
-app.get('/checkout', (req, res) => res.sendFile(path.join(publicDir, 'checkout.html')));
-
-app.get('/shop/:slug', (req, res) => {
-    res.sendFile(path.join(publicDir, 'index.html'));
+// -------------------------------------------------------------
+// SYSTEM RESET / PURGE ROUTE
+// -------------------------------------------------------------
+app.get('/api/admin/reset-system-purge', (req, res) => {
+    stores = {};
+    products = [];
+    orders = [];
+    console.log("🧹 [SYSTEM PURGE]: បានសម្អាតទិន្នន័យចាស់ទាំងអស់ចេញពី Server រួចរាល់!");
+    res.send(`
+        <!DOCTYPE html>
+        <html lang="km">
+        <head>
+            <meta charset="UTF-8">
+            <title>សម្អាតប្រព័ន្ធជោគជ័យ</title>
+            <script src="https://cdn.tailwindcss.com"></script>
+        </head>
+        <body class="bg-slate-900 text-white min-h-screen flex items-center justify-center p-4">
+            <div class="bg-slate-800 p-8 rounded-3xl border border-slate-700 text-center max-w-md shadow-2xl">
+                <div class="text-4xl mb-3">🧹</div>
+                <h2 class="text-xl font-bold text-emerald-400 mb-2">សម្អាតទិន្នន័យចាស់ជោគជ័យ!</h2>
+                <p class="text-xs text-slate-400 mb-4">រាល់ឈ្មោះហាង Logo និងស្តុកចាស់ៗត្រូវបានលុបស្អាត ១០០%។</p>
+                <div class="text-[11px] text-slate-500">កំពុងនាំត្រឡប់ទៅទំព័រដើម...</div>
+            </div>
+            <script>
+                try {
+                    localStorage.clear();
+                    sessionStorage.clear();
+                } catch(e) {}
+                setTimeout(function() {
+                    window.location.href = '/';
+                }, 1200);
+            </script>
+        </body>
+        </html>
+    `);
 });
 
-// Store Info API
-app.get('/api/store/get/:slug', (req, res) => {
-    const data = readData();
-    const store = (data.stores || []).find(s => s.slug === req.params.slug);
-    if (!store) return res.status(404).json({ error: 'រកមិនឃើញហាងនេះទេ' });
-    res.json(store);
-});
-
+// -------------------------------------------------------------
+// STORE APIS
+// -------------------------------------------------------------
 app.post('/api/store/create', (req, res) => {
-    const { email, name, slug, logoBase64 } = req.body || {};
-    if (!name || !slug || !email) {
-        return res.status(400).json({ error: 'សូមបំពេញព័ត៌មានឱ្យបានគ្រប់គ្រាន់!' });
+    const { email, name, slug, logoBase64 } = req.body;
+    if (!name || !slug) {
+        return res.status(400).json({ error: 'សូមបំពេញឈ្មោះហាង និង Link ហាងឱ្យបានត្រឹមត្រូវ!' });
     }
 
-    const cleanSlug = slug.toLowerCase().replace(/[^a-z0-9-_]/g, '');
-    const data = readData();
+    const cleanSlug = slug.toLowerCase().trim().replace(/[^a-z0-9-]/g, '');
 
-    let store = data.stores.find(s => s.slug === cleanSlug);
-    if (store) {
-        store.name = name.trim();
-        if (logoBase64) store.logo = logoBase64;
-    } else {
-        store = {
-            id: 'STR_' + Date.now(),
-            email: email.trim(),
-            name: name.trim(),
-            slug: cleanSlug,
-            logo: logoBase64 || '',
-            khqr_image: '',
-            createdAt: new Date().toISOString()
-        };
-        data.stores.push(store);
+    stores[cleanSlug] = {
+        email: email || 'anonymous',
+        name: name.trim(),
+        slug: cleanSlug,
+        logo: logoBase64 || '',
+        khqr: '',
+        createdAt: new Date()
+    };
+
+    console.log(`✓ ហាងថ្មីត្រូវបានបង្កើត៖ ${name} (/shop/${cleanSlug})`);
+    return res.json({ success: true, store: stores[cleanSlug] });
+});
+
+app.get('/api/store/get/:slug', (req, res) => {
+    res.set('Cache-Control', 'no-store');
+    const { slug } = req.params;
+    const store = stores[slug];
+    if (!store) {
+        return res.status(404).json({ error: 'រកមិនឃើញហាងនេះឡើយ' });
     }
-
-    writeData(data);
-    res.json({ status: 'success', store });
+    return res.json(store);
 });
 
-// KHQR Upload API
-app.post('/api/vendor/khqr', upload.single('qrImageFile'), (req, res) => {
-    const storeSlug = req.body.slug;
-    if (!req.file) return res.status(400).json({ error: 'សូមជ្រើសរើសរូបភាព!' });
-    const qrUrl = '/uploads/' + req.file.filename;
-
-    const data = readData();
-    const store = (data.stores || []).find(s => s.slug === storeSlug) || data.stores[0];
-    if (store) {
-        store.khqr_image = qrUrl;
-        writeData(data);
+app.post('/api/vendor/khqr', (req, res) => {
+    const { slug, khqrBase64 } = req.body;
+    if (stores[slug]) {
+        stores[slug].khqr = khqrBase64;
+        return res.json({ success: true });
     }
-    res.json({ status: 'success', qrImage: qrUrl });
+    return res.status(404).json({ error: 'រកមិនឃើញហាងឡើយ' });
 });
 
-app.get('/api/checkout/vendor-qr', (req, res) => {
-    const storeSlug = req.query.slug;
-    const data = readData();
-    const store = (data.stores || []).find(s => s.slug === storeSlug) || data.stores[0] || {};
-    const qrUrl = (store.khqr_image && store.khqr_image.length > 5)
-        ? store.khqr_image
-        : 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=ABA-KHQR-DEMO';
-    res.json({ qrImage: qrUrl, vendorName: store.name || 'ហាងអនឡាញ' });
-});
-
-// Products API (គាំទ្រ Stock)
+// -------------------------------------------------------------
+// PRODUCT APIS
+// -------------------------------------------------------------
 app.get('/api/products', (req, res) => {
-    const storeSlug = req.query.slug;
-    const data = readData();
-    let prods = data.products || [];
-    if (storeSlug && storeSlug !== 'undefined' && storeSlug !== 'null') {
-        const filtered = prods.filter(p => p.store_slug === storeSlug);
-        if (filtered.length > 0) return res.json(filtered);
+    res.set('Cache-Control', 'no-store');
+    const { slug } = req.query;
+    if (slug && slug !== 'all' && slug !== 'undefined') {
+        return res.json(products.filter(p => p.store_slug === slug));
     }
-    res.json(prods);
+    return res.json(products);
 });
 
 app.post('/api/products', (req, res) => {
-    const data = readData();
-    const b = req.body || {};
+    const { store_slug, title, category, price, stock, sizes, promotion, promo, imageBase64 } = req.body;
+    if (!store_slug || !title || !price) {
+        return res.status(400).json({ error: 'សូមបំពេញព័ត៌មានផលិតផលឱ្យគ្រប់គ្រាន់!' });
+    }
+
+    const promoValue = promotion || promo || '';
+
     const newProd = {
-        id: Date.now(),
-        store_slug: b.store_slug || 'default',
-        title: (b.title || 'ទំនិញថ្មី').trim(),
-        category: b.category || 'clothes',
-        price: parseFloat(b.price || 0),
-        stock: parseInt(b.stock !== undefined ? b.stock : 10), // ចំនួនស្តុកកំណត់ដោយម្ចាស់ហាង
-        attributes: { size: (b.sizes || 'S, M, L').trim() },
-        image: b.imageBase64 || ''
+        id: 'PRD_' + Date.now(),
+        store_slug,
+        title: title.trim(),
+        category: category || 'clothes',
+        price: parseFloat(price) || 0,
+        stock: parseInt(stock) || 0,
+        promotion: promoValue ? promoValue.trim() : '',
+        attributes: { size: sizes || 'S, M, L' },
+        image: imageBase64 || '',
+        createdAt: new Date()
     };
 
-    data.products.unshift(newProd);
-    writeData(data);
-    res.json({ status: 'success', product: newProd });
+    products.unshift(newProd);
+    return res.json({ success: true, product: newProd });
 });
 
-// កែប្រែចំនួនស្តុកទំនិញរហ័ស (Quick Update Stock)
+app.put('/api/products/:id', (req, res) => {
+    const { id } = req.params;
+    const { title, category, price, stock, sizes, promotion, promo, imageBase64 } = req.body;
+
+    const prod = products.find(p => p.id === id);
+    if (!prod) {
+        return res.status(404).json({ error: 'រកមិនឃើញទំនិញឡើយ' });
+    }
+
+    if (title) prod.title = title.trim();
+    if (category) prod.category = category;
+    if (price !== undefined) prod.price = parseFloat(price) || 0;
+    if (stock !== undefined) prod.stock = parseInt(stock) || 0;
+    if (sizes) prod.attributes = { size: sizes };
+
+    const promoUpdate = promotion !== undefined ? promotion : promo;
+    if (promoUpdate !== undefined) {
+        prod.promotion = promoUpdate ? promoUpdate.trim() : '';
+    }
+
+    if (imageBase64) prod.image = imageBase64;
+    return res.json({ success: true, product: prod });
+});
+
 app.put('/api/products/:id/stock', (req, res) => {
-    const reqId = String(req.params.id);
+    const { id } = req.params;
     const { stock } = req.body;
-    const data = readData();
-    const prod = (data.products || []).find(p => String(p.id) === reqId);
-
-    if (!prod) return res.status(404).json({ error: 'រកមិនឃើញទំនិញ' });
-    prod.stock = Math.max(0, parseInt(stock || 0));
-    writeData(data);
-
-    res.json({ status: 'success', stock: prod.stock });
+    const prod = products.find(p => p.id === id);
+    if (prod) {
+        prod.stock = parseInt(stock) || 0;
+        return res.json({ success: true, stock: prod.stock });
+    }
+    return res.status(404).json({ error: 'រកមិនឃើញទំនិញ' });
 });
 
 app.delete('/api/products/:id', (req, res) => {
-    const reqId = String(req.params.id);
-    const data = readData();
-    data.products = (data.products || []).filter(p => String(p.id) !== reqId);
-    writeData(data);
-    res.json({ status: 'success' });
+    const { id } = req.params;
+    products = products.filter(p => p.id !== id);
+    return res.json({ success: true });
 });
 
-// Orders Management
-app.post('/api/checkout/confirm-payment', (req, res) => {
-    try {
-        const b = req.body || {};
-        if (!b.slipImage) return res.status(400).json({ error: 'សូម Upload រូបភាពវិក្កយបត្រ!' });
-
-        const data = readData();
-        const tranId = 'TX' + Date.now();
-
-        const newOrder = {
-            tranId,
-            store_slug: b.store_slug || 'default',
-            customerName: (b.customerName || 'អតិថិជន').trim(),
-            bankAccountName: (b.bankAccountName || 'មិនបានបញ្ជាក់').trim(),
-            phone: (b.phone || '-').trim(),
-            deliveryMethod: (b.deliveryMethod || 'វីរៈប៊ុនថាំ (VET Express)').trim(),
-            address: b.address || 'មិនមានអាសយដ្ឋាន',
-            amount: parseFloat(b.amount || 0).toFixed(2),
-            items: b.items || [],
-            slipImage: b.slipImage,
-            status: 'PENDING',
-            rejectReason: '',
-            createdAt: new Date().toLocaleTimeString('km-KH')
-        };
-
-        data.orders.unshift(newOrder);
-        writeData(data);
-
-        res.json({ status: 'success', tranId });
-    } catch (e) {
-        res.status(500).json({ error: 'Server Error' });
-    }
-});
-
-app.post('/api/checkout/reupload-slip', (req, res) => {
-    const { tranId, slipImage } = req.body || {};
-    if (!tranId || !slipImage) return res.status(400).json({ error: 'ទិន្នន័យមិនគ្រប់គ្រាន់' });
-
-    const data = readData();
-    const order = (data.orders || []).find(o => o.tranId === tranId);
-    if (!order) return res.status(404).json({ error: 'រកមិនឃើញ Order' });
-
-    order.slipImage = slipImage;
-    order.status = 'PENDING';
-    order.rejectReason = '';
-    writeData(data);
-
-    res.json({ status: 'success' });
-});
-
-app.get('/api/orders/check-status/:tranId', (req, res) => {
-    const data = readData();
-    const order = (data.orders || []).find(o => o.tranId === req.params.tranId);
-    if (!order) return res.status(404).json({ error: 'រកមិនឃើញ Order' });
-    res.json({ status: order.status, rejectReason: order.rejectReason || '' });
-});
-
+// -------------------------------------------------------------
+// ORDER APIS (LIVE STATUS & INVOICE)
+// -------------------------------------------------------------
 app.get('/api/admin/orders', (req, res) => {
-    const storeSlug = req.query.slug;
-    const data = readData();
-    let orders = data.orders || [];
-
-    if (storeSlug && storeSlug !== 'default' && storeSlug !== 'undefined') {
-        const storeOrders = orders.filter(o => o.store_slug === storeSlug);
-        if (storeOrders.length > 0) return res.json(storeOrders);
+    res.set('Cache-Control', 'no-store');
+    const { slug } = req.query;
+    if (slug) {
+        return res.json(orders.filter(o => o.store_slug === slug));
     }
-    res.json(orders);
+    return res.json(orders);
 });
 
-// នៅពេលយល់ព្រមទទួលប្រាក់ កាត់ស្តុកទំនិញស្វ័យប្រវត្តិ
+app.get('/api/admin/orders/history', (req, res) => {
+    res.set('Cache-Control', 'no-store');
+    const { slug } = req.query;
+    if (slug) {
+        return res.json(orders.filter(o => o.store_slug === slug));
+    }
+    return res.json(orders);
+});
+
+app.post('/api/admin/orders/clear-completed', (req, res) => {
+    const { slug } = req.body;
+    let clearedCount = 0;
+    orders.forEach(o => {
+        if (o.store_slug === slug && (o.status === 'PAID' || o.status === 'REJECTED')) {
+            o.archived = true;
+            clearedCount++;
+        }
+    });
+    return res.json({ success: true, clearedCount });
+});
+
+app.post('/api/checkout/confirm-payment', (req, res) => {
+    const { store_slug, customerName, phone, address, deliveryMethod, items, slipImage, amount } = req.body;
+
+    const newOrder = {
+        tranId: 'TX' + Date.now(),
+        store_slug: store_slug || 'default',
+        customerName: customerName || 'អតិថិជន',
+        phone: phone || '',
+        address: address || '',
+        deliveryMethod: deliveryMethod || 'វីរៈប៊ុនថាំ',
+        items: items || [],
+        slipImage: slipImage || '',
+        amount: amount || '0.00',
+        status: 'PENDING',
+        archived: false,
+        rejectReason: '',
+        createdAt: new Date()
+    };
+
+    orders.unshift(newOrder);
+    console.log(`📥 ទទួលបានការបញ្ជាទិញថ្មី៖ ${newOrder.tranId}`);
+    return res.json({ success: true, tranId: newOrder.tranId });
+});
+
+// API ពិនិត្យមើលស្ថានភាព Order & វិក្កយបត្រ (No Cache)
+app.get('/api/orders/:tranId', (req, res) => {
+    res.set('Cache-Control', 'no-store');
+    const { tranId } = req.params;
+    const order = orders.find(o => String(o.tranId) === String(tranId));
+    if (!order) {
+        return res.status(404).json({ error: 'រកមិនឃើញវិក្កយបត្រឡើយ' });
+    }
+    const store = stores[order.store_slug] || { name: 'SMD Market', logo: '' };
+    return res.json({ success: true, order, store });
+});
+
+// ម្ចាស់ហាងយល់ព្រមទទួលប្រាក់
 app.post('/api/admin/orders/confirm', (req, res) => {
     const { tranId } = req.body;
-    const data = readData();
-    const order = (data.orders || []).find(o => o.tranId === tranId);
+    const order = orders.find(o => String(o.tranId) === String(tranId));
     if (order) {
         order.status = 'PAID';
-
-        // កាត់ស្តុកទំនិញដែលបានលក់
         if (order.items && order.items.length) {
             order.items.forEach(it => {
-                const prod = (data.products || []).find(p => String(p.id) === String(it.id));
-                if (prod && prod.stock !== undefined) {
-                    prod.stock = Math.max(0, prod.stock - (it.qty || 1));
-                }
+                const p = products.find(prod => prod.id === it.id);
+                if (p) p.stock = Math.max(0, p.stock - (it.qty || 1));
             });
         }
-        writeData(data);
+        console.log(`✅ [CONFIRMED]: ម្ចាស់ហាងបានយល់ព្រម Order ${tranId} -> ប្រែជា PAID`);
+        return res.json({ success: true, order });
     }
-    res.json({ message: 'ជោគជ័យ' });
+    return res.status(404).json({ error: 'រកមិនឃើញ Order' });
 });
 
+// ម្ចាស់ហាងបដិសេធ
 app.post('/api/admin/orders/reject', (req, res) => {
     const { tranId, reason } = req.body;
-    const data = readData();
-    const order = (data.orders || []).find(o => o.tranId === tranId);
+    const order = orders.find(o => String(o.tranId) === String(tranId));
     if (order) {
         order.status = 'REJECTED';
-        order.rejectReason = reason || 'វិក្កយបត្រមិនត្រឹមត្រូវ';
-        writeData(data);
+        order.rejectReason = reason || 'ការទូទាត់ប្រាក់មិនត្រឹមត្រូវ';
+        console.log(`❌ [REJECTED]: ម្ចាស់ហាងបានបដិសេធ Order ${tranId}`);
+        return res.json({ success: true, order });
     }
-    res.json({ message: 'បានបដិសេធ' });
+    return res.status(404).json({ error: 'រកមិនឃើញ Order ឡើយ' });
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 Server កំពុងដំណើរការលើ http://localhost:${PORT}`));
+// Routes Frontend
+app.get('/shop/:slug', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
-module.exports = app;
+app.get('/dashboard', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+});
+
+app.listen(PORT, () => {
+    console.log(`🚀 Server កំពុងដំណើរការលើ http://localhost:${PORT}`);
+});
