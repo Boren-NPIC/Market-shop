@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ទូទាត់ប្រាក់ KHQR</title>
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -119,13 +119,13 @@
                 <img id="vendor-qr-img" src="" alt="KHQR" class="w-60 h-60 object-contain mx-auto rounded-lg">
             </div>
 
-            <!-- ប្រអប់ Upload វិក្កយបត្រ -->
             <div class="bg-indigo-50/60 border-2 border-dashed border-indigo-200 rounded-xl p-4 mb-4 text-left">
                 <label class="block text-xs font-bold text-indigo-900 mb-1">
                     📸 ភ្ជាប់រូបភាពវិក្កយបត្របាញ់លុយ (Payment Slip) <span class="text-red-500">*</span>
                 </label>
                 <p class="text-[11px] text-gray-500 mb-2">សូមជ្រើសរើសរូបថត Screenshot វិក្កយបត្របាញ់លុយ</p>
-                <input type="file" id="slip-file" accept="image/*" required onchange="compressAndPreviewSlip(event)"
+                <input type="file" id="slip-file" accept="image/*" required
+                    onchange="compressAndPreviewSlip(event, 'slip-preview-img', 'slip-preview-box')"
                     class="w-full text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 cursor-pointer border rounded-lg p-1 bg-white">
 
                 <div id="slip-preview-box" class="hidden mt-3 flex items-center gap-3 bg-white p-2 rounded-lg border">
@@ -143,7 +143,7 @@
             </button>
         </div>
 
-        <!-- ដំណាក់កាលទី ៣: ផ្ទាំងរង់ចាំ និងជោគជ័យ -->
+        <!-- ដំណាក់កាលទី ៣: ផ្ទាំងរង់ចាំពិនិត្យ -->
         <div id="step-waiting" class="hidden text-center border-t pt-5">
             <div class="inline-block p-3 bg-amber-50 rounded-full text-amber-600 mb-3">
                 <svg class="w-10 h-10 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -158,6 +158,40 @@
             </div>
         </div>
 
+        <!-- ដំណាក់កាលទី ៤: ផ្ទាំងពេលហាងបដិសេធ (Rejected Box) -->
+        <div id="step-rejected" class="hidden text-center border-t pt-5">
+            <div
+                class="w-14 h-14 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-2 text-2xl font-black">
+                ✕
+            </div>
+            <h3 class="text-lg font-bold text-red-600 mb-1">ការទូទាត់ប្រាក់ត្រូវបានបដិសេធ!</h3>
+            <div class="bg-red-50 border border-red-200 rounded-xl p-3 my-3 text-left">
+                <span class="text-xs font-bold text-red-800 block mb-0.5">💬 សារពីម្ចាស់ហាង៖</span>
+                <p id="reject-reason-text" class="text-xs text-red-700 font-medium"></p>
+            </div>
+
+            <!-- ប្រអប់ Upload វិក្កយបត្រថ្មីឡើងវិញ -->
+            <div class="bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl p-4 mb-4 text-left">
+                <label class="block text-xs font-bold text-gray-800 mb-1">
+                    📸 ផ្ញើរូបភាពវិក្កយបត្រថ្មីឡើងវិញ
+                </label>
+                <input type="file" id="reupload-slip-file" accept="image/*"
+                    onchange="compressAndPreviewSlip(event, 'reslip-preview-img', 'reslip-preview-box')"
+                    class="w-full text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-red-600 file:text-white hover:file:bg-red-700 cursor-pointer border rounded-lg p-1 bg-white">
+
+                <div id="reslip-preview-box" class="hidden mt-3 flex items-center gap-3 bg-white p-2 rounded-lg border">
+                    <img id="reslip-preview-img" src="" class="w-16 h-20 object-cover rounded border">
+                    <span class="text-xs text-green-600 font-bold">✓ បានជ្រើសរើសវិក្កយបត្រថ្មី!</span>
+                </div>
+            </div>
+
+            <button type="button" id="btn-reupload" onclick="submitReuploadSlip()"
+                class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold h-11 rounded-xl text-xs transition shadow-md">
+                ផ្ញើវិក្កយបត្រថ្មីម្តងទៀត &rarr;
+            </button>
+        </div>
+
+        <!-- ដំណាក់កាលទី ៥: ជោគជ័យ (PAID) -->
         <div id="step-success" class="hidden text-center border-t pt-5">
             <div
                 class="w-14 h-14 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-2 text-2xl font-black">
@@ -183,6 +217,7 @@
         document.getElementById('display-amount').innerText = amount.toFixed(2);
 
         let base64Slip = '';
+        let base64Reupload = '';
         let customerInfo = {};
         let activeTranId = null;
         let pollInterval = null;
@@ -217,8 +252,7 @@
             document.getElementById('step-payment').classList.remove('hidden');
         };
 
-        // មុខងារ Compress រូបភាពពីទូរស័ព្ទឱ្យនៅត្រឹមទំហំស្រាល (~150KB)
-        function compressAndPreviewSlip(event) {
+        function compressAndPreviewSlip(event, imgId, boxId) {
             const file = event.target.files[0];
             if (!file) return;
 
@@ -229,8 +263,6 @@
                     const canvas = document.createElement('canvas');
                     let width = img.width;
                     let height = img.height;
-
-                    // កំណត់ទំហំអតិបរមា 1000px ដើម្បីកុំឱ្យធ្ងន់
                     const maxDim = 1000;
                     if (width > maxDim || height > maxDim) {
                         if (width > height) {
@@ -241,17 +273,21 @@
                             height = maxDim;
                         }
                     }
-
                     canvas.width = width;
                     canvas.height = height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
 
-                    // Compress ជា JPEG Quality 0.7 (ច្បាស់ តែទំហំស្រាលខ្លាំង)
-                    base64Slip = canvas.toDataURL('image/jpeg', 0.7);
+                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
 
-                    document.getElementById('slip-preview-img').src = base64Slip;
-                    document.getElementById('slip-preview-box').classList.remove('hidden');
+                    if (imgId === 'slip-preview-img') {
+                        base64Slip = compressedBase64;
+                    } else {
+                        base64Reupload = compressedBase64;
+                    }
+
+                    document.getElementById(imgId).src = compressedBase64;
+                    document.getElementById(boxId).classList.remove('hidden');
                 };
                 img.src = e.target.result;
             };
@@ -259,18 +295,13 @@
         }
 
         async function submitFinalOrder() {
-            if (!base64Slip) {
-                return alert('⚠️ សូម Upload រូបភាពវិក្កយបត្របាញ់លុយ (Slip) ជាមុនសិន!');
-            }
+            if (!base64Slip) return alert('⚠️ សូម Upload រូបភាពវិក្កយបត្របាញ់លុយ (Slip) ជាមុនសិន!');
 
             const btn = document.getElementById('btn-submit-order');
             btn.disabled = true;
             btn.innerText = 'កំពុងផ្ញើទិន្នន័យ...';
 
-            const payload = {
-                ...customerInfo,
-                slipImage: base64Slip
-            };
+            const payload = { ...customerInfo, slipImage: base64Slip };
 
             try {
                 const res = await fetch('/api/checkout/confirm-payment', {
@@ -290,12 +321,17 @@
                 document.getElementById('step-waiting').classList.remove('hidden');
                 document.getElementById('tran-display').innerText = activeTranId;
 
-                pollInterval = setInterval(checkStatusFromAdmin, 2000);
+                startPolling();
             } catch (err) {
                 alert('កំហុស៖ ' + err.message);
                 btn.disabled = false;
                 btn.innerText = '✓ ខ្ញុំបានបាញ់លុយរួចរាល់ (ផ្ញើការកុម្ម៉ង់)';
             }
+        }
+
+        function startPolling() {
+            if (pollInterval) clearInterval(pollInterval);
+            pollInterval = setInterval(checkStatusFromAdmin, 2500);
         }
 
         async function checkStatusFromAdmin() {
@@ -304,15 +340,59 @@
                 const res = await fetch(`/api/orders/check-status/${activeTranId}`);
                 if (res.ok) {
                     const data = await res.json();
+
+                    // ករណីម្ចាស់ហាងយល់ព្រម
                     if (data.status === 'PAID') {
                         clearInterval(pollInterval);
                         document.getElementById('step-waiting').classList.add('hidden');
+                        document.getElementById('step-rejected').classList.add('hidden');
                         document.getElementById('step-success').classList.remove('hidden');
                         localStorage.removeItem(CART_KEY);
+                    }
+                    // ករណីម្ចាស់ហាងបដិសេធ (លោតសារប្រាប់ភ្ញៀវ)
+                    else if (data.status === 'REJECTED') {
+                        clearInterval(pollInterval);
+                        document.getElementById('step-waiting').classList.add('hidden');
+                        document.getElementById('step-rejected').classList.remove('hidden');
+                        document.getElementById('reject-reason-text').innerText = data.rejectReason || 'វិក្កយបត្រមិនត្រឹមត្រូវ ឬមិនទាន់ទទួលបានប្រាក់';
                     }
                 }
             } catch (e) {
                 console.error(e);
+            }
+        }
+
+        // ផ្ញើវិក្កយបត្រថ្មីឡើងវិញ
+        async function submitReuploadSlip() {
+            if (!base64Reupload) return alert('សូមជ្រើសរើសរូបភាពវិក្កយបត្រថ្មីជាមុនសិន!');
+
+            const btn = document.getElementById('btn-reupload');
+            btn.disabled = true;
+            btn.innerText = 'កំពុងផ្ញើ...';
+
+            try {
+                const res = await fetch('/api/checkout/reupload-slip', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tranId: activeTranId, slipImage: base64Reupload })
+                });
+
+                if (res.ok) {
+                    alert('✓ បានផ្ញើវិក្កយបត្រថ្មីរួចរាល់!');
+                    document.getElementById('step-rejected').classList.add('hidden');
+                    document.getElementById('step-waiting').classList.remove('hidden');
+                    base64Reupload = '';
+                    document.getElementById('reslip-preview-box').classList.add('hidden');
+                    document.getElementById('reupload-slip-file').value = '';
+                    startPolling();
+                } else {
+                    alert('បរាជ័យក្នុងការផ្ញើ');
+                }
+            } catch (e) {
+                alert('បរាជ័យក្នុងការតភ្ជាប់');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'ផ្ញើវិក្កយបត្រថ្មីម្តងទៀត →';
             }
         }
     </script>

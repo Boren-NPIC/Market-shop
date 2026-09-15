@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ហាងទំនិញអនឡាញ - KM-Market</title>
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -14,6 +14,7 @@
     <style>
         * {
             font-family: 'Khmer OS Siemreap', 'Siemreap', sans-serif !important;
+            -webkit-tap-highlight-color: transparent;
         }
 
         input,
@@ -29,14 +30,28 @@
 
     <!-- Header សម្រាប់អ្នកទិញ -->
     <header class="bg-white shadow-sm border-b sticky top-0 z-30">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
-            <a href="/" class="flex items-center gap-2">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex justify-between items-center">
+
+            <!-- Logo: ចុច Double-Click លើ Logo នេះដើម្បីដោះសោរប៊ូតុង Dashboard -->
+            <div onclick="handleSecretClick()" class="flex items-center gap-2 cursor-pointer select-none"
+                title="KM-Market">
                 <span class="text-2xl">🛍️</span>
                 <span class="text-xl font-black text-indigo-600 tracking-tight">KM-Market</span>
-            </a>
-            <div>
+            </div>
+
+            <!-- ប៊ូតុងខាងស្តាំ -->
+            <div class="flex items-center gap-2 sm:gap-3">
+
+                <!-- ប៊ូតុង Dashboard សម្រាប់តែម្ចាស់ហាង (លាក់ទុកជាមុន មិនឱ្យអ្នកទិញឃើញទេ) -->
+                <a id="btn-admin-dashboard" href="/admin?key=mysecret8888"
+                    class="hidden bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs px-3 sm:px-4 py-2 rounded-xl items-center gap-1.5 transition shadow-sm animate-pulse">
+                    <span>⚙️</span>
+                    <span>Dashboard</span>
+                </a>
+
+                <!-- ប៊ូតុងកន្ត្រកទំនិញរបស់អ្នកទិញ -->
                 <a href="/cart.html"
-                    class="relative bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs px-4 py-2 rounded-xl flex items-center gap-2 transition">
+                    class="relative bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs px-3.5 sm:px-4 py-2 rounded-xl flex items-center gap-2 transition">
                     <span>🛒 កន្ត្រកទំនិញ</span>
                     <span id="cart-count"
                         class="bg-red-500 text-white text-[11px] px-2 py-0.5 rounded-full font-bold">0</span>
@@ -46,17 +61,17 @@
     </header>
 
     <!-- Main Grid -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex-1 w-full">
-        <div class="mb-6">
-            <h1 class="text-2xl font-black text-gray-900 tracking-tight">ទំនិញទើបដាក់លក់ថ្មីៗ</h1>
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 flex-1 w-full">
+        <div class="mb-5 sm:mb-6">
+            <h1 class="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">ទំនិញទើបដាក់លក់ថ្មីៗ</h1>
             <p class="text-xs text-gray-500 mt-1">រើសទំនិញដែលអ្នកពេញចិត្ត រួចកុម្ម៉ង់ទិញយ៉ាងងាយស្រួល</p>
         </div>
 
-        <div id="product-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
+        <div id="product-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5 sm:gap-6">
         </div>
     </main>
 
-    <!-- Modal បង្ហាញព័ត៌មានលម្អិតទំនិញ ( Detail Modal ) -->
+    <!-- Modal បង្ហាញព័ត៌មានលម្អិតទំនិញ -->
     <div id="detail-modal"
         class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border text-center">
@@ -70,9 +85,9 @@
             <div id="modal-stock" class="text-xs text-gray-500 mb-4"></div>
             <div class="flex gap-2">
                 <button onclick="closeDetailModal()"
-                    class="w-1/2 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold transition">បិទ</button>
+                    class="w-1/2 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold transition">បិទ</button>
                 <button id="modal-buy-btn"
-                    class="w-1/2 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition">ជ្រើសរើសទិញ</button>
+                    class="w-1/2 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition">ជ្រើសរើសទិញ</button>
             </div>
         </div>
     </div>
@@ -82,7 +97,7 @@
         class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border">
             <div class="flex gap-3 items-center pb-3 border-b mb-3">
-                <img id="opt-img" src="" class="w-16 h-16 object-cover rounded-xl border bg-gray-50">
+                <img id="opt-img" src="" class="w-16 h-16 object-cover rounded-xl border bg-gray-50 flex-shrink-0">
                 <div class="flex-1 min-w-0">
                     <h3 id="opt-title" class="font-bold text-gray-900 text-sm truncate"></h3>
                     <div id="opt-price" class="text-indigo-600 font-black text-base mt-0.5"></div>
@@ -132,7 +147,7 @@
         </div>
     </div>
 
-    <!-- Popup បញ្ជាក់ពេលដាក់ចូលកន្ត្រករួច ( Buy & Continue ) -->
+    <!-- Popup បញ្ជាក់ពេលដាក់ចូលកន្ត្រករួច -->
     <div id="confirm-cart-modal"
         class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border text-center">
@@ -158,9 +173,55 @@
 
     <script>
         const CART_KEY = 'km_market_cart';
+        const ADMIN_UNLOCKED_KEY = 'km_owner_is_admin';
         let productList = [];
         let selectedSize = '';
         let currentProduct = null;
+
+        // -------------------------------------------------------------
+        // យន្តការលាក់/បង្ហាញប៊ូតុង Dashboard សម្រាប់តែម្ចាស់ហាង
+        // -------------------------------------------------------------
+        function checkOwnerStatus() {
+            const isAdmin = localStorage.getItem(ADMIN_UNLOCKED_KEY);
+            const btn = document.getElementById('btn-admin-dashboard');
+            if (isAdmin === 'true') {
+                btn.classList.remove('hidden');
+                btn.classList.add('flex');
+            } else {
+                btn.classList.add('hidden');
+                btn.classList.remove('flex');
+            }
+        }
+
+        // ចុច ២ ដងលើ Logo ដើម្បីបើកសោរប៊ូតុង Dashboard
+        let clickCount = 0;
+        let clickTimer = null;
+        function handleSecretClick() {
+            clickCount++;
+            if (clickCount === 1) {
+                clickTimer = setTimeout(() => { clickCount = 0; }, 500);
+            } else if (clickCount === 2) {
+                clearTimeout(clickTimer);
+                clickCount = 0;
+
+                const currentStatus = localStorage.getItem(ADMIN_UNLOCKED_KEY);
+                if (currentStatus === 'true') {
+                    if (confirm('តើអ្នកចង់លាក់ប៊ូតុង Dashboard វិញមែនទេ?')) {
+                        localStorage.removeItem(ADMIN_UNLOCKED_KEY);
+                        checkOwnerStatus();
+                    }
+                } else {
+                    const pin = prompt('🔐 សូមបញ្ចូលលេខកូដសម្ងាត់ម្ចាស់ហាង (PIN):');
+                    if (pin === '8888') {
+                        localStorage.setItem(ADMIN_UNLOCKED_KEY, 'true');
+                        checkOwnerStatus();
+                        alert('✓ បានបើកប៊ូតុង Dashboard ជោគជ័យ!');
+                    } else if (pin !== null) {
+                        alert('លេខកូដមិនត្រឹមត្រូវទេ!');
+                    }
+                }
+            }
+        }
 
         function getCart() {
             try {
@@ -197,25 +258,25 @@
                     const prodImg = p.image || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500';
 
                     return `
-                        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition p-3.5 flex flex-col justify-between">
+                        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition p-3 sm:p-3.5 flex flex-col justify-between">
                             <div>
-                                <div class="w-full h-44 rounded-xl overflow-hidden bg-gray-50 mb-3 border border-gray-100">
+                                <div class="w-full h-36 sm:h-44 rounded-xl overflow-hidden bg-gray-50 mb-2.5 sm:mb-3 border border-gray-100">
                                     <img src="${prodImg}" 
                                          alt="${p.title || 'Product'}" 
                                          class="w-full h-full object-cover">
                                 </div>
-                                <span class="bg-gray-100 text-gray-600 text-[10px] font-bold px-2 py-0.5 rounded">${p.category || 'clothes'}</span>
-                                <h3 class="font-bold text-gray-800 text-sm mt-1.5 line-clamp-1">${p.title || 'គ្មានឈ្មោះ'}</h3>
-                                <div class="text-base font-black text-indigo-600 mt-1">$${Number(p.price || 0).toFixed(2)}</div>
+                                <span class="bg-gray-100 text-gray-600 text-[10px] font-bold px-2 py-0.5 rounded uppercase">${p.category || 'clothes'}</span>
+                                <h3 class="font-bold text-gray-800 text-xs sm:text-sm mt-1.5 line-clamp-1">${p.title || 'គ្មានឈ្មោះ'}</h3>
+                                <div class="text-sm sm:text-base font-black text-indigo-600 mt-1">$${Number(p.price || 0).toFixed(2)}</div>
                             </div>
 
-                            <div class="mt-4 flex gap-2">
+                            <div class="mt-3 sm:mt-4 flex gap-1.5 sm:gap-2">
                                 <button onclick="openDetailModal('${p.id}')" 
-                                    class="w-1/2 border border-gray-300 hover:border-gray-400 bg-white hover:bg-gray-50 text-gray-700 text-xs font-bold py-2 rounded-xl transition">
+                                    class="w-1/2 border border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50 text-gray-700 text-[11px] sm:text-xs font-bold py-1.5 sm:py-2 rounded-xl transition">
                                     លម្អិត
                                 </button>
                                 <button onclick="openOptionModal('${p.id}')" 
-                                    class="w-1/2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2 rounded-xl transition">
+                                    class="w-1/2 bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] sm:text-xs font-bold py-1.5 sm:py-2 rounded-xl transition">
                                     ទិញ
                                 </button>
                             </div>
@@ -229,7 +290,6 @@
             }
         }
 
-        // បើក Modal ជ្រើសរើស Size & ចំនួន
         function openOptionModal(id) {
             currentProduct = productList.find(item => String(item.id) === String(id));
             if (!currentProduct) return;
@@ -240,7 +300,6 @@
             document.getElementById('opt-price').innerText = '$' + Number(currentProduct.price || 0).toFixed(2);
             document.getElementById('opt-stock').innerText = 'ស្តុកនៅសល់៖ ' + (currentProduct.stock || 0);
 
-            // បង្កើតបញ្ជី Size ស្វ័យប្រវត្តិ
             const attr = currentProduct.attributes || {};
             let sizes = [];
 
@@ -297,15 +356,12 @@
             document.getElementById('option-modal').classList.add('hidden');
         }
 
-        // ដាក់បញ្ចូលកន្ត្រកតាម Option ដែលបានរើស
         document.getElementById('option-form').onsubmit = (e) => {
             e.preventDefault();
             if (!currentProduct) return;
 
             const qty = parseInt(document.getElementById('opt-qty').value || 1);
             let cart = getCart();
-
-            // ឆែកតាម id និង size
             const itemKey = `${currentProduct.id}_${selectedSize}`;
             const existingIndex = cart.findIndex(item => item.itemKey === itemKey);
 
@@ -329,7 +385,6 @@
             saveCart(cart);
             closeOptionModal();
 
-            // បង្ហាញ Popup បញ្ជាក់
             document.getElementById('confirm-item-title').innerText = `ទំនិញ «${currentProduct.title}» (Size: ${selectedSize}, ចំនួន: ${qty}) ត្រូវបានដាក់ចូលកន្ត្រក។`;
             document.getElementById('confirm-cart-modal').classList.remove('hidden');
         };
@@ -360,6 +415,8 @@
             document.getElementById('detail-modal').classList.add('hidden');
         }
 
+        // ដំណើរការដំបូង
+        checkOwnerStatus();
         updateCartCount();
         loadProducts();
     </script>

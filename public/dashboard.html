@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Seller Dashboard</title>
+    <title>ផ្ទាំងគ្រប់គ្រងម្ចាស់ហាង</title>
     <script src="https://cdn.tailwindcss.com"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -39,8 +39,8 @@
             <p class="text-[11px] sm:text-xs text-gray-500">Vendor Management Dashboard</p>
         </div>
         <a href="/"
-            class="text-xs sm:text-sm font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-xl transition">
-            &larr; ទៅទំព័រមុខ
+            class="text-xs sm:text-sm font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-xl transition">
+            &larr; ទំព័រមុខ
         </a>
     </header>
 
@@ -81,7 +81,7 @@
                     <span id="order-badge"
                         class="bg-indigo-600 text-white text-[11px] px-2 py-0.5 rounded-full font-bold">0</span>
                 </h2>
-                <p class="text-[11px] text-gray-500">ពិនិត្យវិក្កយបត្រ (Slip) មុននឹងយល់ព្រម</p>
+                <p class="text-[11px] text-gray-500">ពិនិត្យវិក្កយបត្រ (Slip) មុននឹងយល់ព្រម ឬបដិសេធ</p>
             </div>
             <div class="flex gap-1.5">
                 <button onclick="clearAllOrders()"
@@ -95,10 +95,8 @@
             </div>
         </div>
 
-        <!-- បង្ហាញលើទូរស័ព្ទ (Cards) -->
         <div id="order-cards-mobile" class="block sm:hidden space-y-3"></div>
 
-        <!-- បង្ហាញលើកុំព្យូទ័រ (Table) -->
         <div class="hidden sm:block overflow-x-auto border rounded-xl">
             <table class="w-full text-left border-collapse text-xs">
                 <thead class="bg-gray-100 text-gray-700 uppercase border-b font-bold">
@@ -111,7 +109,7 @@
                         <th class="py-3 px-3">ទីតាំង</th>
                         <th class="py-3 px-3">សរុប</th>
                         <th class="py-3 px-3">ស្ថានភាព</th>
-                        <th class="py-3 px-3 text-center">សកម្មភាព</th>
+                        <th class="py-3 px-3 text-center min-w-[140px]">សកម្មភាព</th>
                     </tr>
                 </thead>
                 <tbody id="order-rows" class="divide-y divide-gray-100"></tbody>
@@ -121,20 +119,7 @@
 
     <!-- ៣. ផ្នែកបញ្ចូលផលិតផលថ្មី (Add Product) -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-5">
-        <!-- Logo Generator -->
-        <section class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-100">
-            <h2 class="font-bold mb-1 text-sm sm:text-base text-gray-900">✨ បង្កើត Logo ហាង</h2>
-            <p class="text-[11px] text-gray-500 mb-3">បញ្ចូលឈ្មោះហាងដើម្បីបង្កើត Logo ស្វ័យប្រវត្តិ</p>
-            <input id="logo-name" placeholder="ឈ្មោះហាង..."
-                class="w-full border p-2 rounded-xl mb-2 text-xs sm:text-sm bg-white outline-none">
-            <button onclick="generateLogo()"
-                class="w-full bg-indigo-600 text-white py-2 rounded-xl text-xs font-bold hover:bg-indigo-700 transition">បង្កើត
-                Logo</button>
-            <div id="logo-results" class="grid grid-cols-2 gap-2 mt-3"></div>
-        </section>
-
-        <!-- Form ដាក់លក់ទំនិញថ្មី -->
-        <section class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-100 md:col-span-2">
+        <section class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-100 md:col-span-3">
             <h2 class="font-bold mb-1 text-sm sm:text-base text-gray-900">📦 បញ្ចូលផលិតផលថ្មី</h2>
             <p class="text-[11px] text-gray-500 mb-3">បញ្ចូលព័ត៌មានលម្អិត និងទំហំដែលមានក្នុងស្តុក</p>
 
@@ -195,19 +180,10 @@
         </section>
     </div>
 
-    <!-- ៤. ផ្នែកគ្រប់គ្រងស្តុកទំនិញ (Product Management Responsive) -->
+    <!-- ៤. ផ្នែកគ្រប់គ្រងស្តុកទំនិញ -->
     <section class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-100 mb-6">
-        <div class="flex justify-between items-center mb-3">
-            <div>
-                <h2 class="font-bold text-sm sm:text-base text-gray-900">📊 គ្រប់គ្រងស្តុកទំនិញ</h2>
-                <p class="text-[11px] text-gray-500">ពិនិត្យទំហំ (Sizes) កែប្រែ ឬលុបទំនិញ</p>
-            </div>
-        </div>
-
-        <!-- បង្ហាញលើទូរស័ព្ទ (Cards) -->
+        <h2 class="font-bold text-sm sm:text-base text-gray-900 mb-1">📊 គ្រប់គ្រងស្តុកទំនិញ</h2>
         <div id="product-cards-mobile" class="block sm:hidden space-y-3"></div>
-
-        <!-- បង្ហាញលើកុំព្យូទ័រ (Table) -->
         <div class="hidden sm:block overflow-x-auto border rounded-xl">
             <table class="w-full text-left border-collapse text-xs">
                 <thead>
@@ -226,6 +202,27 @@
         </div>
     </section>
 
+    <!-- Modal សរសេរសារបដិសេធ Order -->
+    <div id="reject-modal"
+        class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border text-center">
+            <div
+                class="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-2 text-xl font-bold">
+                ✕</div>
+            <h3 class="font-bold text-base text-gray-900 mb-1">បដិសេធការបញ្ជាទិញ</h3>
+            <p class="text-xs text-gray-500 mb-4">សូមសរសេរសារប្រាប់អតិថិជនពីមូលហេតុ</p>
+            <input type="hidden" id="reject-tran-id">
+            <textarea id="reject-reason" rows="3" required placeholder="ឧ. មិនទាន់ឃើញលុយចូលកុងទេ..."
+                class="w-full border border-gray-300 rounded-xl p-3 text-xs bg-gray-50 focus:bg-white focus:ring-2 focus:ring-red-500 outline-none resize-none mb-4"></textarea>
+            <div class="flex gap-2">
+                <button type="button" onclick="closeRejectModal()"
+                    class="w-1/2 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl text-xs transition">បោះបង់</button>
+                <button type="button" onclick="submitRejectOrder()" id="btn-submit-reject"
+                    class="w-1/2 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-xs transition shadow">ផ្ញើសារបដិសេធ</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal សម្រាប់ Edit ទំនិញ -->
     <div id="edit-modal"
         class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
@@ -235,7 +232,6 @@
                 <button onclick="closeEditModal()"
                     class="text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
             </div>
-
             <form id="edit-prod-form" class="space-y-3">
                 <input type="hidden" id="edit-p-id">
                 <div>
@@ -243,7 +239,6 @@
                     <input id="edit-p-title" required
                         class="w-full border rounded-xl p-2 text-xs sm:text-sm bg-white focus:ring-2 focus:ring-indigo-500 outline-none">
                 </div>
-
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-semibold text-gray-700 mb-1">ប្រភេទ</label>
@@ -259,7 +254,6 @@
                             class="w-full border rounded-xl p-2 text-xs sm:text-sm bg-white focus:ring-2 focus:ring-indigo-500 outline-none">
                     </div>
                 </div>
-
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-semibold text-gray-700 mb-1">ចំនួនស្តុក</label>
@@ -272,7 +266,6 @@
                             class="w-full border border-indigo-200 bg-indigo-50/40 rounded-xl p-2 text-xs sm:text-sm font-semibold focus:ring-2 focus:ring-indigo-500 outline-none">
                     </div>
                 </div>
-
                 <div class="flex items-center gap-3 bg-gray-50 p-2 rounded-xl border">
                     <img id="edit-preview-img" src=""
                         class="w-12 h-12 object-cover rounded-lg border bg-white shadow-sm">
@@ -282,7 +275,6 @@
                             class="w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-[11px] file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer border rounded-lg p-0.5 bg-white">
                     </div>
                 </div>
-
                 <div class="flex gap-2 pt-3 border-t mt-3">
                     <button type="button" onclick="closeEditModal()"
                         class="w-1/2 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl text-xs transition">បោះបង់</button>
@@ -293,7 +285,7 @@
         </div>
     </div>
 
-    <!-- Modal បង្ហាញរូបវិក្កយបត្រធំ (Slip Zoom Modal) -->
+    <!-- Modal មើលវិក្កយបត្រ Slip Zoom -->
     <div id="slip-modal"
         class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-sm w-full p-4 shadow-2xl border text-center">
@@ -310,6 +302,22 @@
     </div>
 
     <script>
+        // ចាប់យក Secret Key ពី URL (?key=mysecret8888)
+        const urlParams = new URLSearchParams(window.location.search);
+        let secretKey = urlParams.get('key') || localStorage.getItem('km_admin_secret_key') || '';
+
+        if (secretKey) {
+            localStorage.setItem('km_admin_secret_key', secretKey);
+        }
+
+        // Header សម្ងាត់សម្រាប់ហៅ API
+        function getAuthHeaders() {
+            return {
+                'Content-Type': 'application/json',
+                'x-admin-key': secretKey
+            };
+        }
+
         let allProducts = [];
         let base64SelectedImg = '';
         let base64EditImg = '';
@@ -365,23 +373,15 @@
                 const resProd = await fetch('/api/products');
                 allProducts = await resProd.json();
 
-                // Render Desktop Table
                 document.getElementById('product-rows').innerHTML = allProducts.map(p => {
                     const imgSrc = p.image || '';
-                    const sizeText = p.attributes?.size || p.attributes?.shoe_size || 'M, L';
-
+                    const sizeText = p.attributes?.size || 'M, L';
                     return `
                         <tr class="text-xs hover:bg-gray-50 transition">
-                            <td class="py-2.5 px-3">
-                                <img src="${imgSrc}" class="w-12 h-12 object-cover rounded-lg shadow-sm border bg-white">
-                            </td>
+                            <td class="py-2.5 px-3"><img src="${imgSrc}" class="w-12 h-12 object-cover rounded-lg shadow-sm border bg-white"></td>
                             <td class="py-2.5 px-3 font-semibold text-gray-800">${p.title || 'គ្មានឈ្មោះ'}</td>
                             <td class="py-2.5 px-3"><span class="bg-gray-100 px-2 py-0.5 rounded text-gray-600 font-medium">${p.category}</span></td>
-                            <td class="py-2.5 px-3">
-                                <span class="bg-indigo-50 text-indigo-700 px-2 py-1 rounded-md font-bold text-[11px] border border-indigo-100">
-                                    🏷️ ${sizeText}
-                                </span>
-                            </td>
+                            <td class="py-2.5 px-3"><span class="bg-indigo-50 text-indigo-700 px-2 py-1 rounded-md font-bold text-[11px] border border-indigo-100">🏷️ ${sizeText}</span></td>
                             <td class="py-2.5 px-3 font-bold text-indigo-600">$${Number(p.price || 0).toFixed(2)}</td>
                             <td class="py-2.5 px-3">${p.stock > 0 ? `<span class="text-green-600 font-bold">${p.stock}</span>` : '<span class="text-red-500 font-bold">អស់ស្តុក</span>'}</td>
                             <td class="py-2.5 px-3 text-center whitespace-nowrap">
@@ -394,11 +394,9 @@
                     `;
                 }).join('');
 
-                // Render Mobile Cards (រៀបរយលើអេក្រង់ទូរស័ព្ទ)
                 document.getElementById('product-cards-mobile').innerHTML = allProducts.map(p => {
                     const imgSrc = p.image || '';
-                    const sizeText = p.attributes?.size || p.attributes?.shoe_size || 'M, L';
-
+                    const sizeText = p.attributes?.size || 'M, L';
                     return `
                         <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex gap-3 items-center">
                             <img src="${imgSrc}" class="w-16 h-16 object-cover rounded-lg border bg-gray-50 flex-shrink-0">
@@ -411,9 +409,7 @@
                                     ប្រភេទ៖ <span class="uppercase">${p.category}</span> | ស្តុក៖ <b class="${p.stock > 0 ? 'text-green-600' : 'text-red-500'}">${p.stock}</b>
                                 </div>
                                 <div class="mt-1">
-                                    <span class="bg-indigo-50 text-indigo-700 text-[10px] font-bold px-1.5 py-0.5 rounded border border-indigo-100">
-                                        🏷️ Size: ${sizeText}
-                                    </span>
+                                    <span class="bg-indigo-50 text-indigo-700 text-[10px] font-bold px-1.5 py-0.5 rounded border border-indigo-100">🏷️ Size: ${sizeText}</span>
                                 </div>
                                 <div class="flex gap-2 mt-2">
                                     <button onclick="openEditModal('${p.id}')" class="w-1/2 py-1 bg-blue-50 text-blue-600 border border-blue-200 rounded text-[11px] font-bold">✏️ កែប្រែ</button>
@@ -425,12 +421,9 @@
                 }).join('');
 
                 loadOrders();
-            } catch (e) {
-                console.error(e);
-            }
+            } catch (e) { }
         }
 
-        // ដាក់លក់ទំនិញថ្មី
         document.getElementById('prod-form').onsubmit = async (e) => {
             e.preventDefault();
             if (!base64SelectedImg) return alert('សូមជ្រើសរើសរូបភាពទំនិញជាមុនសិន!');
@@ -451,7 +444,7 @@
             try {
                 const res = await fetch('/api/products', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: getAuthHeaders(),
                     body: JSON.stringify(payload)
                 });
                 if (res.ok) {
@@ -465,7 +458,7 @@
                     alert('មិនអាចដាក់លក់បានទេ');
                 }
             } catch (err) {
-                alert('បរាជ័យក្នុងការតភ្ជាប់ទៅ Server');
+                alert('បរាជ័យក្នុងការតភ្ជាប់');
             } finally {
                 btn.disabled = false;
                 btn.innerText = '+ ដាក់លក់ទំនិញ';
@@ -482,7 +475,7 @@
             document.getElementById('edit-p-category').value = p.category || 'clothes';
             document.getElementById('edit-p-price').value = p.price || 0;
             document.getElementById('edit-p-stock').value = p.stock || 0;
-            document.getElementById('edit-p-sizes').value = p.attributes?.size || p.attributes?.shoe_size || 'S, M, L';
+            document.getElementById('edit-p-sizes').value = p.attributes?.size || 'S, M, L';
             document.getElementById('edit-preview-img').src = p.image || '';
             document.getElementById('edit-p-img-file').value = '';
 
@@ -514,10 +507,9 @@
             try {
                 const res = await fetch(`/api/products/${id}`, {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: getAuthHeaders(),
                     body: JSON.stringify(payload)
                 });
-
                 if (res.ok) {
                     alert('✓ បានកែប្រែទំនិញជោគជ័យ!');
                     closeEditModal();
@@ -526,7 +518,7 @@
                     alert('កំហុសក្នុងការកែប្រែ');
                 }
             } catch (err) {
-                alert('បរាជ័យក្នុងការតភ្ជាប់ទៅ Server');
+                alert('បរាជ័យក្នុងការតភ្ជាប់');
             } finally {
                 btn.disabled = false;
                 btn.innerText = 'រក្សាទុកការកែប្រែ';
@@ -536,7 +528,10 @@
         async function deleteProduct(prodId) {
             if (!confirm('តើអ្នកពិតជាចង់លុបទំនិញនេះចេញពីស្តុកមែនទេ?')) return;
             try {
-                const res = await fetch(`/api/products/${prodId}`, { method: 'DELETE' });
+                const res = await fetch(`/api/products/${prodId}`, {
+                    method: 'DELETE',
+                    headers: getAuthHeaders()
+                });
                 if (res.ok) {
                     alert('✓ បានលុបទំនិញរួចរាល់!');
                     loadDashboardData();
@@ -548,7 +543,11 @@
 
         async function loadOrders() {
             try {
-                const res = await fetch('/api/admin/orders');
+                const res = await fetch('/api/admin/orders', {
+                    headers: getAuthHeaders()
+                });
+                if (!res.ok) return;
+
                 const orders = await res.json();
                 const tbody = document.getElementById('order-rows');
                 const mobileCards = document.getElementById('order-cards-mobile');
@@ -562,9 +561,11 @@
                     return;
                 }
 
-                // Render Desktop Table Rows
                 tbody.innerHTML = orders.map(o => {
-                    const isPaid = (o.status || '').toUpperCase() === 'PAID';
+                    const status = (o.status || 'PENDING').toUpperCase();
+                    const isPaid = status === 'PAID';
+                    const isRejected = status === 'REJECTED';
+
                     const itemsHtml = (o.items && o.items.length > 0)
                         ? o.items.map(it => `<div class="text-[11px] font-medium">${it.title} (Size: ${it.attributes?.size || 'M'}, x${it.qty || 1})</div>`).join('')
                         : '<span class="text-gray-400">គ្មានទំនិញ</span>';
@@ -572,6 +573,10 @@
                     const slipHtml = o.slipImage
                         ? `<button onclick="viewSlip('${o.slipImage}')" class="inline-block"><img src="${o.slipImage}" class="w-10 h-12 object-cover rounded border"></button>`
                         : '<span class="text-red-400 text-[10px]">គ្មាន Slip</span>';
+
+                    let statusBadge = '<span class="text-amber-600 font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">⏳ រង់ចាំ</span>';
+                    if (isPaid) statusBadge = '<span class="text-green-600 font-bold bg-green-50 px-2 py-0.5 rounded border border-green-200">✓ បង់រួច</span>';
+                    if (isRejected) statusBadge = `<span class="text-red-600 font-bold bg-red-50 px-2 py-0.5 rounded border border-red-200">✕ បដិសេធ</span>`;
 
                     return `
                         <tr class="hover:bg-gray-50 transition">
@@ -582,24 +587,30 @@
                             <td class="py-2.5 px-3 text-center">${slipHtml}</td>
                             <td class="py-2.5 px-3 text-[11px]">${o.deliveryMethod}<br><span class="text-gray-500">${o.address}</span></td>
                             <td class="py-2.5 px-3 font-bold text-indigo-600">$${o.amount}</td>
-                            <td class="py-2.5 px-3">${isPaid ? '<span class="text-green-600 font-bold">✓ បង់រួច</span>' : '<span class="text-amber-600 font-bold">⏳ រង់ចាំ</span>'}</td>
-                            <td class="py-2.5 px-3 text-center">
-                                ${!isPaid ? `<button onclick="confirmOrder('${o.tranId}')" class="bg-emerald-600 text-white px-2.5 py-1 rounded-md text-[11px] font-bold">✓ យល់ព្រម</button>` : '<span class="text-gray-400 text-[11px]">រួចរាល់</span>'}
+                            <td class="py-2.5 px-3">${statusBadge}</td>
+                            <td class="py-2.5 px-3 text-center whitespace-nowrap">
+                                ${!isPaid && !isRejected ? `
+                                    <div class="flex items-center justify-center gap-1.5">
+                                        <button onclick="confirmOrder('${o.tranId}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded-md text-[11px] font-bold transition shadow-sm">✓ យល់ព្រម</button>
+                                        <button onclick="openRejectModal('${o.tranId}')" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-2.5 py-1 rounded-md text-[11px] font-bold transition">✕ បដិសេធ</button>
+                                    </div>
+                                ` : `<span class="text-gray-400 text-[11px]">${isPaid ? 'រួចរាល់' : 'បានបដិសេធ'}</span>`}
                             </td>
                         </tr>
                     `;
                 }).join('');
 
-                // Render Mobile Order Cards (រៀបរយលើអេក្រង់ទូរស័ព្ទ)
                 mobileCards.innerHTML = orders.map(o => {
-                    const isPaid = (o.status || '').toUpperCase() === 'PAID';
+                    const status = (o.status || 'PENDING').toUpperCase();
+                    const isPaid = status === 'PAID';
+                    const isRejected = status === 'REJECTED';
 
                     return `
                         <div class="bg-white p-3.5 rounded-xl border border-gray-200 shadow-sm text-xs">
                             <div class="flex justify-between items-center pb-2 mb-2 border-b">
                                 <span class="font-mono text-[11px] text-gray-500">${o.tranId}</span>
-                                <span class="${isPaid ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'} font-bold px-2 py-0.5 rounded text-[10px]">
-                                    ${isPaid ? '✓ បង់រួច' : '⏳ រង់ចាំពិនិត្យ'}
+                                <span class="${isPaid ? 'bg-green-100 text-green-700' : (isRejected ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700')} font-bold px-2 py-0.5 rounded text-[10px]">
+                                    ${isPaid ? '✓ បង់រួច' : (isRejected ? '✕ បានបដិសេធ' : '⏳ រង់ចាំពិនិត្យ')}
                                 </span>
                             </div>
 
@@ -608,6 +619,7 @@
                                     <div class="font-bold text-gray-900">${o.customerName} (${o.phone || '-'})</div>
                                     <div class="text-[10px] text-indigo-600 font-bold uppercase mt-0.5">🏦 ${o.bankAccountName || 'មិនបានបញ្ជាក់'}</div>
                                     <div class="text-[11px] text-gray-500 mt-1">📍 ${o.address} (${o.deliveryMethod})</div>
+                                    ${isRejected && o.rejectReason ? `<div class="mt-1.5 text-[10px] text-red-600 bg-red-50 p-1.5 rounded border border-red-100"><b>មូលហេតុ៖</b> ${o.rejectReason}</div>` : ''}
                                 </div>
                                 <div class="text-right">
                                     <div class="font-black text-indigo-600 text-sm">$${o.amount}</div>
@@ -620,18 +632,21 @@
                                 </div>
                             </div>
 
-                            ${!isPaid ? `
-                                <button onclick="confirmOrder('${o.tranId}')" class="w-full mt-2 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition shadow-sm">
-                                    ✓ យល់ព្រមទទួលប្រាក់
-                                </button>
+                            ${!isPaid && !isRejected ? `
+                                <div class="flex gap-2 mt-3 pt-2 border-t">
+                                    <button onclick="openRejectModal('${o.tranId}')" class="w-1/2 py-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg text-xs font-bold transition">
+                                        ✕ បដិសេធ
+                                    </button>
+                                    <button onclick="confirmOrder('${o.tranId}')" class="w-1/2 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition shadow-sm">
+                                        ✓ យល់ព្រម
+                                    </button>
+                                </div>
                             ` : ''}
                         </div>
                     `;
                 }).join('');
 
-            } catch (e) {
-                console.error(e);
-            }
+            } catch (e) { }
         }
 
         function viewSlip(slipSrc) {
@@ -643,10 +658,49 @@
             document.getElementById('slip-modal').classList.add('hidden');
         }
 
+        function openRejectModal(tranId) {
+            document.getElementById('reject-tran-id').value = tranId;
+            document.getElementById('reject-reason').value = 'មិនទាន់ឃើញលុយចូលកុងទេ សូមពិនិត្យ ឬបាញ់ម្តងទៀត';
+            document.getElementById('reject-modal').classList.remove('hidden');
+        }
+
+        function closeRejectModal() {
+            document.getElementById('reject-modal').classList.add('hidden');
+        }
+
+        async function submitRejectOrder() {
+            const tranId = document.getElementById('reject-tran-id').value;
+            const reason = document.getElementById('reject-reason').value.trim();
+            if (!reason) return alert('សូមសរសេរមូលហេតុនៃការបដិសេធ!');
+
+            const btn = document.getElementById('btn-submit-reject');
+            btn.disabled = true;
+            btn.innerText = 'កំពុងផ្ញើសារ...';
+
+            try {
+                const res = await fetch('/api/admin/orders/reject', {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({ tranId, reason })
+                });
+
+                if (res.ok) {
+                    alert('✓ បានផ្ញើសារបដិសេធទៅកាន់អតិថិជនរួចរាល់!');
+                    closeRejectModal();
+                    loadOrders();
+                }
+            } catch (e) {
+                alert('បរាជ័យក្នុងការតភ្ជាប់ Server');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'ផ្ញើសារបដិសេធ';
+            }
+        }
+
         async function confirmOrder(tranId) {
             const res = await fetch('/api/admin/orders/confirm', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: getAuthHeaders(),
                 body: JSON.stringify({ tranId })
             });
             if (res.ok) {
@@ -656,8 +710,11 @@
         }
 
         async function clearAllOrders() {
-            if (!confirm('តើអ្នកពិតជាចង់សម្អាត Order ចាស់ៗចោលមែនទេ?')) return;
-            const res = await fetch('/api/admin/orders/clear', { method: 'POST' });
+            if (!confirm('តើអ្នកពិតជាចង់សម្អាត Order ចាស់ៗទាំងអស់ចោលមែនទេ?')) return;
+            const res = await fetch('/api/admin/orders/clear', {
+                method: 'POST',
+                headers: getAuthHeaders()
+            });
             if (res.ok) {
                 alert('បានសម្អាតរួចរាល់!');
                 loadOrders();
@@ -683,8 +740,6 @@
                     alert('✓ បាន Upload KHQR ហាងជោគជ័យ!');
                     document.getElementById('current-qr-preview').src = data.qrImage;
                     document.getElementById('qr-preview-box').classList.remove('hidden');
-                } else {
-                    alert('កំហុស៖ ' + data.error);
                 }
             } catch (err) {
                 alert('បរាជ័យក្នុងការតភ្ជាប់');
@@ -693,24 +748,6 @@
                 btn.innerText = 'រក្សាទុក KHQR នេះ';
             }
         };
-
-        async function generateLogo() {
-            const name = document.getElementById('logo-name').value;
-            if (!name) return alert('សូមបញ្ចូលឈ្មោះហាងជាមុនសិន!');
-
-            const res = await fetch('/api/generate-logo', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name })
-            });
-            const data = await res.json();
-            if (res.ok) {
-                document.getElementById('logo-results').innerHTML = data.logos.join('');
-                loadDashboardData();
-            } else {
-                alert(data.error);
-            }
-        }
 
         loadDashboardData();
         setInterval(loadOrders, 3000);

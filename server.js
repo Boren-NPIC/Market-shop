@@ -10,20 +10,19 @@ app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ limit: '20mb', extended: true }));
 
 const publicDir = path.join(__dirname, 'public');
-app.use(express.static(publicDir));
 
-// កំណត់ទីតាំង DATA_FILE (បើនៅលើ Vercel ប្រើ /tmp)
+// កូដសម្ងាត់សម្រាប់ម្ចាស់ហាងចូល Dashboard
+const ADMIN_SECRET_KEY = "mysecret8888";
+
 const isVercel = process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME;
 const DATA_FILE = isVercel ? path.join('/tmp', 'data.json') : path.join(__dirname, 'data.json');
 
-// កំណត់ Folder uploads
 const uploadDir = isVercel ? path.join('/tmp', 'uploads') : path.join(publicDir, 'uploads');
 if (!fs.existsSync(uploadDir)) {
     try { fs.mkdirSync(uploadDir, { recursive: true }); } catch (e) { }
 }
 app.use('/uploads', express.static(uploadDir));
 
-// ចម្លងទិន្នន័យដើមទៅ /tmp បើនៅលើ Vercel
 if (isVercel) {
     try {
         if (!fs.existsSync(DATA_FILE)) {
@@ -37,7 +36,6 @@ if (isVercel) {
     }
 }
 
-// Memory fallback បើ filesystem មានបញ្ហា
 let memoryDB = null;
 
 function readData() {
@@ -47,24 +45,12 @@ function readData() {
             memoryDB = JSON.parse(content);
             return memoryDB;
         }
-    } catch (e) {
-        console.error("Read data error:", e);
-    }
+    } catch (e) { }
 
     if (!memoryDB) {
         memoryDB = {
             users: [{ id: 1, name: "ហាង ម៉ូដទាន់សម័យ", credits: 15, image_limit: 50, images_used: 0, khqr_image: "" }],
-            products: [
-                {
-                    id: 1789445000001,
-                    title: "អាវខូវប៊យដៃវែង Jeans",
-                    category: "clothes",
-                    price: 18,
-                    stock: 25,
-                    attributes: { size: "S, M, L, XL" },
-                    image: "https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=500"
-                }
-            ],
+            products: [],
             orders: []
         };
     }
@@ -75,12 +61,9 @@ function writeData(data) {
     memoryDB = data;
     try {
         fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
-    } catch (e) {
-        console.warn("Could not write to disk, using memory state:", e.message);
-    }
+    } catch (e) { }
 }
 
-// Multer សម្រាប់ Upload KHQR
 const storage = multer.diskStorage({
     destination: (req, file, cb) => cb(null, uploadDir),
     filename: (req, file, cb) => {
@@ -90,11 +73,37 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// Routes
+// បើកឱ្យទាញយក Static Files ប៉ុន្តែហាមប្រាម dashboard.html ជាដាច់ខាត
+app.use(express.static(publicDir, {
+    index: false
+}));
+
+// Route សាធារណៈសម្រាប់អ្នកទិញទូទៅ
 app.get('/', (req, res) => res.sendFile(path.join(publicDir, 'index.html')));
-app.get('/dashboard', (req, res) => res.sendFile(path.join(publicDir, 'dashboard.html')));
 app.get('/cart', (req, res) => res.sendFile(path.join(publicDir, 'cart.html')));
 app.get('/checkout', (req, res) => res.sendFile(path.join(publicDir, 'checkout.html')));
+
+// បើអ្នកទិញចង់ចូល dashboard ឬ dashboard.html វានឹងរុញទៅទំព័រដើមវិញភ្លាម
+app.get(['/dashboard', '/dashboard.html'], (req, res) => {
+    res.redirect('/');
+});
+
+// ROUTE សម្ងាត់ផ្ដាច់មុខសម្រាប់តែម្ចាស់ហាង (មាន Key ទើបមើលឃើញ)
+app.get('/admin', (req, res) => {
+    const key = req.query.key;
+    if (key === ADMIN_SECRET_KEY) {
+        return res.sendFile(path.join(publicDir, 'dashboard.html'));
+    }
+    // បើគ្មាន key ឬ key ខុស រុញទៅទំព័រមុខហាងដូចភ្ញៀវធម្មតា
+    res.redirect('/');
+});
+
+// Middleware ការពារ Admin API មិនឱ្យអ្នកក្រៅហៅបាន
+function requireAdminKey(req, res, next) {
+    const authKey = req.headers['x-admin-key'] || req.query.key;
+    if (authKey === ADMIN_SECRET_KEY) return next();
+    res.status(403).json({ error: 'អ្នកមិនមានសិទ្ធិចូលមើលទិន្នន័យនេះទេ!' });
+}
 
 // KHQR & Profile
 app.post('/api/vendor/khqr', upload.single('qrImageFile'), (req, res) => {
@@ -117,13 +126,11 @@ app.get('/api/checkout/vendor-qr', (req, res) => {
     res.json({ qrImage: qrUrl, vendorName: vendor.name });
 });
 
-// Orders Management (ទទួលវិក្កយបត្របាញ់លុយ)
+// Orders Management
 app.post('/api/checkout/confirm-payment', (req, res) => {
     try {
         const b = req.body || {};
-        if (!b.slipImage) {
-            return res.status(400).json({ error: 'សូម Upload រូបភាពវិក្កយបត្របាញ់លុយ!' });
-        }
+        if (!b.slipImage) return res.status(400).json({ error: 'សូម Upload រូបភាពវិក្កយបត្របាញ់លុយ!' });
 
         const data = readData();
         const tranId = 'TX' + Date.now();
@@ -139,6 +146,7 @@ app.post('/api/checkout/confirm-payment', (req, res) => {
             items: b.items || [],
             slipImage: b.slipImage,
             status: 'PENDING',
+            rejectReason: '',
             createdAt: new Date().toLocaleTimeString('km-KH')
         };
 
@@ -146,24 +154,39 @@ app.post('/api/checkout/confirm-payment', (req, res) => {
         data.orders.unshift(newOrder);
         writeData(data);
 
-        console.log("✓ Order ថ្មីជោគជ័យ:", tranId);
         res.json({ status: 'success', tranId });
     } catch (err) {
-        console.error("Order error:", err);
         res.status(500).json({ error: 'មានបញ្ហាក្នុងការបង្កើត Order' });
     }
+});
+
+app.post('/api/checkout/reupload-slip', (req, res) => {
+    const { tranId, slipImage } = req.body || {};
+    if (!tranId || !slipImage) return res.status(400).json({ error: 'ទិន្នន័យមិនគ្រប់គ្រាន់' });
+
+    const data = readData();
+    const order = (data.orders || []).find(o => o.tranId === tranId);
+    if (!order) return res.status(404).json({ error: 'រកមិនឃើញ Order' });
+
+    order.slipImage = slipImage;
+    order.status = 'PENDING';
+    order.rejectReason = '';
+    writeData(data);
+
+    res.json({ status: 'success', message: 'បានផ្ញើវិក្កយបត្រថ្មី' });
 });
 
 app.get('/api/orders/check-status/:tranId', (req, res) => {
     const data = readData();
     const order = (data.orders || []).find(o => o.tranId === req.params.tranId);
     if (!order) return res.status(404).json({ error: 'រកមិនឃើញ Order' });
-    res.json({ status: order.status });
+    res.json({ status: order.status, rejectReason: order.rejectReason || '' });
 });
 
-app.get('/api/admin/orders', (req, res) => res.json(readData().orders || []));
+// Admin Only Endpoints (ការពារដោយ Secret Key)
+app.get('/api/admin/orders', requireAdminKey, (req, res) => res.json(readData().orders || []));
 
-app.post('/api/admin/orders/confirm', (req, res) => {
+app.post('/api/admin/orders/confirm', requireAdminKey, (req, res) => {
     const { tranId } = req.body;
     const data = readData();
     const order = (data.orders || []).find(o => o.tranId === tranId);
@@ -174,7 +197,19 @@ app.post('/api/admin/orders/confirm', (req, res) => {
     res.json({ message: 'ជោគជ័យ' });
 });
 
-app.post('/api/admin/orders/clear', (req, res) => {
+app.post('/api/admin/orders/reject', requireAdminKey, (req, res) => {
+    const { tranId, reason } = req.body;
+    const data = readData();
+    const order = (data.orders || []).find(o => o.tranId === tranId);
+    if (order) {
+        order.status = 'REJECTED';
+        order.rejectReason = reason || 'វិក្កយបត្រមិនត្រឹមត្រូវ';
+        writeData(data);
+    }
+    res.json({ message: 'បានបដិសេធ' });
+});
+
+app.post('/api/admin/orders/clear', requireAdminKey, (req, res) => {
     const data = readData();
     data.orders = [];
     writeData(data);
@@ -184,7 +219,7 @@ app.post('/api/admin/orders/clear', (req, res) => {
 // Products CRUD
 app.get('/api/products', (req, res) => res.json(readData().products || []));
 
-app.post('/api/products', (req, res) => {
+app.post('/api/products', requireAdminKey, (req, res) => {
     const data = readData();
     const user = data.users[0];
     const b = req.body || {};
@@ -207,7 +242,7 @@ app.post('/api/products', (req, res) => {
     res.json({ status: 'success', product: newProd });
 });
 
-app.put('/api/products/:id', (req, res) => {
+app.put('/api/products/:id', requireAdminKey, (req, res) => {
     const reqId = String(req.params.id);
     const data = readData();
     const index = (data.products || []).findIndex(p => String(p.id) === reqId);
@@ -232,7 +267,7 @@ app.put('/api/products/:id', (req, res) => {
     res.json({ status: 'success', product: data.products[index] });
 });
 
-app.delete('/api/products/:id', (req, res) => {
+app.delete('/api/products/:id', requireAdminKey, (req, res) => {
     const reqId = String(req.params.id);
     const data = readData();
     data.products = (data.products || []).filter(p => String(p.id) !== reqId);
