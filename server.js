@@ -6,12 +6,10 @@ const multer = require('multer');
 
 const app = express();
 app.use(cors());
-app.use(express.json({ limit: '20mb' }));
-app.use(express.urlencoded({ limit: '20mb', extended: true }));
+app.use(express.json({ limit: '30mb' }));
+app.use(express.urlencoded({ limit: '30mb', extended: true }));
 
 const publicDir = path.join(__dirname, 'public');
-
-const ADMIN_SECRET_KEY = "mysecret8888";
 
 const isVercel = process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME;
 const DATA_FILE = isVercel ? path.join('/tmp', 'data.json') : path.join(__dirname, 'data.json');
@@ -45,7 +43,7 @@ function readData() {
 
     if (!memoryDB) {
         memoryDB = {
-            users: [{ id: 1, name: "KM-Market", logo: "", owner_email: "", credits: 15, khqr_image: "" }],
+            users: [{ id: 1, name: "KM-Market", logo: "", owner_email: "", isRegistered: false, khqr_image: "" }],
             products: [],
             orders: []
         };
@@ -69,59 +67,43 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-app.use(express.static(publicDir, { index: false }));
+app.use(express.static(publicDir));
 
-// Public Routes
+// Routes
 app.get('/', (req, res) => res.sendFile(path.join(publicDir, 'index.html')));
+app.get('/dashboard', (req, res) => res.sendFile(path.join(publicDir, 'dashboard.html')));
 app.get('/cart', (req, res) => res.sendFile(path.join(publicDir, 'cart.html')));
 app.get('/checkout', (req, res) => res.sendFile(path.join(publicDir, 'checkout.html')));
 
-app.get(['/dashboard', '/dashboard.html'], (req, res) => res.redirect('/'));
-
-app.get('/admin', (req, res) => {
-    if (req.query.key === ADMIN_SECRET_KEY) {
-        return res.sendFile(path.join(publicDir, 'dashboard.html'));
-    }
-    res.redirect('/');
-});
-
-function requireAdminKey(req, res, next) {
-    const authKey = req.headers['x-admin-key'] || req.query.key;
-    if (authKey === ADMIN_SECRET_KEY) return next();
-    res.status(403).json({ error: 'គ្មានសិទ្ធិ' });
-}
-
 // -------------------------------------------------------------
-// SETUP STORE PROFILE (ឈ្មោះហាង, Logo, Email)
+// SELLER AUTH & SETUP API
 // -------------------------------------------------------------
-app.get('/api/store/info', (req, res) => {
+app.get('/api/store/profile', (req, res) => {
     const data = readData();
-    const store = data.users[0] || {};
-    res.json({
-        name: store.name || 'KM-Market',
-        logo: store.logo || '',
-        isConfigured: !!store.owner_email
-    });
+    res.json(data.users[0]);
 });
 
-app.post('/api/store/setup', (req, res) => {
-    const { name, logoBase64, email } = req.body || {};
-    if (!name || !email) {
-        return res.status(400).json({ error: 'សូមបំពេញឈ្មោះហាង និង Email!' });
+// Setup ឈ្មោះហាង & Logo ក្រោយពេល Login
+app.post('/api/store/register', (req, res) => {
+    const { email, name, logoBase64 } = req.body || {};
+    if (!email || !name) {
+        return res.status(400).json({ error: 'សូមបំពេញព័ត៌មានឱ្យបានគ្រប់គ្រាន់!' });
     }
 
     const data = readData();
-    data.users[0].name = name.trim();
-    data.users[0].owner_email = email.trim();
-    if (logoBase64) {
-        data.users[0].logo = logoBase64;
-    }
+    data.users[0] = {
+        ...data.users[0],
+        owner_email: email.trim(),
+        name: name.trim(),
+        logo: logoBase64 || data.users[0].logo || '',
+        isRegistered: true
+    };
     writeData(data);
 
     res.json({ status: 'success', store: data.users[0] });
 });
 
-// KHQR & Vendor
+// KHQR
 app.post('/api/vendor/khqr', upload.single('qrImageFile'), (req, res) => {
     if (!req.file) return res.status(400).json({ error: 'សូមជ្រើសរើសរូបភាព!' });
     const qrUrl = '/uploads/' + req.file.filename;
@@ -199,10 +181,9 @@ app.get('/api/orders/check-status/:tranId', (req, res) => {
     res.json({ status: order.status, rejectReason: order.rejectReason || '' });
 });
 
-// Admin Orders
-app.get('/api/admin/orders', requireAdminKey, (req, res) => res.json(readData().orders || []));
+app.get('/api/admin/orders', (req, res) => res.json(readData().orders || []));
 
-app.post('/api/admin/orders/confirm', requireAdminKey, (req, res) => {
+app.post('/api/admin/orders/confirm', (req, res) => {
     const { tranId } = req.body;
     const data = readData();
     const order = (data.orders || []).find(o => o.tranId === tranId);
@@ -213,7 +194,7 @@ app.post('/api/admin/orders/confirm', requireAdminKey, (req, res) => {
     res.json({ message: 'ជោគជ័យ' });
 });
 
-app.post('/api/admin/orders/reject', requireAdminKey, (req, res) => {
+app.post('/api/admin/orders/reject', (req, res) => {
     const { tranId, reason } = req.body;
     const data = readData();
     const order = (data.orders || []).find(o => o.tranId === tranId);
@@ -225,7 +206,7 @@ app.post('/api/admin/orders/reject', requireAdminKey, (req, res) => {
     res.json({ message: 'បានបដិសេធ' });
 });
 
-app.post('/api/admin/orders/clear', requireAdminKey, (req, res) => {
+app.post('/api/admin/orders/clear', (req, res) => {
     const data = readData();
     data.orders = [];
     writeData(data);
@@ -235,7 +216,7 @@ app.post('/api/admin/orders/clear', requireAdminKey, (req, res) => {
 // Products CRUD
 app.get('/api/products', (req, res) => res.json(readData().products || []));
 
-app.post('/api/products', requireAdminKey, (req, res) => {
+app.post('/api/products', (req, res) => {
     const data = readData();
     const user = data.users[0];
     const b = req.body || {};
@@ -258,7 +239,7 @@ app.post('/api/products', requireAdminKey, (req, res) => {
     res.json({ status: 'success', product: newProd });
 });
 
-app.put('/api/products/:id', requireAdminKey, (req, res) => {
+app.put('/api/products/:id', (req, res) => {
     const reqId = String(req.params.id);
     const data = readData();
     const index = (data.products || []).findIndex(p => String(p.id) === reqId);
@@ -283,7 +264,7 @@ app.put('/api/products/:id', requireAdminKey, (req, res) => {
     res.json({ status: 'success', product: data.products[index] });
 });
 
-app.delete('/api/products/:id', requireAdminKey, (req, res) => {
+app.delete('/api/products/:id', (req, res) => {
     const reqId = String(req.params.id);
     const data = readData();
     data.products = (data.products || []).filter(p => String(p.id) !== reqId);

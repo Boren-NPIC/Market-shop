@@ -32,30 +32,37 @@
     <header class="bg-white shadow-sm border-b sticky top-0 z-30">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex justify-between items-center">
 
-            <!-- Logo ហាង (ចុច ២ ដងដើម្បី Login / Open Dashboard) -->
-            <div onclick="handleSecretClick()" class="flex items-center gap-2.5 cursor-pointer select-none"
-                title="ចុច ២ ដងដើម្បី Login / Dashboard">
-                <div id="store-logo-wrapper"
+            <!-- Logo & ឈ្មោះហាង (Update តាមដែលម្ចាស់ហាងបានដាក់) -->
+            <a href="/" class="flex items-center gap-2.5 select-none">
+                <div id="header-logo-box"
                     class="w-9 h-9 rounded-xl overflow-hidden bg-indigo-50 border border-indigo-100 flex items-center justify-center text-xl font-bold shadow-sm">
-                    <span id="store-logo-emoji">🛍️</span>
-                    <img id="store-logo-img" src="" class="w-full h-full object-cover hidden">
+                    <span id="header-logo-emoji">🛍️</span>
+                    <img id="header-logo-img" src="" class="w-full h-full object-cover hidden">
                 </div>
-                <span id="store-name-display"
-                    class="text-lg sm:text-xl font-black text-indigo-600 tracking-tight">KM-Market</span>
-            </div>
+                <span id="header-store-name"
+                    class="text-lg sm:text-xl font-black text-indigo-600 tracking-tight">ហាងអនឡាញ</span>
+            </a>
 
             <!-- ប៊ូតុងខាងស្តាំ -->
             <div class="flex items-center gap-2 sm:gap-3">
-                <!-- ប៊ូតុង Dashboard សម្រាប់តែម្ចាស់ហាង (លាក់ទុកជាមុន) -->
-                <a id="btn-admin-dashboard" href="/admin?key=mysecret8888"
-                    class="hidden bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs px-3 sm:px-4 py-2 rounded-xl items-center gap-1.5 transition shadow-sm animate-pulse">
+
+                <!-- ១. ប៊ូតុងសម្រាប់ម្ចាស់ហាងចុច Login / Setup លើកដំបូង -->
+                <button id="btn-seller-login" onclick="openAuthModal()"
+                    class="bg-gray-900 hover:bg-black text-white text-xs font-bold px-3 py-2 rounded-xl transition flex items-center gap-1.5 shadow-sm">
+                    <span>👤</span>
+                    <span>ម្ចាស់ហាង (Login)</span>
+                </button>
+
+                <!-- ២. ប៊ូតុង Dashboard (បង្ហាញតែពេលម្ចាស់ហាងបាន Login & ដាក់ឈ្មោះ Logo រួចរាល់) -->
+                <a id="btn-seller-dashboard" href="/dashboard"
+                    class="hidden bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition items-center gap-1.5 shadow-sm">
                     <span>⚙️</span>
                     <span>Dashboard</span>
                 </a>
 
-                <!-- ប៊ូតុងកន្ត្រករបស់អ្នកទិញ -->
+                <!-- ៣. ប៊ូតុងកន្ត្រកទំនិញរបស់អ្នកទិញ -->
                 <a href="/cart.html"
-                    class="relative bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs px-3.5 sm:px-4 py-2 rounded-xl flex items-center gap-2 transition">
+                    class="relative bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs px-3 sm:px-4 py-2 rounded-xl flex items-center gap-2 transition">
                     <span>🛒 កន្ត្រក</span>
                     <span id="cart-count"
                         class="bg-red-500 text-white text-[11px] px-2 py-0.5 rounded-full font-bold">0</span>
@@ -75,7 +82,7 @@
         </div>
     </main>
 
-    <!-- Modal ជ្រើសរើស Size និងចំនួន -->
+    <!-- Modal ជ្រើសរើស Size និងចំនួន ( Buy Options Modal ) -->
     <div id="option-modal"
         class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border">
@@ -119,7 +126,7 @@
                     </button>
                     <button type="submit"
                         class="w-1/2 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow">
-                        ដាក់ចូលកន្ត្រក (Buy)
+                        ដាក់ចូលកន្ត្រក
                     </button>
                 </div>
             </form>
@@ -167,24 +174,27 @@
     </div>
 
     <!-- ============================================================= -->
-    <!-- MODAL SETUP ដំបូង (Sign in with Google + ឈ្មោះហាង + Logo + PIN) -->
+    <!-- MODAL ម្ចាស់ហាង: SIGN IN WITH GOOGLE -> ដាក់ឈ្មោះហាង & LOGO -->
     <!-- ============================================================= -->
-    <div id="setup-owner-modal"
+    <div id="seller-auth-modal"
         class="fixed inset-0 bg-black/70 backdrop-blur-md hidden z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border text-left">
             <div class="flex justify-between items-center pb-3 border-b mb-4">
-                <div class="flex items-center gap-2">
-                    <span class="text-2xl">🏪</span>
-                    <h3 class="font-black text-base text-gray-900">រៀបចំ និងចុះឈ្មោះហាងរបស់អ្នក</h3>
-                </div>
-                <button onclick="closeSetupModal()"
+                <h3 class="font-black text-base text-gray-900 flex items-center gap-2">
+                    <span>🏪</span>
+                    <span id="modal-step-title">ចូលគណនីម្ចាស់ហាង</span>
+                </h3>
+                <button onclick="closeAuthModal()"
                     class="text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
             </div>
 
-            <!-- ជំហានទី ១: Sign in with Google Button (Mock Google Auth) -->
-            <div id="google-auth-box" class="mb-4">
-                <button onclick="mockGoogleSignIn()" type="button"
-                    class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 hover:bg-gray-50 py-2.5 px-4 rounded-xl shadow-sm text-xs font-bold text-gray-700 transition">
+            <!-- ដំណាក់កាលទី ១៖ Sign In with Google / Email -->
+            <div id="step-signin">
+                <p class="text-xs text-gray-500 mb-4">សូមចូលគណនីដើម្បីបង្កើត និងគ្រប់គ្រងហាងអនឡាញរបស់អ្នក</p>
+
+                <!-- ប៊ូតុង Google Sign In -->
+                <button onclick="handleGoogleSignIn()" type="button"
+                    class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 hover:bg-gray-50 py-3 px-4 rounded-xl shadow-sm text-xs font-bold text-gray-700 transition">
                     <svg class="w-4 h-4" viewBox="0 0 24 24">
                         <path fill="#4285F4"
                             d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -197,171 +207,139 @@
                     </svg>
                     <span>Sign in with Google</span>
                 </button>
-                <div class="flex items-center my-3">
+
+                <div class="flex items-center my-4">
                     <div class="flex-1 border-t"></div>
-                    <span class="px-2 text-[10px] text-gray-400 font-bold uppercase">ឬ បញ្ចូលព័ត៌មានដោយផ្ទាល់</span>
+                    <span class="px-2 text-[10px] text-gray-400 font-bold uppercase">ឬ ចូលតាម Email</span>
                     <div class="flex-1 border-t"></div>
                 </div>
-            </div>
 
-            <!-- ព័ត៌មាន Profile ហាង -->
-            <form id="owner-setup-form" class="space-y-3">
-                <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1">Email ម្ចាស់ហាង <span
-                            class="text-red-500">*</span></label>
-                    <input type="email" id="setup-email" required placeholder="owner@gmail.com"
+                <form id="email-login-form" class="space-y-3">
+                    <input type="email" id="login-email-input" required placeholder="name@gmail.com"
                         class="w-full border rounded-xl p-2.5 text-xs bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1">ឈ្មោះហាងរបស់អ្នក <span
-                            class="text-red-500">*</span></label>
-                    <input type="text" id="setup-store-name" required
-                        placeholder="ឧ. បូរិន ម៉ូដទាន់សម័យ (Boren Fashion)"
-                        class="w-full border rounded-xl p-2.5 text-xs bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1">ជ្រើសរើស Logo ហាង</label>
-                    <input type="file" id="setup-logo-file" accept="image/*" onchange="previewSetupLogo(event)"
-                        class="w-full text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer border rounded-xl p-1 bg-white">
-                    <div id="setup-logo-preview-box" class="hidden mt-2 flex items-center gap-2">
-                        <img id="setup-logo-preview" src="" class="w-10 h-10 object-cover rounded-lg border">
-                        <span class="text-[11px] text-green-600 font-bold">✓ បានជ្រើសរើស Logo</span>
-                    </div>
-                </div>
-
-                <!-- កំណត់ PIN -->
-                <div class="grid grid-cols-2 gap-2 pt-1 border-t">
-                    <div>
-                        <label class="block text-xs font-bold text-indigo-700 mb-1">កំណត់ PIN <span
-                                class="text-red-500">*</span></label>
-                        <input type="password" id="setup-pin" required maxlength="8" placeholder="ឧ. 1234"
-                            class="w-full border border-indigo-200 bg-indigo-50/40 rounded-xl p-2.5 text-xs font-bold focus:ring-2 focus:ring-indigo-500 outline-none text-center">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-indigo-700 mb-1">បញ្ជាក់ PIN <span
-                                class="text-red-500">*</span></label>
-                        <input type="password" id="setup-pin-confirm" required maxlength="8" placeholder="ឧ. 1234"
-                            class="w-full border border-indigo-200 bg-indigo-50/40 rounded-xl p-2.5 text-xs font-bold focus:ring-2 focus:ring-indigo-500 outline-none text-center">
-                    </div>
-                </div>
-
-                <button type="submit" id="btn-save-setup"
-                    class="w-full mt-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl text-xs transition shadow-md">
-                    រក្សាទុក & បើកដំណើរការហាង &rarr;
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal សួរលេខ PIN ពេលចូលលើកក្រោយៗ -->
-    <div id="pin-prompt-modal"
-        class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border text-center">
-            <div
-                class="w-14 h-14 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-2xl font-bold">
-                🔐
-            </div>
-            <h3 class="font-bold text-base text-gray-900 mb-1">ផ្ទៀងផ្ទាត់ម្ចាស់ហាង</h3>
-            <p class="text-xs text-gray-500 mb-4">សូមបញ្ចូលលេខកូដសម្ងាត់ PIN របស់អ្នកដើម្បីបើក Dashboard</p>
-
-            <form id="pin-verify-form" class="space-y-3">
-                <input type="password" id="verify-pin-input" required maxlength="8" placeholder="បញ្ចូល PIN..."
-                    class="w-full border-2 border-purple-200 rounded-xl p-3 text-center text-lg font-bold outline-none focus:border-purple-600 bg-purple-50/30">
-                <div class="flex gap-2 pt-2">
-                    <button type="button" onclick="closePinModal()"
-                        class="w-1/2 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl text-xs transition">បោះបង់</button>
                     <button type="submit"
-                        class="w-1/2 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-xs transition shadow">ផ្ទៀងផ្ទាត់</button>
+                        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs transition">
+                        បន្តទៅជំហានបន្ទាប់ &rarr;
+                    </button>
+                </form>
+            </div>
+
+            <!-- ដំណាក់កាលទី ២៖ បញ្ចូលឈ្មោះហាង & Upload Logo ហាង -->
+            <div id="step-setup-store" class="hidden">
+                <div class="bg-indigo-50/60 p-2.5 rounded-xl border border-indigo-100 text-[11px] text-indigo-700 mb-3">
+                    គណនីម្ចាស់ហាង៖ <b id="display-auth-email" class="font-mono"></b>
                 </div>
-            </form>
+
+                <form id="store-profile-form" class="space-y-3.5">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">ឈ្មោះហាងរបស់អ្នក <span
+                                class="text-red-500">*</span></label>
+                        <input type="text" id="setup-store-name" required
+                            placeholder="ឧ. បូរិន ម៉ូដទាន់សម័យ (Boren Store)"
+                            class="w-full border rounded-xl p-2.5 text-xs bg-white focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">រូបភាព Logo ហាង <span
+                                class="text-red-500">*</span></label>
+                        <input type="file" id="setup-store-logo" accept="image/*" required
+                            onchange="previewSetupLogo(event)"
+                            class="w-full text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer border rounded-xl p-1 bg-white">
+
+                        <div id="setup-logo-preview-box"
+                            class="hidden mt-2.5 flex items-center gap-3 p-2 bg-gray-50 rounded-xl border">
+                            <img id="setup-logo-preview" src=""
+                                class="w-12 h-12 object-cover rounded-lg border bg-white">
+                            <span class="text-xs text-green-600 font-bold">✓ បានជ្រើសរើស Logo រួចរាល់</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="btn-finish-setup"
+                        class="w-full mt-2 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1.5">
+                        <span>🚀</span>
+                        <span>បញ្ចប់ការរៀបចំ & បើក Dashboard</span>
+                    </button>
+                </form>
+            </div>
+
         </div>
     </div>
 
     <script>
         const CART_KEY = 'km_market_cart';
-        const OWNER_STORED_PIN_KEY = 'km_owner_custom_pin';
-        const ADMIN_UNLOCKED_KEY = 'km_owner_is_admin';
+        const SELLER_AUTH_KEY = 'km_seller_authenticated_email';
 
+        let currentAuthEmail = '';
+        let base64StoreLogo = '';
         let productList = [];
         let selectedSize = '';
         let currentProduct = null;
-        let setupLogoBase64 = '';
 
-        // ផ្ទុកព័ត៌មានហាង (ឈ្មោះ & Logo)
-        async function fetchStoreInfo() {
+        // ពិនិត្យស្ថានភាពហាងពី Server
+        async function loadStoreProfile() {
             try {
-                const res = await fetch('/api/store/info');
+                const res = await fetch('/api/store/profile');
                 const store = await res.json();
 
                 if (store.name) {
-                    document.getElementById('store-name-display').innerText = store.name;
+                    document.getElementById('header-store-name').innerText = store.name;
                     document.title = store.name;
                 }
 
                 if (store.logo && store.logo.length > 10) {
-                    document.getElementById('store-logo-img').src = store.logo;
-                    document.getElementById('store-logo-img').classList.remove('hidden');
-                    document.getElementById('store-logo-emoji').classList.add('hidden');
+                    document.getElementById('header-logo-img').src = store.logo;
+                    document.getElementById('header-logo-img').classList.remove('hidden');
+                    document.getElementById('header-logo-emoji').classList.add('hidden');
+                }
+
+                // បើម្ចាស់ហាងធ្លាប់ Login ក្នុង Browser នេះរួចហើយ
+                const savedEmail = localStorage.getItem(SELLER_AUTH_KEY);
+                if (savedEmail && store.isRegistered) {
+                    document.getElementById('btn-seller-login').classList.add('hidden');
+                    document.getElementById('btn-seller-dashboard').classList.remove('hidden');
+                    document.getElementById('btn-seller-dashboard').classList.add('flex');
+                } else {
+                    document.getElementById('btn-seller-login').classList.remove('hidden');
+                    document.getElementById('btn-seller-dashboard').classList.add('hidden');
+                    document.getElementById('btn-seller-dashboard').classList.remove('flex');
                 }
             } catch (e) { }
         }
 
-        function checkOwnerStatus() {
-            const isAdmin = localStorage.getItem(ADMIN_UNLOCKED_KEY);
-            const btn = document.getElementById('btn-admin-dashboard');
-            if (isAdmin === 'true') {
-                btn.classList.remove('hidden');
-                btn.classList.add('flex');
-            } else {
-                btn.classList.add('hidden');
-                btn.classList.remove('flex');
-            }
+        function openAuthModal() {
+            document.getElementById('seller-auth-modal').classList.remove('hidden');
+            document.getElementById('step-signin').classList.remove('hidden');
+            document.getElementById('step-setup-store').classList.add('hidden');
+            document.getElementById('modal-step-title').innerText = 'ចូលគណនីម្ចាស់ហាង';
         }
 
-        // ចុច ២ ដងលើ Logo
-        let clickCount = 0;
-        let clickTimer = null;
-        function handleSecretClick() {
-            clickCount++;
-            if (clickCount === 1) {
-                clickTimer = setTimeout(() => { clickCount = 0; }, 400);
-            } else if (clickCount === 2) {
-                clearTimeout(clickTimer);
-                clickCount = 0;
-
-                const savedPin = localStorage.getItem(OWNER_STORED_PIN_KEY);
-                const isUnlocked = localStorage.getItem(ADMIN_UNLOCKED_KEY) === 'true';
-
-                if (isUnlocked) {
-                    if (confirm('🔒 តើអ្នកចង់លាក់ប៊ូតុង Dashboard នេះវិញមែនទេ?')) {
-                        localStorage.removeItem(ADMIN_UNLOCKED_KEY);
-                        checkOwnerStatus();
-                    }
-                    return;
-                }
-
-                // លើកដំបូង: មិនទាន់មាន PIN -> បើក Modal Setup ឈ្មោះហាង Logo និង PIN
-                if (!savedPin) {
-                    document.getElementById('setup-owner-modal').classList.remove('hidden');
-                } else {
-                    // លើកក្រោយ: បើក Modal សួរ PIN
-                    document.getElementById('pin-prompt-modal').classList.remove('hidden');
-                    document.getElementById('verify-pin-input').value = '';
-                }
-            }
+        function closeAuthModal() {
+            document.getElementById('seller-auth-modal').classList.add('hidden');
         }
 
-        // Mock Google Sign In (យកឈ្មោះ & Email ស្វ័យប្រវត្តិ)
-        function mockGoogleSignIn() {
+        // Sign In with Google (Mock Auth ងាយស្រួល និងរហ័ស)
+        function handleGoogleSignIn() {
             const mockName = prompt('សូមបញ្ចូលឈ្មោះគណនី Google របស់អ្នក (ឧ. Chan Boren):', 'Chan Boren');
             if (!mockName) return;
-            const email = (mockName.toLowerCase().replace(/\s+/g, '') || 'owner') + '@gmail.com';
 
-            document.getElementById('setup-email').value = email;
-            document.getElementById('setup-store-name').value = 'ហាង ' + mockName;
-            alert(`✓ ចូលដោយជោគជ័យជាមួយគណនី Google:\n${email}\nសូមកំណត់ Logo និងលេខកូដសម្ងាត់ PIN បន្ត!`);
+            currentAuthEmail = (mockName.toLowerCase().replace(/\s+/g, '') || 'seller') + '@gmail.com';
+            goToStepSetup(currentAuthEmail, 'ហាង ' + mockName);
+        }
+
+        document.getElementById('email-login-form').onsubmit = (e) => {
+            e.preventDefault();
+            currentAuthEmail = document.getElementById('login-email-input').value.trim();
+            goToStepSetup(currentAuthEmail, '');
+        };
+
+        function goToStepSetup(email, defaultStoreName) {
+            document.getElementById('step-signin').classList.add('hidden');
+            document.getElementById('step-setup-store').classList.remove('hidden');
+            document.getElementById('modal-step-title').innerText = 'រៀបចំឈ្មោះហាង & Logo';
+            document.getElementById('display-auth-email').innerText = email;
+            if (defaultStoreName) {
+                document.getElementById('setup-store-name').value = defaultStoreName;
+            }
         }
 
         function previewSetupLogo(event) {
@@ -369,85 +347,54 @@
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function (e) {
-                    setupLogoBase64 = e.target.result;
-                    document.getElementById('setup-logo-preview').src = setupLogoBase64;
+                    base64StoreLogo = e.target.result;
+                    document.getElementById('setup-logo-preview').src = base64StoreLogo;
                     document.getElementById('setup-logo-preview-box').classList.remove('hidden');
                 };
                 reader.readAsDataURL(file);
             }
         }
 
-        // រក្សាទុកព័ត៌មាន Setup លើកដំបូង
-        document.getElementById('owner-setup-form').onsubmit = async (e) => {
+        // បញ្ចប់ការ Setup ឈ្មោះហាង និង Logo -> រួចបើក Dashboard
+        document.getElementById('store-profile-form').onsubmit = async (e) => {
             e.preventDefault();
-            const email = document.getElementById('setup-email').value.trim();
             const storeName = document.getElementById('setup-store-name').value.trim();
-            const pin = document.getElementById('setup-pin').value.trim();
-            const pinConfirm = document.getElementById('setup-pin-confirm').value.trim();
 
-            if (pin !== pinConfirm) {
-                return alert('❌ លេខកូដ PIN ទាំងពីរដងមិនដូចគ្នាទេ!');
+            if (!base64StoreLogo) {
+                return alert('សូមជ្រើសរើសរូបភាព Logo ហាងជាមុនសិន!');
             }
 
-            const btn = document.getElementById('btn-save-setup');
+            const btn = document.getElementById('btn-finish-setup');
             btn.disabled = true;
-            btn.innerText = 'កំពុងរៀបចំ...';
+            btn.innerText = 'កំពុងបង្កើតហាង...';
 
             try {
-                const res = await fetch('/api/store/setup', {
+                const res = await fetch('/api/store/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        email: email,
+                        email: currentAuthEmail,
                         name: storeName,
-                        logoBase64: setupLogoBase64
+                        logoBase64: base64StoreLogo
                     })
                 });
 
                 if (res.ok) {
-                    localStorage.setItem(OWNER_STORED_PIN_KEY, pin);
-                    localStorage.setItem(ADMIN_UNLOCKED_KEY, 'true');
-
-                    alert('✓ អបអរសាទរ! ហាងត្រូវបានរៀបចំជោគជ័យ។ ប៊ូតុង Dashboard ត្រូវបានបើកដំណើរការ!');
-                    closeSetupModal();
-                    checkOwnerStatus();
-                    fetchStoreInfo();
+                    localStorage.setItem(SELLER_AUTH_KEY, currentAuthEmail);
+                    alert('✓ អបអរសាទរ! ហាងត្រូវបានបង្កើតជោគជ័យ។ ប្រព័ន្ធនឹងនាំអ្នកទៅកាន់ Dashboard ឥឡូវនេះ!');
+                    window.location.href = '/dashboard';
                 } else {
-                    alert('កំហុសក្នុងការរៀបចំ');
+                    alert('កំហុសក្នុងការចុះឈ្មោះ');
                 }
             } catch (err) {
                 alert('បរាជ័យក្នុងការតភ្ជាប់ Server');
             } finally {
                 btn.disabled = false;
-                btn.innerText = 'រក្សាទុក & បើកដំណើរការហាង →';
+                btn.innerText = '🚀 បញ្ចប់ការរៀបចំ & បើក Dashboard';
             }
         };
 
-        // ផ្ទៀងផ្ទាត់ PIN ពេលចូលលើកក្រោយៗ
-        document.getElementById('pin-verify-form').onsubmit = (e) => {
-            e.preventDefault();
-            const inputPin = document.getElementById('verify-pin-input').value.trim();
-            const savedPin = localStorage.getItem(OWNER_STORED_PIN_KEY);
-
-            if (inputPin === savedPin) {
-                localStorage.setItem(ADMIN_UNLOCKED_KEY, 'true');
-                checkOwnerStatus();
-                closePinModal();
-                alert('✓ ផ្ទៀងផ្ទាត់ត្រឹមត្រូវ! ប៊ូតុង Dashboard ត្រូវបានបើក។');
-            } else {
-                alert('❌ លេខកូដ PIN មិនត្រឹមត្រូវទេ!');
-            }
-        };
-
-        function closeSetupModal() {
-            document.getElementById('setup-owner-modal').classList.add('hidden');
-        }
-
-        function closePinModal() {
-            document.getElementById('pin-prompt-modal').classList.add('hidden');
-        }
-
-        // Cart & Products Handling
+        // Cart & Products
         function getCart() {
             try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch (e) { return []; }
         }
@@ -604,8 +551,7 @@
         }
 
         // Init
-        fetchStoreInfo();
-        checkOwnerStatus();
+        loadStoreProfile();
         updateCartCount();
         loadProducts();
     </script>
